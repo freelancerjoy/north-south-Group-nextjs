@@ -1,0 +1,349 @@
+@import url('https://fonts.googleapis.com/css2?family=Montserrat:ital,wght@0,100..900;1,100..900&family=Nata+Sans:wght@100..900&family=Open+Sans:ital,wght@0,300..800;1,300..800&family=Playwrite+US+Trad+Guides&family=Source+Code+Pro:ital,wght@0,200..900;1,200..900&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Montserrat:ital,wght@0,100..900;1,100..900&family=Playwrite+US+Trad+Guides&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Cinzel:wght@400;500;600;700&family=Cormorant+Garamond:wght@400;500;600;700&family=Manrope:wght@400;500;600;700&display=swap');
+
+
+@import "tailwindcss";
+@plugin "flowbite-react/plugin/tailwindcss";
+@source "../.flowbite-react/class-list.json";
+
+
+
+
+
+
+body{
+   font-family: "Montserrat", sans-serif;
+  font-optical-sizing: auto;
+  font-style: normal;
+  line-height: 30px;
+  letter-spacing: 1px;
+}
+
+#partner{
+  font-family: "Playwrite US Trad Guides", cursive;
+  font-weight: 400;
+  font-style: normal;
+}
+
+
+html {
+  scroll-behavior: smooth;
+}
+
+
+.slide-title {
+  position: relative;
+  display: inline-block;
+  overflow: hidden;
+}
+
+.slide-title::after {
+  content: "";
+  position: absolute;
+  left: 0;
+  top: 0;
+  width: 100%;
+  height: 100%;
+  background: #0f7771;
+  transform: translateX(-100%);
+  z-index: 1;
+}
+
+.slide-title.reveal::after {
+  animation: slideReveal 1.2s ease forwards;
+}
+
+@keyframes slideReveal {
+  0% { transform: translateX(-100%); }
+  100% { transform: translateX(100%); }
+}
+
+
+/* **************************************************** */
+.fade-scroll {
+  animation: fadeScroll 8s linear infinite;
+}
+
+@keyframes fadeScroll {
+  0% { opacity: 0; transform: translateY(30px); }
+  20% { opacity: 1; transform: translateY(0); }
+  80% { opacity: 1; transform: translateY(-30px); }
+  100% { opacity: 0; transform: translateY(-60px); }
+}
+
+
+
+
+/* **************************************************** */
+
+
+.contact{
+ background-image: url(./assets/images/need.png);
+  background-size:cover;
+    background-position: top;
+    background-attachment: fixed;
+    padding: 20px 0px 100px; 
+}
+/*******banner button*******************/
+.slow-bounce {
+  animation: slowBounce 3s ease-in-out infinite;
+}
+
+@keyframes slowBounce {
+  0%, 100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-12px);
+  }
+}
+/*******banner button*******************/
+
+@keyframes fadeIn {
+  0% {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+.animate-fadeIn {
+  animation: fadeIn 1s ease forwards;
+}
+
+@keyframes slideUp {
+  0% {
+    opacity: 0;
+    transform: translateY(50px);
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+.animate-slideUp {
+  animation: slideUp 0.8s ease forwards;
+}
+.delay-150 {
+  animation-delay: 0.15s;
+}
+.delay-300 {
+  animation-delay: 0.3s;
+}
+.delay-450 {
+  animation-delay: 0.45s;
+}
+@keyframes fadeInDown {
+  0% {
+    opacity: 0;
+    transform: translateY(-20px);
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+.animate-fadeInDown {
+  animation: fadeInDown 1s ease forwards;
+}
+
+@keyframes bounceAnimation {
+  0%,
+  100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-10px);
+  }
+}
+
+.animate-bounceAnimation {
+  animation: bounceAnimation 2s infinite;
+}
+
+@keyframes fadeInDown {
+  0% {
+    opacity: 0;
+    transform: translateY(-20px);
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.animate-fadeInDown {
+  animation: fadeInDown 1s ease forwards;
+}
+
+@keyframes fadeInDown {
+  0% {
+    opacity: 0;
+    transform: translateY(-20px);
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+.animate-fadeInDown {
+  animation: fadeInDown 1s ease forwards;
+}
+
+@keyframes slideIn {
+  0% {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+.animate-slideIn {
+  animation: slideIn 0.6s ease forwards;
+}
+
+.swiper-button-prev,
+.swiper-button-next {
+  position: static !important;
+  inset: auto !important;
+  margin: 0 !important;
+}
+
+
+/* hover slide */
+
+/* Generic slide effect for hover */
+.slide-hover {
+  position: relative;
+  display: inline-block;
+  overflow: hidden;
+  cursor: pointer;
+  
+}
+
+.slide-hover::after {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: #0f7771; /* overlay color */
+  transform: translateX(-100%);
+  transition: transform 0.5s ease;
+  z-index: 1; /* below text */
+}
+
+.slide-hover span {
+  position: relative;
+  z-index: 2;
+  transition: color 0.5s ease;
+}
+
+/* Hover triggers the slide */
+.slide-hover:hover::after {
+  transform: translateX(0);
+}
+
+.slide-hover:hover span {
+  color: white!important; /* text becomes white on hover */
+}
+
+
+/* partner  */
+@keyframes marquee {
+        0% { transform: translateX(0); }
+        100% { transform: translateX(-50%); }
+      }
+      .animate-marquee {
+        display: flex;
+        width: max-content;
+        animation: marquee 20s linear infinite;
+      }
+
+      /* partner  */
+
+/* news ticker */
+@keyframes ticker {
+  0%   { transform: translateX(0); }
+  100% { transform: translateX(-50%); }
+}
+/* news ticker */
+
+
+
+/* 
+      project view */
+
+      .wave-circle {
+  position: relative;
+}
+
+.wave-circle::before,
+.wave-circle::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: 50%;
+  border: 3px solid #0a2a66; /* blue-900 */
+  animation: ripple 2s infinite ease-out;
+}
+
+.wave-circle::after {
+  animation-delay: 0.6s;
+}
+
+@keyframes ripple {
+  0% {
+    transform: scale(1);
+    opacity: 0.7;
+  }
+  100% {
+    transform: scale(2.5);
+    opacity: 0;
+  }
+}
+
+
+/* Hide scrollbar for Chrome, Safari and Opera */
+.scrollbar-hide::-webkit-scrollbar {
+  display: none;
+}
+
+/* Hide scrollbar for IE, Edge and Firefox */
+.scrollbar-hide {
+  -ms-overflow-style: none; /* IE and Edge */
+  scrollbar-width: none; /* Firefox */
+}
+
+
+
+
+
+.large_circle,
+.small_circle {
+  width: 40px;
+  height: 40px;
+  border-radius: 100%;
+  border: 1px solid #0f7771;
+  transition: all 200ms ease-out;
+  position: fixed;
+  pointer-events: none;
+  left: 0;
+  top: 0;
+  /* transform: translate(calc(-50% + 15px), -50%); */
+  transform: translate(-50%, -50%);
+  z-index: 9;
+}
+.small_circle {
+  width: 20px;
+  height: 20px;
+  border-radius: 100%;
+  background-color: #0f7771;
+}
+

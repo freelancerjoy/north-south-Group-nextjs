@@ -1,0 +1,10 @@
+#contact{
+background-image: linear-gradient(
+    rgba(15, 119, 113, 0.9), 
+    rgba(15, 119, 113, 0.9)
+  ),
+  url('../../assets/images/realEstateImg3.jpg');
+background-size: cover;
+background-position: center;
+
+}

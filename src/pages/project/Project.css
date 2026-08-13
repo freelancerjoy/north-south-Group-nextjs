@@ -1,0 +1,7 @@
+.need_img{
+  background-image: linear-gradient(rgba(4, 8, 17, 0.56), rgba(4, 8, 17, 0.56)), url(../../assets/images/greenCityImg4.jpg);
+  background-size:cover;
+    background-position: top;
+    background-attachment: fixed;
+    padding: 20px 0px 100px;
+}
