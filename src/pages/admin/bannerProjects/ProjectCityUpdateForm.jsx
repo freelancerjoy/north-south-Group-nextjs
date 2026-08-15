@@ -342,16 +342,10 @@ const ProjectCityUpdateForm = ({
         formData.append("brochurePdfAsset", JSON.stringify(brochurePdfAsset));
         formData.append("brochurePdfUrl", brochurePdfAsset.url || "");
         formData.append("brochurePdfPublicId", brochurePdfAsset.public_id || "");
-        formData.append("bookingPdfAsset", JSON.stringify(brochurePdfAsset));
-        formData.append("bookingPdfUrl", brochurePdfAsset.url || "");
-        formData.append("bookingPdfPublicId", brochurePdfAsset.public_id || "");
       }
-      if (!brochurePdf && bookingPdf) {
-        setSubmissionStage(`Uploading ${projectName} brochure`, "The PDF is going directly to Cloudinary so the server limit is avoided.", 1);
+      if (bookingPdf) {
+        setSubmissionStage(`Uploading ${projectName} booking PDF`, "The booking PDF is going directly to Cloudinary so the server limit is avoided.", 1);
         const bookingPdfAsset = await uploadSingleAsset(bookingPdf, pdfFolder);
-        formData.append("brochurePdfAsset", JSON.stringify(bookingPdfAsset));
-        formData.append("brochurePdfUrl", bookingPdfAsset.url || "");
-        formData.append("brochurePdfPublicId", bookingPdfAsset.public_id || "");
         formData.append("bookingPdfAsset", JSON.stringify(bookingPdfAsset));
         formData.append("bookingPdfUrl", bookingPdfAsset.url || "");
         formData.append("bookingPdfPublicId", bookingPdfAsset.public_id || "");
@@ -661,14 +655,18 @@ const ProjectCityUpdateForm = ({
             <TextField label="Booking Title" name="bookingTitle" value={form.bookingTitle} onChange={handleFormChange} />
           </div>
           <TextAreaField label="Booking Subtitle" name="bookingSubtitle" value={form.bookingSubtitle} onChange={handleFormChange} />
-          <div className={`rounded-2xl border ${colors.paleBorder} ${colors.paleBg} p-5`}>
+          <label className={`flex cursor-pointer items-center justify-between gap-4 rounded-2xl border-2 border-dashed ${colors.paleBorder} ${colors.paleBg} p-5 transition-all ${colors.hoverBorder} ${colors.hoverBg}`}>
             <div>
               <p className="text-sm font-bold text-slate-800">Booking Download PDF</p>
               <p className="mt-1 text-xs leading-5 text-slate-500">
-                This section uses the same Brochure PDF uploaded in Project Overview.
+                {bookingPdfLabel || "Upload the booking form PDF shown in the booking download area."}
               </p>
             </div>
-          </div>
+            <div className={`flex h-11 w-11 shrink-0 items-center justify-center rounded-2xl ${colors.cardIconBg}`}>
+              <MdCloudUpload size={22} />
+            </div>
+            <input type="file" accept="application/pdf,.pdf" className="hidden" onChange={handlePdfChange(setBookingPdf, setBookingPdfLabel)} />
+          </label>
         </div>
 
         <div className={sectionCard}>

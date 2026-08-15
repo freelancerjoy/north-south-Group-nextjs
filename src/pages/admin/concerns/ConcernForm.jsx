@@ -168,9 +168,14 @@ function ImageListField({ label, items, onItemsChange }) {
   const [urlInput, setUrlInput] = useState("");
 
   const handleFileAdd = (e) => {
-    const file = e.target.files?.[0];
-    if (!file) return;
-    onItemsChange([...items, { url: "", file, preview: URL.createObjectURL(file) }]);
+    const files = Array.from(e.target.files || []);
+    if (!files.length) return;
+    const nextItems = files.map((file) => ({
+      url: "",
+      file,
+      preview: URL.createObjectURL(file),
+    }));
+    onItemsChange([...items, ...nextItems]);
     e.target.value = "";
   };
 
@@ -211,8 +216,8 @@ function ImageListField({ label, items, onItemsChange }) {
       <div className="space-y-2">
         <label className="flex cursor-pointer items-center gap-3 rounded-xl border border-dashed border-teal-200 bg-teal-50/70 px-4 py-3 transition hover:border-teal-400 hover:bg-teal-50">
           <MdCloudUpload className="shrink-0 text-teal-500" size={20} />
-          <span className="text-sm font-semibold text-slate-600">Click to add image from file</span>
-          <input type="file" accept="image/*" className="hidden" onChange={handleFileAdd} />
+          <span className="text-sm font-semibold text-slate-600">Click to add images from files</span>
+          <input type="file" accept="image/*" multiple className="hidden" onChange={handleFileAdd} />
         </label>
         <div className="flex gap-2">
           <input

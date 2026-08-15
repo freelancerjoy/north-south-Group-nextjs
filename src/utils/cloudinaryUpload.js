@@ -5,6 +5,10 @@ const IMAGE_MAX_WIDTH = 1600;
 const IMAGE_MAX_HEIGHT = 1600;
 const IMAGE_TARGET_BYTES = 500 * 1024;
 const IMAGE_QUALITIES = [0.82, 0.72, 0.62, 0.52];
+const DIRECT_UPLOAD_RETRIES = 2;
+const DIRECT_UPLOAD_CONCURRENCY = 3;
+let activeDirectUploads = 0;
+const directUploadQueue = [];
 
 // Fetch a signed upload config from the backend (one call per batch)
 const getSignature = async (folder) => {
@@ -105,6 +109,60 @@ export const appendOptimizedFiles = async (formData, fieldName, files = []) => {
   }
 };
 
+const sleep = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
+
+const withRetry = async (task, retries = DIRECT_UPLOAD_RETRIES) => {
+  let lastError;
+  for (let attempt = 0; attempt <= retries; attempt += 1) {
+    try {
+      return await task();
+    } catch (error) {
+      lastError = error;
+      if (attempt === retries) break;
+      await sleep(600 * (attempt + 1));
+    }
+  }
+  throw lastError;
+};
+
+const runWithConcurrency = async (items, limit, worker) => {
+  const results = new Array(items.length);
+  let nextIndex = 0;
+
+  const runners = Array.from({ length: Math.min(limit, items.length) }, async () => {
+    while (nextIndex < items.length) {
+      const index = nextIndex;
+      nextIndex += 1;
+      results[index] = await worker(items[index], index);
+    }
+  });
+
+  await Promise.all(runners);
+  return results;
+};
+
+const enqueueDirectUpload = (task) =>
+  new Promise((resolve, reject) => {
+    const run = async () => {
+      activeDirectUploads += 1;
+      try {
+        resolve(await task());
+      } catch (error) {
+        reject(error);
+      } finally {
+        activeDirectUploads -= 1;
+        const next = directUploadQueue.shift();
+        if (next) next();
+      }
+    };
+
+    if (activeDirectUploads < DIRECT_UPLOAD_CONCURRENCY) {
+      run();
+    } else {
+      directUploadQueue.push(run);
+    }
+  });
+
 // Upload a single File object directly to Cloudinary.
 const uploadOneAsset = async (file, sig) => {
   const fileToUpload = await getCompressedImage(file);
@@ -117,9 +175,13 @@ const uploadOneAsset = async (file, sig) => {
   const resourceType = getCloudinaryResourceType(fileToUpload);
 
   try {
-    const res = await axios.post(
-      `https://api.cloudinary.com/v1_1/${sig.cloudName}/${resourceType}/upload`,
-      fd
+    const res = await enqueueDirectUpload(() =>
+      withRetry(() =>
+        axios.post(
+          `https://api.cloudinary.com/v1_1/${sig.cloudName}/${resourceType}/upload`,
+          fd
+        )
+      )
     );
     return {
       public_id: res.data.public_id,
@@ -142,7 +204,7 @@ export const uploadFiles = async (files, folder = "projects") => {
   const arr = Array.from(files || []);
   if (arr.length === 0) return [];
   const sig = await getSignature(folder);
-  return Promise.all(arr.map((f) => uploadOne(f, sig)));
+  return runWithConcurrency(arr, DIRECT_UPLOAD_CONCURRENCY, (f) => uploadOne(f, sig));
 };
 
 // Upload a single file — returns URL string or null
