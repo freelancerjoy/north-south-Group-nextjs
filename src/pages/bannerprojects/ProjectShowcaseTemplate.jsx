@@ -543,7 +543,7 @@ function ProjectShowcaseTemplate({
             <div className={lightGlossOverlayClass} />
           </>
         )}
-        <div className="relative mx-auto max-w-7xl px-4 py-20 sm:px-6 lg:px-8 lg:py-24">
+        <div className="relative mx-auto max-w-7xl px-4 pb-20 pt-32 sm:px-6 sm:pt-36 lg:px-8 lg:pb-24 lg:pt-40">
           <div className="mx-auto max-w-4xl text-center">
             <SectionEyebrow centered tone={eyebrowTone}>
               {config.heroEyebrow}

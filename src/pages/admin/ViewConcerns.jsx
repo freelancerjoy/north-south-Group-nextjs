@@ -29,6 +29,17 @@ const ViewConcerns = () => {
     }
   };
 
+  const rows = Array.isArray(concerns) ? concerns.map((c, i) => ({
+    id: c._id,
+    no: i + 1,
+    title: c.title,
+    subtitle: c.subtitle,
+    eyebrow: c.eyebrow,
+    theme: c.theme,
+    sortOrder: c.sortOrder,
+    heroImage: c.heroImage, // Used for preview in the table
+  })) : [];
+
   const columns = [
     { field: "no", headerName: "#", width: 60 },
     {
@@ -72,16 +83,6 @@ const ViewConcerns = () => {
       ),
     },
   ];
-
-  const rows = Array.isArray(concerns) ? concerns.map((c, i) => ({
-    id: c._id,
-    no: i + 1,
-    title: c.title,
-    subtitle: c.subtitle,
-    eyebrow: c.eyebrow,
-    theme: c.theme,
-    heroImage: c.heroImage, // Used for preview in the table
-  })) : [];
 
   return (
     <AdminCollectionPage

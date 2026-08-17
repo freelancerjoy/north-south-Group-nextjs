@@ -40,18 +40,16 @@ export default function Banner({ slides, buttons }) {
       <div
         className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2
           h-32 w-32 sm:h-44 sm:w-44 md:h-64 md:w-64 lg:h-80 lg:w-80
-          p-2 sm:p-4 z-50 bg-white/70 border-4 border-dotted
+          p-4 sm:p-6 md:p-8 lg:p-10 z-50 bg-white/70 border-4 border-dotted
           border-gray-500 rounded-full"
       >
-        <OptimizedImage
+        <img
           src={heroLogo}
           alt="Centered"
           className="
             h-full w-full
-            object-contain rounded-[15px] p-2
+            object-contain
           "
-          objectFit="contain"
-          priority
         />
       </div>
 

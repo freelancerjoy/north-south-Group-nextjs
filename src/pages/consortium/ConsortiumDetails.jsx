@@ -1,5 +1,6 @@
 import { useLocation, useParams } from "react-router-dom";
 import { useState, useEffect } from "react";
+import AOS from "aos";
 import { API_BASE_URL } from "../../config/env";
 
 import Projects from "../project/Projects";
@@ -72,10 +73,12 @@ export default function ProjectDetails() {
         setProjectLoading(true);
         setProjectError("");
 
-        if (projectId?.match(/^[0-9a-fA-F]{24}$/)) {
+        try {
           const res = await getProjectById(projectId);
           if (!ignore) setProject(res?.data || null);
           return;
+        } catch (error) {
+          if (projectId?.match(/^[0-9a-fA-F]{24}$/)) throw error;
         }
 
         const res = await getAllProjects();
@@ -177,16 +180,15 @@ export default function ProjectDetails() {
     setProjectGalleryIndex(newIndex);
     setSelectedProjectGallery(projectGalleryPhotos[newIndex]);
   };
-  const handleProjectGallerySlidePrev = () => {
-    setProjectGalleryIndex((prev) => (prev - 1 + projectGalleryPhotos.length) % projectGalleryPhotos.length);
-  };
-  const handleProjectGallerySlideNext = () => {
-    setProjectGalleryIndex((prev) => (prev + 1) % projectGalleryPhotos.length);
-  };
-
   useEffect(() => {
     setCurrent(0);
   }, [project?._id]);
+
+  useEffect(() => {
+    if (projectLoading || !project) return;
+    AOS.init({ duration: 800, once: false });
+    requestAnimationFrame(() => AOS.refreshHard());
+  }, [project, projectLoading]);
 
   if (projectLoading) {
     return (

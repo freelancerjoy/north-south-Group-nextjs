@@ -2,10 +2,11 @@ import { useState, useEffect, useCallback, useMemo, useRef } from "react";
 import realEstateImg1 from "../../assets/images/realEstateImg1.jpg";
 import realEstateImg2 from "../../assets/images/realEstateImg2.jpg";
 import realEstateImg3 from "../../assets/images/realEstateImg3.jpg";
-import heroLogo from "../../assets/images/logo.png";
 import { IoIosArrowBack, IoIosArrowForward } from "react-icons/io";
 import { IoIosArrowDown } from "react-icons/io";
 import Projects from "../project/Projects";
+
+const heroLogo = "/images/heroLogo.gif";
 
 export default function RealEstate() {
   const slides = useMemo(
@@ -56,7 +57,7 @@ export default function RealEstate() {
           <div
             className="
   absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2
-  p-2 sm:p-4
+  p-4 sm:p-6 md:p-8 lg:p-10
   z-50
   bg-white/70
   border-4 border-dotted border-gray-500
@@ -72,9 +73,6 @@ export default function RealEstate() {
       md:w-40 md:h-40
       lg:w-60 lg:h-60
       object-contain
-      rounded-[10px]
-      lg:rounded-[50px]
-      p-1 sm:p-2
     "
             />
           </div>

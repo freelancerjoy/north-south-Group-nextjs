@@ -86,6 +86,12 @@ const navSections = [
         match: ["viewConcerns", "createConcern", "updateConcern", "concernDetails"],
       },
       {
+        label: "Menu",
+        to: "menuSettings",
+        icon: <MdMenu size={20} />,
+        match: ["menuSettings"],
+      },
+      {
         label: "About Page",
         to: "aboutPageSettings",
         icon: <MdBusiness size={20} />,
@@ -260,6 +266,10 @@ export default function AdminDashboard() {
     viewPlotBooking: {
       title: "Plot Bookings",
       description: "Track submitted booking requests, buyer information, and reserved plot details.",
+    },
+    menuSettings: {
+      title: "Menu Settings",
+      description: "Arrange the Our Concern menu links and control which items appear on the public site.",
     },
     adminProfile: {
       title: "Admin Profile",

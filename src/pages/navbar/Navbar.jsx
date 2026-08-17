@@ -9,7 +9,7 @@ import { toast } from "react-toastify";
 import { IoIosLogOut } from "react-icons/io";
 import { IoCloseOutline } from "react-icons/io5";
 import { MdKeyboardArrowDown } from "react-icons/md";
-import { useConcernStore } from "../../store/concern/concernStore";
+import { useMenuStore } from "../../store/menu/menuStore";
 
 const headerLinks = [
   { label: "Home", to: "/" },
@@ -47,35 +47,36 @@ const isHiddenConcernItem = (item) =>
   hiddenConcernKeys.has(item.label?.trim().toLowerCase()) ||
   hiddenConcernKeys.has(item.to?.trim().toLowerCase());
 
-const buildConcernItems = (savedConcerns = []) => {
-  const items = fallbackConcernItems.filter((item) => !isHiddenConcernItem(item));
-  const seen = new Set(
-    items.flatMap((item) => [
-      item.label?.trim().toLowerCase(),
-      item.to?.trim().toLowerCase(),
-      item.href?.trim().toLowerCase(),
-    ])
-  );
+const buildConcernItems = (menuItems = []) => {
+  const items = [];
+  const seen = new Set();
+  const addItem = (item) => {
+    if (isHiddenConcernItem(item)) return;
+    const labelKey = item.label?.trim().toLowerCase();
+    const routeKey = item.to?.trim().toLowerCase();
+    const hrefKey = item.href?.trim().toLowerCase();
+    if (!labelKey || (!routeKey && !hrefKey) || seen.has(labelKey) || seen.has(routeKey) || seen.has(hrefKey)) return;
+    seen.add(labelKey);
+    if (routeKey) seen.add(routeKey);
+    if (hrefKey) seen.add(hrefKey);
+    items.push(item);
+  };
 
-  if (!Array.isArray(savedConcerns)) {
-    return items;
+  if (Array.isArray(menuItems) && menuItems.length) {
+    menuItems
+      .filter((item) => item?.isVisible !== false)
+      .map((item) => ({
+        label: item.label,
+        to: item.to,
+        href: item.href,
+        external: item.external,
+      }))
+      .forEach(addItem);
   }
 
-  savedConcerns
-    .filter((concern) => concern?.isPublished !== false)
-    .map((concern) => ({
-      label: concern.title,
-      to: concern.slug ? `/concern/${concern.slug}` : concern.routePath,
-    }))
-    .forEach((item) => {
-      if (isHiddenConcernItem(item)) return;
-      const labelKey = item.label?.trim().toLowerCase();
-      const routeKey = item.to?.trim().toLowerCase();
-      if (!labelKey || !routeKey || seen.has(labelKey) || seen.has(routeKey)) return;
-      seen.add(labelKey);
-      seen.add(routeKey);
-      items.push(item);
-    });
+  if (!Array.isArray(menuItems) || !menuItems.length) {
+    fallbackConcernItems.forEach(addItem);
+  }
 
   return items;
 };
@@ -85,7 +86,7 @@ function Navbar() {
   const [openSub, setOpenSub] = useState(false);
   const [scrolled, setScrolled] = useState(false);
   const { user, logoutUser, isLoggedIn } = useAuthStore();
-  const { concerns, loadConcerns } = useConcernStore();
+  const { concernMenuItems, loadConcernMenuItems } = useMenuStore();
   const profilePicUrl = user?.profilePic?.url;
 
   const toggleMenu = useCallback(() => setOpen((prev) => !prev), []);
@@ -98,8 +99,8 @@ function Navbar() {
   }, []);
 
   useEffect(() => {
-    if (!concerns?.length) loadConcerns();
-  }, [concerns?.length, loadConcerns]);
+    if (!concernMenuItems?.length) loadConcernMenuItems();
+  }, [concernMenuItems?.length, loadConcernMenuItems]);
 
   const logOut = async () => {
     try {
@@ -110,7 +111,7 @@ function Navbar() {
     }
   };
 
-  const concernItems = buildConcernItems(concerns);
+  const concernItems = buildConcernItems(concernMenuItems);
 
   const navLinks = [
     { label: "Real Estate", to: "/realEstate" },

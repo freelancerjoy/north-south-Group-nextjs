@@ -32,6 +32,7 @@ const AdminDashboard = lazy(() => import("./pages/admin/AdminDashboard"));
 const ViewDashboard = lazy(() => import("./pages/admin/ViewDashboard"));
 const AdminProfile = lazy(() => import("./pages/admin/AdminProfile.jsx"));
 const ViewConcerns = lazy(() => import("./pages/admin/ViewConcerns.jsx"));
+const MenuSettings = lazy(() => import("./pages/admin/MenuSettings.jsx"));
 const ConcernForm = lazy(() => import("./pages/admin/concerns/ConcernForm.jsx"));
 const ConcernDetails = lazy(() => import("./pages/admin/concerns/ConcernDetails.jsx"));
 const CreateProject = lazy(() => import("./pages/admin/projects/createProject"));
@@ -294,6 +295,7 @@ function App({ scaling }) {
                   element={<ViewPlotBooking />}
                 />
                 <Route path="viewConcerns" element={<ViewConcerns />} />
+                <Route path="menuSettings" element={<MenuSettings />} />
                 <Route path="createConcern" element={<ConcernForm />} />
                 <Route path="updateConcern/:id" element={<ConcernForm />} />
                 <Route path="concernDetails/:id" element={<ConcernDetails />} />
