@@ -21,7 +21,7 @@ const fallbackConcerns = [
   { label: "Northsouth Green City Ltd", to: "/greenCity" },
   { label: "Northsouth Industrial City", to: "/industrialCity" },
   { label: "Northsouth Square City", to: "/squareCity" },
-  { label: "Purbachal Nirapad Valley", to: "/purbachalNirapadValley" },
+  { label: "Nirapad Valley Condominium Project", to: "/purbachalNirapadValley" },
   { label: "Northsouth Duplex Home", to: "/conceptDetails" },
   { label: "Northsouth Farms Ltd", to: "/northsouthFarmsLtd" },
   { label: "Northsouth Garments", to: "/northsouthGarments" },
@@ -46,8 +46,17 @@ const isHiddenConcernItem = (item) =>
   hiddenConcernKeys.has(item.label?.trim().toLowerCase()) ||
   hiddenConcernKeys.has(item.to?.trim().toLowerCase());
 
+const normalizeConcernLabel = (label = "") => {
+  const key = label.trim().toLowerCase();
+  if (key === "purbachal nirapad valley") return "Nirapad Valley Condominium Project";
+  if (key === "dailyadin" || key === "daily adin") return "Daily Adin Press Media L.T.D";
+  return label;
+};
+
 const buildConcernItems = (savedConcerns = []) => {
-  const items = fallbackConcerns.filter((item) => !isHiddenConcernItem(item));
+  const items = fallbackConcerns
+    .filter((item) => !isHiddenConcernItem(item))
+    .map((item) => ({ ...item, label: normalizeConcernLabel(item.label) }));
   const seen = new Set(
     items.flatMap((item) => [
       item.label?.trim().toLowerCase(),
@@ -62,7 +71,7 @@ const buildConcernItems = (savedConcerns = []) => {
   savedConcerns
     .filter((concern) => concern?.isPublished !== false)
     .map((concern) => ({
-      label: concern.title,
+      label: normalizeConcernLabel(concern.title),
       to: concern.routePath || `/concern/${concern.slug}`,
     }))
     .forEach((item) => {

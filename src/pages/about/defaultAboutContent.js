@@ -33,7 +33,7 @@ export const defaultAboutContent = {
   overviewHighlightEyebrow: "North South Group",
   overviewHighlightTitle: "Planned projects shaped around trust and long-term value",
   overviewParagraphs: [
-    "North South Group proudly operates through seven sister concerns and has established notable ventures including Purbachal North South Green City, North South Industrial City, Purbachal Nirapad Valley, and North South Duplex Home.",
+    "North South Group proudly operates through seven sister concerns and has established notable ventures including Purbachal North South Green City, North South Industrial City, Nirapad Valley Condominium Project, and North South Duplex Home.",
     "Beyond real estate, our group also operates North South Auto Rice Mill in Bogura and North South Agro Farm in Bhulta-Gausia, Rupganj, Narayanganj, supporting a broader vision of economic contribution and community progress.",
   ],
   stats: [
@@ -63,13 +63,6 @@ export const defaultAboutContent = {
       title: "Client Commitment",
       text: "We focus on trust, transparent communication, and real estate solutions that fit buyer needs.",
     },
-  ],
-  guidanceEyebrow: "What Guides Us",
-  guidanceTitle: "Real estate with structure, care, and a practical vision",
-  guidancePoints: [
-    "Organized land development",
-    "Client-focused communication",
-    "Long-term community value",
   ],
   videoEyebrow: "Inside North South",
   videoTitle: "See the vision behind the group",

@@ -13,12 +13,12 @@ const defaults = {
   "purbachal-nirapad-valley": {
     theme: "emerald",
     eyebrow: "Secure Residential Destination",
-    title: "Purbachal Nirapad Valley",
+    title: "Nirapad Valley Condominium Project",
     subtitle: "A planned, green, and secure living destination shaped for families, professionals, and long-term investors.",
     heroImage: "https://images.unsplash.com/photo-1600585154340-be6161a56a0c?auto=format&fit=crop&w=1200&q=75",
     aboutImage: "https://images.unsplash.com/photo-1600607687939-ce8a6c25118c?auto=format&fit=crop&w=900&q=75",
     aboutTitle: "Peaceful living with planned urban comfort",
-    aboutParagraphs: ["Purbachal Nirapad Valley is designed around safety, greenery, road access, and an organized residential lifestyle.", "The project keeps connectivity, daily convenience, and investment value in focus."],
+    aboutParagraphs: ["Nirapad Valley Condominium Project is designed around safety, greenery, road access, and an organized residential lifestyle.", "The project keeps connectivity, daily convenience, and investment value in focus."],
     stats: [{ value: "Safe", label: "Community" }, { value: "Green", label: "Lifestyle" }, { value: "Smart", label: "Investment" }],
   },
   "concept-details": {

@@ -13,7 +13,7 @@ const concerns = [
   { name: "Northsouth Square City", logo: squareCityLogo },
   { name: "Northsouth Industrial City", logo: industrialCityLogo },
   { name: "Titanic Bay Hotel & Resort Ltd", logo },
-  { name: "Purbachal Nirapad Valley", logo },
+  { name: "Nirapad Valley Condominium Project", logo },
   { name: "Northsouth Duplex Home", logo },
   { name: "Northsouth Farms Ltd", logo },
   { name: "Northsouth Foundation", logo },

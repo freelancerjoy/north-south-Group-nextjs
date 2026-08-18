@@ -3,7 +3,6 @@ import { useState, useCallback, useEffect } from "react";
 import logo from "../../assets/images/logo.png";
 import { SlCallOut } from "react-icons/sl";
 import { Link } from "react-router-dom";
-import { HashLink } from "react-router-hash-link";
 import { useAuthStore } from "../../store/auth/authStore.jsx";
 import { toast } from "react-toastify";
 import { IoIosLogOut } from "react-icons/io";
@@ -16,16 +15,25 @@ const headerLinks = [
   { label: "About Us", to: "/aboutUs" },
 ];
 
+const projectItems = [
+  { label: "Land Project", href: "#" },
+  { label: "Apartment Project", href: "#" },
+  { label: "Commercial Project", href: "#" },
+  { label: "Duplex Project", href: "#" },
+  { label: "Condominium Project", href: "#" },
+  { label: "Hotel Project", href: "#" },
+];
+
 const fallbackConcernItems = [
   { label: "North South Consortium Ltd", to: "/northSouthConsortiumLtd" },
   { label: "Northsouth Green City Ltd", to: "/greenCity" },
   { label: "Northsouth Industrial City", to: "/industrialCity" },
   { label: "Northsouth Square City", to: "/squareCity" },
-  { label: "Purbachal Nirapad Valley", to: "/purbachalNirapadValley" },
+  { label: "Nirapad Valley Condominium Project", to: "/purbachalNirapadValley" },
   { label: "Northsouth Duplex Home", to: "/conceptDetails" },
   { label: "Northsouth Farms Ltd", to: "/northsouthFarmsLtd" },
   { label: "Northsouth Garments", to: "/northsouthGarments" },
-  { label: "Dailyadin", href: "https://www.dailyadin.com/", external: true },
+  { label: "Daily Adin Press Media L.T.D", href: "https://www.dailyadin.com/", external: true },
   { label: "Titanic Bay Hotel & Resort LTD", href: "https://www.titanicbay.com/", external: true },
 ];
 
@@ -47,19 +55,27 @@ const isHiddenConcernItem = (item) =>
   hiddenConcernKeys.has(item.label?.trim().toLowerCase()) ||
   hiddenConcernKeys.has(item.to?.trim().toLowerCase());
 
+const normalizeConcernLabel = (label = "") => {
+  const key = label.trim().toLowerCase();
+  if (key === "purbachal nirapad valley") return "Nirapad Valley Condominium Project";
+  if (key === "dailyadin" || key === "daily adin") return "Daily Adin Press Media L.T.D";
+  return label;
+};
+
 const buildConcernItems = (menuItems = []) => {
   const items = [];
   const seen = new Set();
   const addItem = (item) => {
     if (isHiddenConcernItem(item)) return;
-    const labelKey = item.label?.trim().toLowerCase();
+    const normalizedItem = { ...item, label: normalizeConcernLabel(item.label) };
+    const labelKey = normalizedItem.label?.trim().toLowerCase();
     const routeKey = item.to?.trim().toLowerCase();
     const hrefKey = item.href?.trim().toLowerCase();
     if (!labelKey || (!routeKey && !hrefKey) || seen.has(labelKey) || seen.has(routeKey) || seen.has(hrefKey)) return;
     seen.add(labelKey);
     if (routeKey) seen.add(routeKey);
     if (hrefKey) seen.add(hrefKey);
-    items.push(item);
+    items.push(normalizedItem);
   };
 
   if (Array.isArray(menuItems) && menuItems.length) {
@@ -84,6 +100,7 @@ const buildConcernItems = (menuItems = []) => {
 function Navbar() {
   const [open, setOpen] = useState(false);
   const [openSub, setOpenSub] = useState(false);
+  const [openProjectSub, setOpenProjectSub] = useState(false);
   const [scrolled, setScrolled] = useState(false);
   const { user, logoutUser, isLoggedIn } = useAuthStore();
   const { concernMenuItems, loadConcernMenuItems } = useMenuStore();
@@ -115,7 +132,6 @@ function Navbar() {
 
   const navLinks = [
     { label: "Real Estate", to: "/realEstate" },
-    { label: "Project", to: "/projects" },
     { label: "Land Wanted", to: "/landWanted" },
     { label: "Gallery", to: "/gallery" },
     { label: "News & Event", to: "/newsEvent" },
@@ -161,17 +177,31 @@ function Navbar() {
                 {label}
               </Link>
             ))}
-            <HashLink
-              smooth
-              to="/#contact"
-              className={`px-3 py-2 text-sm font-semibold transition-colors duration-300 ${
-                scrolled
-                  ? "text-gray-700 hover:text-green-700"
-                  : "text-white/90 hover:text-white"
-              }`}
-            >
-              Contact
-            </HashLink>
+            <div className="group relative">
+              <button
+                type="button"
+                className={`flex items-center gap-1 px-3 py-2 text-sm font-semibold transition-colors duration-300 ${
+                  scrolled
+                    ? "text-gray-700 hover:text-green-700"
+                    : "text-white/90 hover:text-white"
+                }`}
+              >
+                Project
+                <MdKeyboardArrowDown size={16} />
+              </button>
+              <div className="pointer-events-none absolute left-0 top-full min-w-[14.5rem] translate-y-3 rounded-2xl border border-white/70 bg-white p-2 opacity-0 shadow-[0_28px_70px_-35px_rgba(15,23,42,0.45)] transition duration-200 group-hover:pointer-events-auto group-hover:translate-y-1 group-hover:opacity-100">
+                {projectItems.map((item) => (
+                  <a
+                    key={item.label}
+                    href={item.href}
+                    onClick={(event) => event.preventDefault()}
+                    className="block rounded-xl px-4 py-2.5 text-sm font-semibold text-gray-600 transition hover:bg-green-50 hover:text-green-700"
+                  >
+                    {item.label}
+                  </a>
+                ))}
+              </div>
+            </div>
             <Link
               to="/gallery"
               className={`px-3 py-2 text-sm font-semibold transition-colors duration-300 ${
@@ -360,6 +390,41 @@ function Navbar() {
             </ul>
           </li>
 
+          {/* Project accordion */}
+          <li>
+            <button
+              onClick={() => setOpenProjectSub(!openProjectSub)}
+              className="w-full flex items-center gap-3 pl-8 pr-6 py-3.5 text-gray-500 hover:text-green-600 hover:bg-green-50/60 transition-all duration-200 text-sm font-medium group"
+            >
+              <span className="w-3 h-px bg-gray-200 group-hover:bg-green-400 group-hover:w-5 transition-all duration-300 shrink-0" />
+              Project
+              <MdKeyboardArrowDown
+                size={16}
+                className={`ml-auto text-gray-300 transition-transform duration-300 shrink-0 ${
+                  openProjectSub ? "rotate-180 text-green-500" : ""
+                }`}
+              />
+            </button>
+            <ul
+              className={`overflow-hidden transition-all duration-300 bg-gray-50/50 ${
+                openProjectSub ? "max-h-96 opacity-100" : "max-h-0 opacity-0"
+              }`}
+            >
+              {projectItems.map((item) => (
+                <li key={item.label}>
+                  <a
+                    href={item.href}
+                    onClick={(event) => event.preventDefault()}
+                    className="flex items-center gap-2.5 pl-16 pr-6 py-2.5 text-gray-400 hover:text-green-600 hover:bg-green-50 transition-all duration-200 text-xs font-medium tracking-wide"
+                  >
+                    <span className="w-1 h-1 rounded-full bg-green-300 shrink-0" />
+                    {item.label}
+                  </a>
+                </li>
+              ))}
+            </ul>
+          </li>
+
           {/* Regular links */}
           {navLinks.map(({ label, to }) => (
             <li key={to}>
@@ -370,12 +435,6 @@ function Navbar() {
             </li>
           ))}
 
-          <li>
-            <HashLink smooth to="/#contact" onClick={toggleMenu} className="flex items-center gap-3 pl-8 pr-6 py-3.5 text-gray-500 hover:text-green-600 hover:bg-green-50/60 transition-all duration-200 text-sm font-medium group">
-              <span className="w-3 h-px bg-gray-200 group-hover:bg-green-400 group-hover:w-5 transition-all duration-300 shrink-0" />
-              Contact
-            </HashLink>
-          </li>
           <li>
             <Link to="/privacyPolicy" onClick={toggleMenu} className="flex items-center gap-3 pl-8 pr-6 py-3.5 text-gray-500 hover:text-green-600 hover:bg-green-50/60 transition-all duration-200 text-sm font-medium group">
               <span className="w-3 h-px bg-gray-200 group-hover:bg-green-400 group-hover:w-5 transition-all duration-300 shrink-0" />
