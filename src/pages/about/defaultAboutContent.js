@@ -64,13 +64,6 @@ export const defaultAboutContent = {
       text: "We focus on trust, transparent communication, and real estate solutions that fit buyer needs.",
     },
   ],
-  guidanceEyebrow: "What Guides Us",
-  guidanceTitle: "Real estate with structure, care, and a practical vision",
-  guidancePoints: [
-    "Organized land development",
-    "Client-focused communication",
-    "Long-term community value",
-  ],
   videoEyebrow: "Inside North South",
   videoTitle: "See the vision behind the group",
   videoText:

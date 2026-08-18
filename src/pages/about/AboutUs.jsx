@@ -110,10 +110,6 @@ const AboutUs = () => {
       Array.isArray(aboutContent?.overviewParagraphs) && aboutContent.overviewParagraphs.length > 0
         ? aboutContent.overviewParagraphs
         : defaultAboutContent.overviewParagraphs,
-    guidancePoints:
-      Array.isArray(aboutContent?.guidancePoints) && aboutContent.guidancePoints.length > 0
-        ? aboutContent.guidancePoints
-        : defaultAboutContent.guidancePoints,
   };
 
   const [hero1 = defaultAboutContent.heroSlides[0], hero2 = defaultAboutContent.heroSlides[1], hero3 = defaultAboutContent.heroSlides[2]] =
@@ -296,58 +292,6 @@ const AboutUs = () => {
                     </div>
                   );
                 })}
-              </div>
-            </div>
-          </div>
-        </div>
-      </section>
-
-      <section className="relative isolate overflow-hidden bg-white px-4 py-20 sm:px-6 lg:px-8">
-        <div className="absolute inset-0 bg-[linear-gradient(180deg,#ffffff_0%,#eef9ef_100%)]" />
-        <div className="relative mx-auto max-w-7xl">
-          <div className="grid gap-8 lg:grid-cols-[0.75fr_1.25fr] lg:items-center">
-            <div className="relative min-h-[320px] overflow-hidden rounded-[2rem] bg-[#10291d] shadow-[0_30px_90px_-55px_rgba(22,101,52,0.72)]">
-              <img
-                src={hero3}
-                alt="North South Group community planning"
-                className="absolute inset-0 h-full w-full object-cover"
-              />
-              <div className="absolute inset-0 bg-[linear-gradient(180deg,rgba(3,7,18,0.04)_0%,rgba(8,47,30,0.12)_42%,rgba(3,7,18,0.72)_100%)]" />
-              <div className="absolute inset-4 rounded-[1.5rem] border border-white/25" />
-              <div className="absolute bottom-8 left-8 right-8 rounded-[1.5rem] border border-white/30 bg-black/32 p-5 text-white shadow-[0_24px_70px_-45px_rgba(0,0,0,0.9)] backdrop-blur-xl">
-                <p className="text-xs font-bold uppercase" style={accentFont}>
-                  Consistent Growth
-                </p>
-                <p className="mt-3 text-4xl font-semibold" style={displayFont}>
-                  Trust. Structure. Progress.
-                </p>
-              </div>
-            </div>
-            <div>
-              <p
-                className="text-xs font-bold uppercase text-green-700"
-                style={accentFont}
-              >
-                {data.guidanceEyebrow}
-              </p>
-              <h3
-                className="mt-4 text-4xl font-semibold leading-tight text-gray-950 sm:text-5xl"
-                style={displayFont}
-              >
-                {data.guidanceTitle}
-              </h3>
-              <div className="mt-7 grid gap-5 sm:grid-cols-3">
-                {data.guidancePoints.map((item) => (
-                  <div
-                    key={item}
-                    className="flex items-start gap-3"
-                  >
-                    <FaCheckCircle className="mt-1 shrink-0 text-green-600" />
-                    <p className="text-sm font-semibold leading-6 text-gray-700">
-                      {item}
-                    </p>
-                  </div>
-                ))}
               </div>
             </div>
           </div>
