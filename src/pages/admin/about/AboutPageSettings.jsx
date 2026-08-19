@@ -393,7 +393,7 @@ const LeaderListField = ({ values, onChange }) => {
   return (
     <div>
       <label className={lbl}>Leadership Team</label>
-      <p className="-mt-1 mb-3 text-xs leading-5 text-slate-500">Manage executive names, roles, and profile images for the public page.</p>
+      <p className="-mt-1 mb-3 text-xs leading-5 text-slate-500">Manage executive names, roles, profile images, and short descriptions for the public page.</p>
       <div className="space-y-4">
         {values.map((item, index) => (
           <div key={index} className="rounded-[24px] border border-slate-200 bg-slate-50/80 p-4 shadow-sm">
@@ -409,6 +409,12 @@ const LeaderListField = ({ values, onChange }) => {
                 value={item.role || ""}
                 onChange={(event) => update(index, "role", event.target.value)}
                 placeholder="Role"
+              />
+              <textarea
+                className={`${inp} min-h-24 resize-y md:col-span-2`}
+                value={item.description || item.text || ""}
+                onChange={(event) => update(index, "description", event.target.value)}
+                placeholder="Short leadership description"
               />
               <div className="md:col-span-2 space-y-3">
                 <label className={lbl}>Leader Image</label>
@@ -454,7 +460,7 @@ const LeaderListField = ({ values, onChange }) => {
       </div>
       <button
         type="button"
-        onClick={() => onChange([...values, { id: "", name: "", role: "", img: "", file: null, preview: null }])}
+        onClick={() => onChange([...values, { id: "", name: "", role: "", description: "", img: "", file: null, preview: null }])}
         className="mt-3 inline-flex items-center gap-2 rounded-2xl border border-cyan-200 bg-cyan-50 px-4 py-2.5 text-sm font-semibold text-cyan-700 transition hover:border-cyan-300 hover:bg-cyan-100"
       >
         <FaPlus size={12} /> Add leader

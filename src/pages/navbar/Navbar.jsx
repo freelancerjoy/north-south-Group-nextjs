@@ -16,57 +16,38 @@ const headerLinks = [
 ];
 
 const projectItems = [
-  { label: "Land Project", href: "#" },
-  { label: "Apartment Project", href: "#" },
-  { label: "Commercial Project", href: "#" },
-  { label: "Duplex Project", href: "#" },
-  { label: "Condominium Project", href: "#" },
-  { label: "Hotel Project", href: "#" },
+  { label: "Land Project", to: "/landWanted" },
+  { label: "Apartment Project", to: "/projects" },
+  { label: "Commercial Project", to: "/industrialCity" },
+  { label: "Duplex Project", to: "/conceptDetails" },
+  { label: "Condominium Project", to: "/purbachalNirapadValley" },
+  { label: "Hotel Project", href: "https://www.titanicbay.com/", external: true },
 ];
 
 const fallbackConcernItems = [
-  { label: "North South Consortium Ltd", to: "/northSouthConsortiumLtd" },
-  { label: "Northsouth Green City Ltd", to: "/greenCity" },
+  { label: "North South Consortium L.T.D", to: "/northSouthConsortiumLtd" },
+  { label: "Northsouth Green City L.T.D", to: "/greenCity" },
   { label: "Northsouth Industrial City", to: "/industrialCity" },
   { label: "Northsouth Square City", to: "/squareCity" },
   { label: "Nirapad Valley Condominium Project", to: "/purbachalNirapadValley" },
   { label: "Northsouth Duplex Home", to: "/conceptDetails" },
-  { label: "Northsouth Farms Ltd", to: "/northsouthFarmsLtd" },
+  { label: "Northsouth Farms L.T.D", to: "/northsouthFarmsLtd" },
   { label: "Northsouth Garments", to: "/northsouthGarments" },
   { label: "Daily Adin Press Media L.T.D", href: "https://www.dailyadin.com/", external: true },
-  { label: "Titanic Bay Hotel & Resort LTD", href: "https://www.titanicbay.com/", external: true },
+  { label: "Titanic Bay Hotel & Resort L.T.D", href: "https://www.titanicbay.com/", external: true },
 ];
-
-const hiddenConcernKeys = new Set([
-  "northsouth foundation",
-  "northsouth butterfly",
-  "northsouth tours & travels",
-  "/northsouthfoundation",
-  "/northsouthbutterfly",
-  "/northsouthtourstravels",
-  "/titanicbayhotelresort",
-  "/concern/northsouth-foundation",
-  "/concern/northsouth-butterfly",
-  "/concern/northsouth-tours-travels",
-  "/concern/titanic-bay-hotel-resort-ltd",
-]);
-
-const isHiddenConcernItem = (item) =>
-  hiddenConcernKeys.has(item.label?.trim().toLowerCase()) ||
-  hiddenConcernKeys.has(item.to?.trim().toLowerCase());
 
 const normalizeConcernLabel = (label = "") => {
   const key = label.trim().toLowerCase();
   if (key === "purbachal nirapad valley") return "Nirapad Valley Condominium Project";
   if (key === "dailyadin" || key === "daily adin") return "Daily Adin Press Media L.T.D";
-  return label;
+  return label.replace(/\bltd\b/gi, "L.T.D");
 };
 
 const buildConcernItems = (menuItems = []) => {
   const items = [];
   const seen = new Set();
   const addItem = (item) => {
-    if (isHiddenConcernItem(item)) return;
     const normalizedItem = { ...item, label: normalizeConcernLabel(item.label) };
     const labelKey = normalizedItem.label?.trim().toLowerCase();
     const routeKey = item.to?.trim().toLowerCase();
@@ -190,16 +171,27 @@ function Navbar() {
                 <MdKeyboardArrowDown size={16} />
               </button>
               <div className="pointer-events-none absolute left-0 top-full min-w-[14.5rem] translate-y-3 rounded-2xl border border-white/70 bg-white p-2 opacity-0 shadow-[0_28px_70px_-35px_rgba(15,23,42,0.45)] transition duration-200 group-hover:pointer-events-auto group-hover:translate-y-1 group-hover:opacity-100">
-                {projectItems.map((item) => (
+                {projectItems.map((item) =>
+                  item.external || item.href?.startsWith("http") ? (
                   <a
                     key={item.label}
                     href={item.href}
-                    onClick={(event) => event.preventDefault()}
+                    target="_blank"
+                    rel="noopener noreferrer"
                     className="block rounded-xl px-4 py-2.5 text-sm font-semibold text-gray-600 transition hover:bg-green-50 hover:text-green-700"
                   >
                     {item.label}
                   </a>
-                ))}
+                  ) : (
+                  <Link
+                    key={item.label}
+                    to={item.to}
+                    className="block rounded-xl px-4 py-2.5 text-sm font-semibold text-gray-600 transition hover:bg-green-50 hover:text-green-700"
+                  >
+                    {item.label}
+                  </Link>
+                  )
+                )}
               </div>
             </div>
             <Link
@@ -412,14 +404,27 @@ function Navbar() {
             >
               {projectItems.map((item) => (
                 <li key={item.label}>
-                  <a
-                    href={item.href}
-                    onClick={(event) => event.preventDefault()}
-                    className="flex items-center gap-2.5 pl-16 pr-6 py-2.5 text-gray-400 hover:text-green-600 hover:bg-green-50 transition-all duration-200 text-xs font-medium tracking-wide"
-                  >
-                    <span className="w-1 h-1 rounded-full bg-green-300 shrink-0" />
-                    {item.label}
-                  </a>
+                  {item.external || item.href?.startsWith("http") ? (
+                    <a
+                      href={item.href}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      onClick={toggleMenu}
+                      className="flex items-center gap-2.5 pl-16 pr-6 py-2.5 text-gray-400 hover:text-green-600 hover:bg-green-50 transition-all duration-200 text-xs font-medium tracking-wide"
+                    >
+                      <span className="w-1 h-1 rounded-full bg-green-300 shrink-0" />
+                      {item.label}
+                    </a>
+                  ) : (
+                    <Link
+                      to={item.to}
+                      onClick={toggleMenu}
+                      className="flex items-center gap-2.5 pl-16 pr-6 py-2.5 text-gray-400 hover:text-green-600 hover:bg-green-50 transition-all duration-200 text-xs font-medium tracking-wide"
+                    >
+                      <span className="w-1 h-1 rounded-full bg-green-300 shrink-0" />
+                      {item.label}
+                    </Link>
+                  )}
                 </li>
               ))}
             </ul>

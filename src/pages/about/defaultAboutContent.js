@@ -74,9 +74,30 @@ export const defaultAboutContent = {
   leadershipText:
     "A focused leadership team guides the group with industry knowledge, operational discipline, and a client-first mindset.",
   leaders: [
-    { id: "chairman", name: "Md. Shaidul Islam Sazu", role: "Chairman", img: chairmanImg },
-    { id: "managing-director", name: "Md. Usuf Ali Khan", role: "Managing Director", img: mdImg },
-    { id: "marketing-director", name: "Md. Mahbububul Hossain Khan", role: "Director, Marketing", img: marketingImg },
+    {
+      id: "chairman",
+      name: "Md. Shaidul Islam Sazu",
+      role: "Chairman",
+      img: chairmanImg,
+      description:
+        "Provides strategic guidance for the group with a focus on governance, trust, and long-term institutional growth.",
+    },
+    {
+      id: "deputy-managing-director",
+      name: "Md. Mahbubull Hossain Khan",
+      role: "Deputy Managing Director",
+      img: marketingImg,
+      description:
+        "Leads operational coordination and business development priorities across the group's projects and concerns.",
+    },
+    {
+      id: "managing-director",
+      name: "Md. Usuf Ali",
+      role: "Managing Director",
+      img: mdImg,
+      description:
+        "Guides the company vision with client-first decision making, project discipline, and sustainable growth planning.",
+    },
     { id: "hr-director", name: "Oumar Faruk", role: "Director, HR & Admin", img: hrImg },
     { id: "director", name: "Mst. Shajeratul Yiaken", role: "Director", img: directorImg },
     { id: "ceo", name: "Brig. Gen. Md. Mahfuzur Rahman", role: "CEO", img: ceoImg },

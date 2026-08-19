@@ -11,7 +11,7 @@ import { entityId } from "../../utils/entity";
 const fallbackProjects = [
   {
     _id: "titanic-bay-project",
-    title: "Titanic Bay Hotel & Resort Ltd",
+    title: "Titanic Bay Hotel & Resort L.T.D",
     status: "upcoming",
     image: [hotelImage],
     description: {
@@ -24,7 +24,7 @@ const fallbackProjects = [
   },
 ];
 
-export default function Projects({ type = "all", fullWidth = false }) {
+export default function Projects({ type = "all", fullWidth = false, view = "slider" }) {
   const { projects, loadProjects, isLoading } = useProjectStore();
   const prevRef = useRef(null);
   const nextRef = useRef(null);
@@ -54,6 +54,7 @@ export default function Projects({ type = "all", fullWidth = false }) {
     return mergedProjects.filter((p) => p.status?.toLowerCase() === type);
   }, [projects, type]);
   const shouldLoop = filteredProjects.length > 3;
+  const isGridView = view === "grid";
 
   if (isLoading) {
     return (
@@ -79,6 +80,7 @@ export default function Projects({ type = "all", fullWidth = false }) {
               <span className="text-green-600">in architecture and design</span>
             </h2>
           </div>
+          {!isGridView && (
           <div className="flex gap-3 shrink-0">
             <button
               ref={prevRef}
@@ -93,11 +95,18 @@ export default function Projects({ type = "all", fullWidth = false }) {
               <IoIosArrowForward size={16} />
             </button>
           </div>
+          )}
         </div>
 
         {/* Slider */}
         {filteredProjects.length === 0 ? (
           <p className="text-center text-gray-500 py-12">No projects found</p>
+        ) : isGridView ? (
+          <div className={`${fullWidth ? "w-full" : "max-w-7xl mx-auto"} grid gap-6 sm:grid-cols-2 xl:grid-cols-3`}>
+            {filteredProjects.map((p) => (
+              <ProjectCard key={entityId(p) || p.title} project={p} compact />
+            ))}
+          </div>
         ) : (
           <div className={fullWidth ? "w-full" : "max-w-7xl mx-auto"}>
             <Swiper

@@ -91,6 +91,7 @@ const albums = [
     label: "Event album",
     description: "Press, event, and publication moments from Daily Adin news paper activities.",
     folder: "Daily adin",
+    externalUrl: "https://www.dailyadin.com/",
     images: makeImages("Daily adin", dailyAdinImages),
   },
   {
@@ -326,10 +327,16 @@ const Gallery = () => {
               </Link>
 
               <div className="lg:col-span-2 grid gap-4 pt-2 md:grid-cols-2">
-                {albums.map((album, index) => (
-                  <Link
+                {albums.map((album, index) => {
+                  const AlbumCard = album.externalUrl ? "a" : Link;
+                  const albumLinkProps = album.externalUrl
+                    ? { href: album.externalUrl, target: "_blank", rel: "noopener noreferrer" }
+                    : { to: "/gallery" };
+
+                  return (
+                  <AlbumCard
                     key={album.id}
-                    to="/gallery"
+                    {...albumLinkProps}
                     className="group grid overflow-hidden border border-white/10 bg-white/[0.07] text-white backdrop-blur transition hover:-translate-y-1 hover:border-green-300 hover:bg-white hover:text-gray-950 sm:grid-cols-[156px_1fr]"
                   >
                     <div className="relative h-44 overflow-hidden sm:h-full">
@@ -357,8 +364,9 @@ const Gallery = () => {
                         <FiArrowRight />
                       </span>
                     </div>
-                  </Link>
-                ))}
+                  </AlbumCard>
+                  );
+                })}
               </div>
             </div>
           </div>
@@ -368,13 +376,22 @@ const Gallery = () => {
       {isGalleryPage && (
       <section className="mx-auto max-w-7xl px-4 py-12 sm:px-6 lg:px-8 lg:py-16">
         <div className="mb-10 grid gap-4 md:grid-cols-2">
-          {albums.map((album) => (
-            <button
+          {albums.map((album) => {
+            const AlbumButton = album.externalUrl ? "a" : "button";
+            const albumButtonProps = album.externalUrl
+              ? { href: album.externalUrl, target: "_blank", rel: "noopener noreferrer" }
+              : {
+                  type: "button",
+                  onClick: () => {
+                    setActiveAlbumId(album.id);
+                    setSelectedIndex(null);
+                  },
+                };
+
+            return (
+            <AlbumButton
               key={album.id}
-              onClick={() => {
-                setActiveAlbumId(album.id);
-                setSelectedIndex(null);
-              }}
+              {...albumButtonProps}
               className={`group overflow-hidden border bg-white text-left shadow-sm transition-all duration-300 ${
                 activeAlbumId === album.id
                   ? "border-green-700 shadow-xl shadow-green-900/10"
@@ -405,8 +422,9 @@ const Gallery = () => {
                   </div>
                 </div>
               </div>
-            </button>
-          ))}
+            </AlbumButton>
+            );
+          })}
         </div>
 
         <div className="mb-7 flex flex-col justify-between gap-4 border-y border-gray-200 py-5 md:flex-row md:items-end">

@@ -1,6 +1,8 @@
 import { create } from "zustand";
 import { toast } from "react-toastify";
 import apiInstance from "../../config/axios";
+import { useMenuStore } from "../menu/menuStore";
+import { entityId } from "../../utils/entity";
 
 const unwrap = (response) => response.data?.data ?? response.data;
 const CACHE_TTL = 5 * 60 * 1000;
@@ -12,6 +14,16 @@ const getSortOrder = (concern) => {
   const sortOrder = Number(concern?.sortOrder);
   return Number.isFinite(sortOrder) ? sortOrder : Number.MAX_SAFE_INTEGER;
 };
+
+const refreshConcernMenu = () => useMenuStore.getState().loadConcernMenuItems(true);
+
+const normalizeConcern = (concern) => {
+  const id = entityId(concern);
+  return id ? { ...concern, _id: id, id } : concern;
+};
+
+const normalizeConcerns = (concerns = []) =>
+  (Array.isArray(concerns) ? concerns : []).map(normalizeConcern);
 
 export const sortConcernList = (concerns = []) =>
   [...concerns].sort((a, b) => {
@@ -38,7 +50,7 @@ export const useConcernStore = create((set, get) => ({
 
     concernsRequest = (async () => {
       const response = await apiInstance.get("/concern");
-      const concerns = sortConcernList(unwrap(response));
+      const concerns = sortConcernList(normalizeConcerns(unwrap(response)));
       set({ concerns, isLoading: false });
       concernsFetchedAt = Date.now();
       concernsLoaded = true;
@@ -60,7 +72,7 @@ export const useConcernStore = create((set, get) => ({
     set({ isLoading: true, error: null });
     try {
       const response = await apiInstance.get(`/concern/${id}`);
-      const concern = unwrap(response);
+      const concern = normalizeConcern(unwrap(response));
       set({ concern, isLoading: false });
       return concern;
     } catch (err) {
@@ -74,7 +86,7 @@ export const useConcernStore = create((set, get) => ({
     set({ isLoading: true, error: null });
     try {
       const response = await apiInstance.get(`/concern/${slug}`);
-      const concern = unwrap(response);
+      const concern = normalizeConcern(unwrap(response));
       set({ concern, isLoading: false });
       return concern;
     } catch (err) {
@@ -87,10 +99,11 @@ export const useConcernStore = create((set, get) => ({
     set({ isLoading: true, error: null });
     try {
       const response = await apiInstance.post("/concern", concernData);
-      const concern = unwrap(response);
+      const concern = normalizeConcern(unwrap(response));
       set((state) => ({ concerns: sortConcernList([...state.concerns, concern]), isLoading: false }));
       concernsFetchedAt = Date.now();
       concernsLoaded = true;
+      await refreshConcernMenu();
       toast.success("Concern created successfully!");
       return concern;
     } catch (err) {
@@ -104,16 +117,17 @@ export const useConcernStore = create((set, get) => ({
     set({ isLoading: true, error: null });
     try {
       const response = await apiInstance.put(`/concern/${id}`, concernData);
-      const concern = unwrap(response);
+      const concern = normalizeConcern(unwrap(response));
       set((state) => ({
         concerns: sortConcernList(state.concerns.map((item) =>
-          item._id === id ? concern : item
+          entityId(item) === id ? concern : item
         )),
         concern,
         isLoading: false,
       }));
       concernsFetchedAt = Date.now();
       concernsLoaded = true;
+      await refreshConcernMenu();
       toast.success("Concern updated successfully!");
       return concern;
     } catch (err) {
@@ -135,11 +149,11 @@ export const useConcernStore = create((set, get) => ({
     try {
       const response = await apiInstance.patch("/concern/reorder", {
         items: nextConcerns.map((concern) => ({
-          id: concern._id,
+          id: entityId(concern),
           sortOrder: concern.sortOrder,
         })),
       });
-      const concerns = sortConcernList(unwrap(response));
+      const concerns = sortConcernList(normalizeConcerns(unwrap(response)));
       set({ concerns, isLoading: false });
       concernsFetchedAt = Date.now();
       concernsLoaded = true;
@@ -157,11 +171,12 @@ export const useConcernStore = create((set, get) => ({
     try {
       await apiInstance.delete(`/concern/${id}`);
       set((state) => ({
-        concerns: sortConcernList(state.concerns.filter((concern) => concern._id !== id)),
+        concerns: sortConcernList(state.concerns.filter((concern) => entityId(concern) !== id)),
         isLoading: false,
       }));
       concernsFetchedAt = Date.now();
       concernsLoaded = true;
+      await refreshConcernMenu();
       toast.success("Concern deleted successfully!");
     } catch (err) {
       set({ error: err.message, isLoading: false });

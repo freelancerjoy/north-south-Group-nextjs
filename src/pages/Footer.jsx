@@ -14,75 +14,45 @@ import { Link } from "react-router-dom";
 import logo from "../assets/images/logo.png";
 import { useEffect } from "react";
 import { useContactInfoStore } from "../store/contactInfo/contactInfoStore";
-import { useConcernStore } from "../store/concern/concernStore";
+import { useMenuStore } from "../store/menu/menuStore";
 
 const fallbackConcerns = [
-  { label: "North South Consortium Ltd", to: "/northSouthConsortiumLtd" },
-  { label: "Northsouth Green City Ltd", to: "/greenCity" },
+  { label: "North South Consortium L.T.D", to: "/northSouthConsortiumLtd" },
+  { label: "Northsouth Green City L.T.D", to: "/greenCity" },
   { label: "Northsouth Industrial City", to: "/industrialCity" },
   { label: "Northsouth Square City", to: "/squareCity" },
   { label: "Nirapad Valley Condominium Project", to: "/purbachalNirapadValley" },
   { label: "Northsouth Duplex Home", to: "/conceptDetails" },
-  { label: "Northsouth Farms Ltd", to: "/northsouthFarmsLtd" },
+  { label: "Northsouth Farms L.T.D", to: "/northsouthFarmsLtd" },
   { label: "Northsouth Garments", to: "/northsouthGarments" },
+  { label: "Northsouth Foundation", to: "/northsouthFoundation" },
+  { label: "Northsouth Butterfly Resort & Park", to: "/northsouthButterfly" },
+  { label: "Northsouth Tours & Travels", to: "/northsouthToursTravels" },
+  { label: "Titanic Bay Hotel & Resort L.T.D", to: "/titanicBayHotelResort" },
 ];
-
-const hiddenConcernKeys = new Set([
-  "northsouth foundation",
-  "northsouth butterfly",
-  "northsouth tours & travels",
-  "titanic bay hotel & resort ltd",
-  "/northsouthfoundation",
-  "/northsouthbutterfly",
-  "/northsouthtourstravels",
-  "/titanicbayhotelresort",
-  "/concern/northsouth-foundation",
-  "/concern/northsouth-butterfly",
-  "/concern/northsouth-tours-travels",
-  "/concern/titanic-bay-hotel-resort-ltd",
-]);
-
-const isHiddenConcernItem = (item) =>
-  hiddenConcernKeys.has(item.label?.trim().toLowerCase()) ||
-  hiddenConcernKeys.has(item.to?.trim().toLowerCase());
 
 const normalizeConcernLabel = (label = "") => {
   const key = label.trim().toLowerCase();
   if (key === "purbachal nirapad valley") return "Nirapad Valley Condominium Project";
   if (key === "dailyadin" || key === "daily adin") return "Daily Adin Press Media L.T.D";
-  return label;
+  return label.replace(/\bltd\b/gi, "L.T.D");
 };
 
-const buildConcernItems = (savedConcerns = []) => {
-  const items = fallbackConcerns
-    .filter((item) => !isHiddenConcernItem(item))
-    .map((item) => ({ ...item, label: normalizeConcernLabel(item.label) }));
-  const seen = new Set(
-    items.flatMap((item) => [
-      item.label?.trim().toLowerCase(),
-      item.to?.trim().toLowerCase(),
-    ])
-  );
-
-  if (!Array.isArray(savedConcerns)) {
-    return items;
+const buildConcernItems = (menuItems = []) => {
+  if (Array.isArray(menuItems) && menuItems.length > 0) {
+    return menuItems
+      .filter((item) => item?.isVisible !== false)
+      .map((item) => ({
+        label: normalizeConcernLabel(item.label),
+        to: item.to,
+        href: item.href,
+        external: item.external,
+      }))
+      .filter((item) => item.label && (item.to || item.href));
   }
 
-  savedConcerns
-    .filter((concern) => concern?.isPublished !== false)
-    .map((concern) => ({
-      label: normalizeConcernLabel(concern.title),
-      to: concern.routePath || `/concern/${concern.slug}`,
-    }))
-    .forEach((item) => {
-      if (isHiddenConcernItem(item)) return;
-      const labelKey = item.label?.trim().toLowerCase();
-      const routeKey = item.to?.trim().toLowerCase();
-      if (!labelKey || seen.has(labelKey) || seen.has(routeKey)) return;
-      seen.add(labelKey);
-      seen.add(routeKey);
-      items.push(item);
-    });
+  const items = fallbackConcerns
+    .map((item) => ({ ...item, label: normalizeConcernLabel(item.label) }));
 
   return items;
 };
@@ -90,12 +60,12 @@ const buildConcernItems = (savedConcerns = []) => {
 const Footer = () => {
   const currentYear = new Date().getFullYear();
   const { contactInfo, loadContactInfo } = useContactInfoStore();
-  const { concerns: savedConcerns, loadConcerns } = useConcernStore();
+  const { concernMenuItems, loadConcernMenuItems } = useMenuStore();
 
   useEffect(() => {
     loadContactInfo();
-    if (!savedConcerns?.length) loadConcerns();
-  }, [loadContactInfo, loadConcerns, savedConcerns?.length]);
+    if (!concernMenuItems?.length) loadConcernMenuItems();
+  }, [loadContactInfo, loadConcernMenuItems, concernMenuItems?.length]);
 
   const socialLinks = [
     {
@@ -141,7 +111,7 @@ const Footer = () => {
     { label: "Privacy Policy", to: "/privacyPolicy" },
   ];
 
-  const concerns = buildConcernItems(savedConcerns);
+  const concerns = buildConcernItems(concernMenuItems);
 
   return (
     <footer
@@ -226,17 +196,33 @@ const Footer = () => {
             <ul className="flex flex-col gap-3">
               {concerns.map((item) => (
                 <li key={item.label}>
-                  <Link
-                    to={item.to}
-                    className="flex items-center gap-2 text-gray-400 text-sm transition-colors duration-200 hover:text-white group"
-                  >
-                    <FaChevronRight
-                      size={10}
-                      className="transition-transform duration-200 group-hover:translate-x-1"
-                      style={{ color: "#0f7771" }}
-                    />
-                    {item.label}
-                  </Link>
+                  {item.external || item.href?.startsWith("http") ? (
+                    <a
+                      href={item.href}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="flex items-center gap-2 text-gray-400 text-sm transition-colors duration-200 hover:text-white group"
+                    >
+                      <FaChevronRight
+                        size={10}
+                        className="transition-transform duration-200 group-hover:translate-x-1"
+                        style={{ color: "#0f7771" }}
+                      />
+                      {item.label}
+                    </a>
+                  ) : (
+                    <Link
+                      to={item.to}
+                      className="flex items-center gap-2 text-gray-400 text-sm transition-colors duration-200 hover:text-white group"
+                    >
+                      <FaChevronRight
+                        size={10}
+                        className="transition-transform duration-200 group-hover:translate-x-1"
+                        style={{ color: "#0f7771" }}
+                      />
+                      {item.label}
+                    </Link>
+                  )}
                 </li>
               ))}
             </ul>

@@ -1,6 +1,7 @@
 import { create } from "zustand";
 import { toast } from "react-toastify";
 import apiInstance from "../../config/axios";
+import { entityId } from "../../utils/entity";
 
 const unwrap = (response) => response.data?.data ?? response.data;
 const CACHE_TTL = 5 * 60 * 1000;
@@ -11,6 +12,55 @@ let menuLoaded = false;
 const getSortOrder = (item) => {
   const sortOrder = Number(item?.sortOrder);
   return Number.isFinite(sortOrder) ? sortOrder : Number.MAX_SAFE_INTEGER;
+};
+
+const normalizeRoute = (value = "") => String(value || "").trim().toLowerCase();
+const normalizeLabel = (value = "") =>
+  String(value || "")
+    .trim()
+    .toLowerCase()
+    .replace(/\bltd\b/g, "l.t.d");
+
+const isDynamicConcernMenuItem = (item) =>
+  item?.source === "concern" ||
+  String(item?.key || "").startsWith("concern-") ||
+  normalizeRoute(item?.to).startsWith("/concern/");
+
+const buildValidConcernLookup = (concerns = []) => {
+  const routes = new Set();
+  const labels = new Set();
+  const keys = new Set();
+
+  (Array.isArray(concerns) ? concerns : [])
+    .filter((concern) => concern?.isPublished !== false)
+    .forEach((concern) => {
+      const id = entityId(concern);
+      const slug = concern?.slug;
+      const routePath = concern?.routePath || (slug ? `/concern/${slug}` : "");
+
+      if (id) keys.add(`concern-${id}`);
+      if (routePath) routes.add(normalizeRoute(routePath));
+      if (slug) routes.add(normalizeRoute(`/concern/${slug}`));
+      if (concern?.title) labels.add(normalizeLabel(concern.title));
+    });
+
+  return { routes, labels, keys };
+};
+
+const removeDeletedConcernMenuItems = (items = [], concerns = []) => {
+  const { routes, labels, keys } = buildValidConcernLookup(concerns);
+
+  return (Array.isArray(items) ? items : []).filter((item) => {
+    if (!isDynamicConcernMenuItem(item)) return true;
+
+    const key = String(item?.key || "");
+    const route = normalizeRoute(item.to);
+    const label = normalizeLabel(item.label);
+
+    if (key.startsWith("concern-")) return keys.has(key);
+
+    return (route && routes.has(route)) || (label && labels.has(label));
+  });
 };
 
 export const sortMenuItems = (items = []) =>
@@ -36,8 +86,13 @@ export const useMenuStore = create((set, get) => ({
     set({ isLoading: true, error: null });
 
     menuRequest = (async () => {
-      const response = await apiInstance.get("/menu/concerns");
-      const items = sortMenuItems(unwrap(response));
+      const [menuResponse, concernResponse] = await Promise.all([
+        apiInstance.get("/menu/concerns"),
+        apiInstance.get("/concern"),
+      ]);
+      const items = sortMenuItems(
+        removeDeletedConcernMenuItems(unwrap(menuResponse), unwrap(concernResponse))
+      );
       set({ concernMenuItems: items, isLoading: false });
       menuFetchedAt = Date.now();
       menuLoaded = true;
@@ -66,7 +121,7 @@ export const useMenuStore = create((set, get) => ({
     try {
       const response = await apiInstance.patch("/menu/concerns", {
         items: nextItems.map((item) => ({
-          id: item._id,
+          id: entityId(item),
           sortOrder: item.sortOrder,
           isVisible: item.isVisible !== false,
         })),

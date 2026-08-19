@@ -39,8 +39,8 @@ export default function Banner({ slides, buttons }) {
     >
       <div
         className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2
-          h-32 w-32 sm:h-44 sm:w-44 md:h-64 md:w-64 lg:h-80 lg:w-80
-          p-4 sm:p-6 md:p-8 lg:p-10 z-50 bg-white/70 border-4 border-dotted
+          h-24 w-24 sm:h-32 sm:w-32 md:h-48 md:w-48 lg:h-60 lg:w-60
+          p-3 sm:p-4 md:p-6 lg:p-7 z-50 bg-white/70 border-4 border-dotted
           border-gray-500 rounded-full"
       >
         <img

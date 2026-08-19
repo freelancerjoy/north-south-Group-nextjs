@@ -5,6 +5,12 @@ const IMAGE_MAX_WIDTH = 1600;
 const IMAGE_MAX_HEIGHT = 1600;
 const IMAGE_TARGET_BYTES = 500 * 1024;
 const IMAGE_QUALITIES = [0.82, 0.72, 0.62, 0.52];
+const CONCERN_IMAGE_OPTIONS = {
+  maxWidth: 1400,
+  maxHeight: 1400,
+  targetBytes: 350 * 1024,
+  qualities: [0.78, 0.68, 0.58, 0.48],
+};
 const DIRECT_UPLOAD_RETRIES = 2;
 const DIRECT_UPLOAD_CONCURRENCY = 3;
 let activeDirectUploads = 0;
@@ -51,9 +57,14 @@ const canvasToBlob = (canvas, type, quality) =>
     canvas.toBlob(resolve, type, quality);
   });
 
-export const getCompressedImage = async (file) => {
+export const getCompressedImage = async (file, options = {}) => {
   if (!shouldCompressImage(file)) return file;
-  if (file.type === "image/webp" && file.size <= IMAGE_TARGET_BYTES) return file;
+  const maxWidth = options.maxWidth || IMAGE_MAX_WIDTH;
+  const maxHeight = options.maxHeight || IMAGE_MAX_HEIGHT;
+  const targetBytes = options.targetBytes || IMAGE_TARGET_BYTES;
+  const qualities = options.qualities || IMAGE_QUALITIES;
+
+  if (file.type === "image/webp" && file.size <= targetBytes) return file;
 
   let image;
   try {
@@ -64,8 +75,8 @@ export const getCompressedImage = async (file) => {
 
   const scale = Math.min(
     1,
-    IMAGE_MAX_WIDTH / image.naturalWidth,
-    IMAGE_MAX_HEIGHT / image.naturalHeight
+    maxWidth / image.naturalWidth,
+    maxHeight / image.naturalHeight
   );
   const width = Math.max(1, Math.round(image.naturalWidth * scale));
   const height = Math.max(1, Math.round(image.naturalHeight * scale));
@@ -80,11 +91,11 @@ export const getCompressedImage = async (file) => {
   let bestBlob = null;
   const outputType = "image/webp";
 
-  for (const quality of IMAGE_QUALITIES) {
+  for (const quality of qualities) {
     const blob = await canvasToBlob(canvas, outputType, quality);
     if (!blob) continue;
     bestBlob = blob;
-    if (blob.size <= IMAGE_TARGET_BYTES) break;
+    if (blob.size <= targetBytes) break;
   }
 
   if (!bestBlob) return file;
@@ -165,7 +176,8 @@ const enqueueDirectUpload = (task) =>
 
 // Upload a single File object directly to Cloudinary.
 const uploadOneAsset = async (file, sig) => {
-  const fileToUpload = await getCompressedImage(file);
+  const isConcernUpload = String(sig.folder || "").startsWith("concerns");
+  const fileToUpload = await getCompressedImage(file, isConcernUpload ? CONCERN_IMAGE_OPTIONS : {});
   const fd = new FormData();
   fd.append("file", fileToUpload);
   fd.append("api_key", sig.apiKey);
