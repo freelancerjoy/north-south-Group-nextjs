@@ -6,10 +6,10 @@ const IMAGE_MAX_HEIGHT = 1600;
 const IMAGE_TARGET_BYTES = 500 * 1024;
 const IMAGE_QUALITIES = [0.82, 0.72, 0.62, 0.52];
 const CONCERN_IMAGE_OPTIONS = {
-  maxWidth: 1400,
-  maxHeight: 1400,
-  targetBytes: 350 * 1024,
-  qualities: [0.78, 0.68, 0.58, 0.48],
+  maxWidth: 1920,
+  maxHeight: 1920,
+  targetBytes: 700 * 1024,
+  qualities: [0.84, 0.76, 0.68, 0.58],
 };
 const DIRECT_UPLOAD_RETRIES = 2;
 const DIRECT_UPLOAD_CONCURRENCY = 3;

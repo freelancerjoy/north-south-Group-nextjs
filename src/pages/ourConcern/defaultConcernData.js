@@ -132,8 +132,13 @@ const common = {
   contactButtonLabel: "Send Message",
 };
 
+export const hasDefaultConcern = (slug) =>
+  Object.prototype.hasOwnProperty.call(defaults, slug);
+
 export const getDefaultConcern = (slug) => {
-  const concern = { ...common, ...(defaults[slug] || defaults["north-south-consortium-ltd"]) };
+  if (!hasDefaultConcern(slug)) return null;
+
+  const concern = { ...common, ...defaults[slug] };
   const derivedImages = uniqueImages([
     concern.heroImage,
     concern.aboutImage,

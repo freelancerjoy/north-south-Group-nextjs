@@ -2,6 +2,7 @@ import { useEffect, useMemo, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import { MdArrowBack, MdAdd, MdClose, MdCloudUpload, MdDelete } from "react-icons/md";
 import { FaSpinner } from "react-icons/fa";
+import { toast } from "react-toastify";
 import { useConcernStore } from "../../../store/concern/concernStore";
 import { uploadSingle } from "../../../utils/cloudinaryUpload";
 
@@ -53,6 +54,11 @@ const slugify = (value = "") =>
     .replace(/[^a-z0-9]+/g, "-")
     .replace(/^-+|-+$/g, "");
 const publicRouteFromSlug = (slug) => `/concern/${slug}`;
+const normalizeRoutePath = (value = "") => {
+  const routePath = String(value || "").trim();
+  if (!routePath) return "";
+  return routePath.startsWith("/") ? routePath : `/${routePath}`;
+};
 
 function ImageUploadField({ label, value, file, preview, onUrlChange, onFileChange, onRemoveFile }) {
   const displayImage = preview || value;
@@ -280,6 +286,7 @@ const ConcernForm = () => {
   const [featureImagePreviews, setFeatureImagePreviews] = useState({});
   const [sliderItems, setSliderItems] = useState([]);
   const [galleryItems, setGalleryItems] = useState([]);
+  const [isSaving, setIsSaving] = useState(false);
 
   const safeRevoke = (url) => {
     if (typeof url === "string" && url.startsWith("blob:")) URL.revokeObjectURL(url);
@@ -417,63 +424,73 @@ const ConcernForm = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    const [heroImageUrl, aboutImageUrl] = await Promise.all([
-      imageFiles.heroImage ? uploadSingle(imageFiles.heroImage, "concerns") : Promise.resolve(form.heroImage),
-      imageFiles.aboutImage ? uploadSingle(imageFiles.aboutImage, "concerns") : Promise.resolve(form.aboutImage),
-    ]);
+    setIsSaving(true);
 
-    const serviceImageEntries = await Promise.all(
-      (form.services || []).map(async (service, index) => [
-        index,
-        serviceImageFiles[index] ? await uploadSingle(serviceImageFiles[index], "concerns/services") : service.image,
-      ])
-    );
-    const serviceImageUrls = Object.fromEntries(serviceImageEntries);
+    try {
+      const [heroImageUrl, aboutImageUrl] = await Promise.all([
+        imageFiles.heroImage ? uploadSingle(imageFiles.heroImage, "concerns") : Promise.resolve(form.heroImage),
+        imageFiles.aboutImage ? uploadSingle(imageFiles.aboutImage, "concerns") : Promise.resolve(form.aboutImage),
+      ]);
 
-    const featureImageEntries = await Promise.all(
-      (form.features || []).map(async (feature, index) => [
-        index,
-        featureImageFiles[index] ? await uploadSingle(featureImageFiles[index], "concerns/features") : feature.image,
-      ])
-    );
-    const featureImageUrls = Object.fromEntries(featureImageEntries);
+      const serviceImageEntries = await Promise.all(
+        (form.services || []).map(async (service, index) => [
+          index,
+          serviceImageFiles[index] ? await uploadSingle(serviceImageFiles[index], "concerns/services") : service.image,
+        ])
+      );
+      const serviceImageUrls = Object.fromEntries(serviceImageEntries);
 
-    const heroSliderImages = (
-      await Promise.all(
-        sliderItems.map((item) =>
-          item.file ? uploadSingle(item.file, "concerns/slider") : Promise.resolve(item.url)
+      const featureImageEntries = await Promise.all(
+        (form.features || []).map(async (feature, index) => [
+          index,
+          featureImageFiles[index] ? await uploadSingle(featureImageFiles[index], "concerns/features") : feature.image,
+        ])
+      );
+      const featureImageUrls = Object.fromEntries(featureImageEntries);
+
+      const heroSliderImages = (
+        await Promise.all(
+          sliderItems.map((item) =>
+            item.file ? uploadSingle(item.file, "concerns/slider") : Promise.resolve(item.url)
+          )
         )
-      )
-    ).filter(Boolean);
+      ).filter(Boolean);
 
-    const galleryImages = (
-      await Promise.all(
-        galleryItems.map((item) =>
-          item.file ? uploadSingle(item.file, "concerns/gallery") : Promise.resolve(item.url)
+      const galleryImages = (
+        await Promise.all(
+          galleryItems.map((item) =>
+            item.file ? uploadSingle(item.file, "concerns/gallery") : Promise.resolve(item.url)
+          )
         )
-      )
-    ).filter(Boolean);
+      ).filter(Boolean);
 
-    const payload = {
-      ...form,
-      slug: slugify(form.slug),
-      routePath: form.routePath?.trim() || publicRouteFromSlug(slugify(form.slug)),
-      heroImage: heroImageUrl,
-      aboutImage: aboutImageUrl,
-      heroSliderImages,
-      galleryImages,
-      sortOrder: Number(form.sortOrder || 0),
-      aboutParagraphs: cleanList(form.aboutParagraphs),
-      processItems: cleanList(form.processItems),
-      stats: (form.stats || []).filter((item) => item.value?.trim() || item.label?.trim()),
-      services: cleanCards((form.services || []).map((service, index) => ({ ...service, image: serviceImageUrls[index] || service.image }))),
-      features: cleanCards((form.features || []).map((feature, index) => ({ ...feature, image: featureImageUrls[index] || feature.image }))),
-      highlights: cleanCards(form.highlights),
-    };
+      const normalizedSlug = slugify(form.slug);
+      const payload = {
+        ...form,
+        slug: normalizedSlug,
+        routePath: normalizeRoutePath(form.routePath) || publicRouteFromSlug(normalizedSlug),
+        heroImage: heroImageUrl,
+        aboutImage: aboutImageUrl,
+        heroSliderImages,
+        galleryImages,
+        sortOrder: Number(form.sortOrder || 0),
+        aboutParagraphs: cleanList(form.aboutParagraphs),
+        processItems: cleanList(form.processItems),
+        stats: (form.stats || []).filter((item) => item.value?.trim() || item.label?.trim()),
+        services: cleanCards((form.services || []).map((service, index) => ({ ...service, image: serviceImageUrls[index] || service.image }))),
+        features: cleanCards((form.features || []).map((feature, index) => ({ ...feature, image: featureImageUrls[index] || feature.image }))),
+        highlights: cleanCards(form.highlights),
+      };
 
-    if (isEdit) await updateConcern(id, payload);
-    else await createConcern(payload);
-    navigate("/adminDashboard/viewConcerns");
+      if (isEdit) await updateConcern(id, payload);
+      else await createConcern(payload);
+      navigate("/adminDashboard/viewConcerns");
+    } catch (error) {
+      console.error("Concern save failed:", error);
+      toast.error(error?.message || "Concern image upload failed. Please try a JPG, PNG, or WEBP image.");
+    } finally {
+      setIsSaving(false);
+    }
   };
 
   if (booting) {
@@ -597,9 +614,9 @@ const ConcernForm = () => {
         </div>
         <div><label className={labelClass}>Contact Form Description</label><textarea className={`${inputClass} min-h-20 resize-y`} value={form.contactDescription || ""} onChange={(e) => setField("contactDescription", e.target.value)} /></div>
 
-        <button type="submit" disabled={isLoading} className="flex w-full items-center justify-center gap-2 rounded-xl bg-teal-700 py-3 text-sm font-bold text-white shadow-lg transition hover:bg-teal-800 disabled:opacity-60">
-          {isLoading && <FaSpinner className="animate-spin" />}
-          {isLoading ? "Saving..." : title}
+        <button type="submit" disabled={isLoading || isSaving} className="flex w-full items-center justify-center gap-2 rounded-xl bg-teal-700 py-3 text-sm font-bold text-white shadow-lg transition hover:bg-teal-800 disabled:opacity-60">
+          {(isLoading || isSaving) && <FaSpinner className="animate-spin" />}
+          {isLoading || isSaving ? "Saving..." : title}
         </button>
       </form>
     </div>
