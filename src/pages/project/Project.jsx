@@ -8,7 +8,7 @@ const projectOverviews = [
   {
     title: "Hotel",
     icon: FaHotel,
-    text: "Premium hospitality opportunities including Titanic Bay Hotel & Resort Ltd and future 5 Star Hotel & Resort planning.",
+    text: "Premium hospitality opportunities including Titanic Bay Hotel & Resort L.T.D and future 5 Star Hotel & Resort planning.",
   },
   {
     title: "Land",

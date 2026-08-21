@@ -9,7 +9,7 @@ const Video = () => {
         <iframe
           className="absolute top-0 left-0 w-full h-full rounded-xl"
           src="https://www.youtube.com/embed/7HjHVU9V_j8?si=hAwaNBakh9HPRZ3D"
-          title="About North South Consortium Ltd."
+          title="About North South Consortium L.T.D."
           frameBorder="0"
           allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
           allowFullScreen

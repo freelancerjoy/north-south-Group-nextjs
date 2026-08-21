@@ -2,23 +2,23 @@ const defaults = {
   "north-south-consortium-ltd": {
     theme: "teal",
     eyebrow: "Diversified Business Platform",
-    title: "North South Consortium Ltd",
+    title: "North South Consortium L.T.D",
     subtitle: "A future-focused concern connecting real estate, business development, investment thinking, and responsible project delivery.",
     heroImage: "https://images.unsplash.com/photo-1497366754035-f200968a6e72?auto=format&fit=crop&w=1200&q=75",
     aboutImage: "https://images.unsplash.com/photo-1556761175-4b46a572b786?auto=format&fit=crop&w=900&q=75",
     aboutTitle: "A strategic engine for sustainable growth",
-    aboutParagraphs: ["North South Consortium Ltd brings together the group's development vision, operational discipline, and partnership network.", "The company focuses on planning, market understanding, reliable execution, and long-term stakeholder confidence."],
+    aboutParagraphs: ["North South Consortium L.T.D brings together the group's development vision, operational discipline, and partnership network.", "The company focuses on planning, market understanding, reliable execution, and long-term stakeholder confidence."],
     stats: [{ value: "360", label: "Business View" }, { value: "Multi", label: "Sector Focus" }, { value: "Long", label: "Term Value" }],
   },
   "purbachal-nirapad-valley": {
     theme: "emerald",
     eyebrow: "Secure Residential Destination",
-    title: "Purbachal Nirapad Valley",
+    title: "Nirapad Valley Condominium Project",
     subtitle: "A planned, green, and secure living destination shaped for families, professionals, and long-term investors.",
     heroImage: "https://images.unsplash.com/photo-1600585154340-be6161a56a0c?auto=format&fit=crop&w=1200&q=75",
     aboutImage: "https://images.unsplash.com/photo-1600607687939-ce8a6c25118c?auto=format&fit=crop&w=900&q=75",
     aboutTitle: "Peaceful living with planned urban comfort",
-    aboutParagraphs: ["Purbachal Nirapad Valley is designed around safety, greenery, road access, and an organized residential lifestyle.", "The project keeps connectivity, daily convenience, and investment value in focus."],
+    aboutParagraphs: ["Nirapad Valley Condominium Project is designed around safety, greenery, road access, and an organized residential lifestyle.", "The project keeps connectivity, daily convenience, and investment value in focus."],
     stats: [{ value: "Safe", label: "Community" }, { value: "Green", label: "Lifestyle" }, { value: "Smart", label: "Investment" }],
   },
   "concept-details": {
@@ -35,12 +35,12 @@ const defaults = {
   "northsouth-farms-ltd": {
     theme: "emerald",
     eyebrow: "Sustainable Agriculture",
-    title: "Northsouth Farms Ltd",
+    title: "Northsouth Farms L.T.D",
     subtitle: "Cultivating healthier food systems through responsible farming, modern practices, and community connection.",
     heroImage: "https://images.unsplash.com/photo-1501004318641-b39e6451bec6?auto=format&fit=crop&w=1200&q=75",
     aboutImage: "https://images.unsplash.com/photo-1589923188900-85dae523342b?auto=format&fit=crop&w=900&q=75",
     aboutTitle: "Farming with responsibility and innovation",
-    aboutParagraphs: ["Northsouth Farms Ltd combines practical farming knowledge with modern cultivation methods.", "The concern supports healthier production, responsible land use, and future-ready agriculture."],
+    aboutParagraphs: ["Northsouth Farms L.T.D combines practical farming knowledge with modern cultivation methods.", "The concern supports healthier production, responsible land use, and future-ready agriculture."],
     stats: [{ value: "Eco", label: "Friendly" }, { value: "Fresh", label: "Production" }, { value: "Local", label: "Community" }],
   },
   "northsouth-garments": {
@@ -90,12 +90,12 @@ const defaults = {
   "titanic-bay-hotel-resort-ltd": {
     theme: "blue",
     eyebrow: "Premium Hospitality Project",
-    title: "Titanic Bay Hotel & Resort Ltd",
+    title: "Titanic Bay Hotel & Resort L.T.D",
     subtitle: "A premium hotel and resort concern planned around destination hospitality, investor value, and North South Group's long-term brand trust.",
     heroImage: "https://images.unsplash.com/photo-1566073771259-6a8506099945?auto=format&fit=crop&w=1200&q=75",
     aboutImage: "https://images.unsplash.com/photo-1551882547-ff40c63fe5fa?auto=format&fit=crop&w=900&q=75",
     aboutTitle: "A destination-focused hospitality opportunity",
-    aboutParagraphs: ["Titanic Bay Hotel & Resort Ltd is presented as a premium hospitality concern under North South Group.", "The project is shaped for guests, partners, and investors who expect a polished destination experience backed by organized planning."],
+    aboutParagraphs: ["Titanic Bay Hotel & Resort L.T.D is presented as a premium hospitality concern under North South Group.", "The project is shaped for guests, partners, and investors who expect a polished destination experience backed by organized planning."],
     stats: [{ value: "5 Star", label: "Vision" }, { value: "Resort", label: "Experience" }, { value: "Premium", label: "Value" }],
   },
 };
@@ -132,8 +132,13 @@ const common = {
   contactButtonLabel: "Send Message",
 };
 
+export const hasDefaultConcern = (slug) =>
+  Object.prototype.hasOwnProperty.call(defaults, slug);
+
 export const getDefaultConcern = (slug) => {
-  const concern = { ...common, ...(defaults[slug] || defaults["north-south-consortium-ltd"]) };
+  if (!hasDefaultConcern(slug)) return null;
+
+  const concern = { ...common, ...defaults[slug] };
   const derivedImages = uniqueImages([
     concern.heroImage,
     concern.aboutImage,

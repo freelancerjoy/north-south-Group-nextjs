@@ -3,7 +3,7 @@ import { MdLocationOn } from "react-icons/md";
 import OptimizedImage from "../../components/OptimizedImage";
 import { projectDetailsPath } from "../../utils/entity";
 
-export default function ProjectCard({ project }) {
+export default function ProjectCard({ project, compact = false }) {
   const status = project.status?.toLowerCase();
 
   const statusStyle = {
@@ -16,7 +16,9 @@ export default function ProjectCard({ project }) {
     <Link
       to={projectDetailsPath(project)}
       state={{ project }}
-      className="block h-[70vh] relative group overflow-hidden rounded-2xl shadow-xl cursor-pointer"
+      className={`block relative group overflow-hidden rounded-2xl shadow-xl cursor-pointer ${
+        compact ? "h-[440px]" : "h-[70vh]"
+      }`}
     >
       {/* Full-cover image */}
       <OptimizedImage

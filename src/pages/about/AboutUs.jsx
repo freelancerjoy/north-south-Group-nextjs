@@ -112,7 +112,7 @@ const AboutUs = () => {
         : defaultAboutContent.overviewParagraphs,
   };
 
-  const [hero1 = defaultAboutContent.heroSlides[0], hero2 = defaultAboutContent.heroSlides[1], hero3 = defaultAboutContent.heroSlides[2]] =
+  const [hero1 = defaultAboutContent.heroSlides[0], hero2 = defaultAboutContent.heroSlides[1]] =
     data.heroSlides || [];
   const embedUrl = getYouTubeEmbedUrl(data.videoUrl);
 
@@ -374,28 +374,33 @@ const AboutUs = () => {
             >
               {data.leaders.map((leader) => (
                 <SwiperSlide key={leader.id}>
-                  <article className="group overflow-hidden rounded-[1.75rem] border border-white/80 bg-white/[0.78] p-3 shadow-[0_28px_85px_-54px_rgba(22,101,52,0.72)] ring-1 ring-green-100/80 backdrop-blur-xl">
+                  <article className="group overflow-hidden rounded-[1.4rem] border border-white/80 bg-white/[0.88] p-3 shadow-[0_24px_70px_-50px_rgba(22,101,52,0.68)] ring-1 ring-green-100/80 backdrop-blur-xl">
                     <button
                       type="button"
                       onClick={() => setSelectedLeader(leader)}
-                      className="relative block w-full overflow-hidden rounded-[1.25rem] text-left"
+                      className="block w-full overflow-hidden rounded-[1rem] text-left"
                       aria-label={`View ${leader.name}`}
                     >
-                      <img
-                        src={leader.img}
-                        alt={leader.name}
-                        className="h-[420px] w-full object-cover transition duration-700 group-hover:scale-105"
-                      />
-                      <div className="absolute inset-0 bg-[linear-gradient(180deg,transparent_42%,rgba(3,7,18,0.82)_100%)]" />
-                      <div className="absolute bottom-0 left-0 right-0 p-6">
+                      <div className="relative overflow-hidden rounded-[1rem]">
+                        <img
+                          src={leader.img}
+                          alt={leader.name}
+                          className="h-[270px] w-full object-cover transition duration-700 group-hover:scale-105 sm:h-[300px]"
+                        />
+                        <div className="absolute inset-0 bg-[linear-gradient(180deg,transparent_52%,rgba(3,7,18,0.54)_100%)]" />
+                      </div>
+                      <div className="px-3 pb-3 pt-5">
                         <h3
-                          className="text-3xl font-semibold leading-tight text-white"
+                          className="text-2xl font-semibold leading-tight text-gray-950"
                           style={displayFont}
                         >
                           {leader.name}
                         </h3>
-                        <p className="mt-2 text-sm font-semibold uppercase text-green-100">
+                        <p className="mt-2 text-xs font-bold uppercase tracking-[0.14em] text-green-700">
                           {leader.role}
+                        </p>
+                        <p className="mt-3 line-clamp-3 min-h-[4.9rem] text-sm leading-6 text-gray-600">
+                          {leader.description || leader.text || "Leadership profile details can be updated from the About page settings."}
                         </p>
                       </div>
                     </button>
@@ -487,6 +492,11 @@ const AboutUs = () => {
               <p className="mt-1 text-sm font-semibold uppercase text-green-700">
                 {selectedLeader.role}
               </p>
+              {(selectedLeader.description || selectedLeader.text) && (
+                <p className="mt-3 text-sm leading-7 text-gray-600">
+                  {selectedLeader.description || selectedLeader.text}
+                </p>
+              )}
             </div>
           </div>
         </div>

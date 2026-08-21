@@ -6,13 +6,13 @@ const PurbachalNirapadValley = () => {
     <ConcernPageTemplate
       theme="emerald"
       eyebrow="Secure Residential Destination"
-      title="Purbachal Nirapad Valley"
+      title="Nirapad Valley Condominium Project"
       subtitle="A planned, green, and secure living destination shaped for families, professionals, and long-term investors who want confidence in every square foot."
       heroImage={NirapadValley}
       aboutImage="https://images.unsplash.com/photo-1600607687939-ce8a6c25118c?auto=format&fit=crop&w=900&q=75"
       aboutTitle="Peaceful living with planned urban comfort"
       aboutParagraphs={[
-        "Purbachal Nirapad Valley is designed around safety, greenery, road access, and a more organized residential lifestyle.",
+        "Nirapad Valley Condominium Project is designed around safety, greenery, road access, and a more organized residential lifestyle.",
         "The project gives residents a calm environment while keeping connectivity, daily convenience, and investment value in focus.",
         "From wide internal movement to secured entry planning, every detail supports a safer and more comfortable address.",
       ]}
@@ -80,7 +80,7 @@ const PurbachalNirapadValley = () => {
         "Protect long-term value through thoughtful development.",
       ]}
       ctaTitle="Explore a safer future address"
-      ctaText="Talk with our team to learn more about Purbachal Nirapad Valley and available opportunities."
+      ctaText="Talk with our team to learn more about Nirapad Valley Condominium Project and available opportunities."
       ctaLabel="Explore Project"
     />
   );

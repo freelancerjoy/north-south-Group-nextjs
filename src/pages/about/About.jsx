@@ -8,14 +8,14 @@ import industrialCityLogo from "../../assets/images/industrialCityLogo.png";
 import { usePartnerStore } from "../../store/partners/partnersStore";
 
 const concerns = [
-  { name: "North South Consortium Ltd", logo },
-  { name: "Northsouth Green City Ltd", logo: greenCityLogo },
+  { name: "North South Consortium L.T.D", logo },
+  { name: "Northsouth Green City L.T.D", logo: greenCityLogo },
   { name: "Northsouth Square City", logo: squareCityLogo },
   { name: "Northsouth Industrial City", logo: industrialCityLogo },
-  { name: "Titanic Bay Hotel & Resort Ltd", logo },
-  { name: "Purbachal Nirapad Valley", logo },
+  { name: "Titanic Bay Hotel & Resort L.T.D", logo },
+  { name: "Nirapad Valley Condominium Project", logo },
   { name: "Northsouth Duplex Home", logo },
-  { name: "Northsouth Farms Ltd", logo },
+  { name: "Northsouth Farms L.T.D", logo },
   { name: "Northsouth Foundation", logo },
 ];
 

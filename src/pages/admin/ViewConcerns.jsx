@@ -10,6 +10,7 @@ import {
   MdBusiness, // A suitable icon for business concerns
 } from "react-icons/md";
 import { AdminCollectionPage, getAdminGridStyles } from "./adminUi";
+import { entityId } from "../../utils/entity";
 
 const ViewConcerns = () => {
   const { concerns, isLoading, loadConcerns, deleteConcern } = useConcernStore();
@@ -30,7 +31,7 @@ const ViewConcerns = () => {
   };
 
   const rows = Array.isArray(concerns) ? concerns.map((c, i) => ({
-    id: c._id,
+    id: entityId(c),
     no: i + 1,
     title: c.title,
     subtitle: c.subtitle,

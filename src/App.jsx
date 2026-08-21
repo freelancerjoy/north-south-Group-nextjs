@@ -188,7 +188,32 @@ function App({ scaling }) {
                   path="/northsouthGarments"
                   element={<DynamicConcernPage slug="northsouth-garments" />}
                 />
+                <Route
+                  path="/northsouthFoundation"
+                  element={<DynamicConcernPage slug="northsouth-foundation" />}
+                />
+                <Route
+                  path="/NorthSouthHumanityAidFoundation"
+                  element={<DynamicConcernPage slug="northsouth-foundation" />}
+                />
+                <Route
+                  path="/northSouthHumanityAidFoundation"
+                  element={<DynamicConcernPage slug="northsouth-foundation" />}
+                />
+                <Route
+                  path="/northsouthButterfly"
+                  element={<DynamicConcernPage slug="northsouth-butterfly" />}
+                />
+                <Route
+                  path="/northsouthToursTravels"
+                  element={<DynamicConcernPage slug="northsouth-tours-travels" />}
+                />
+                <Route
+                  path="/titanicBayHotelResort"
+                  element={<DynamicConcernPage slug="titanic-bay-hotel-resort-ltd" />}
+                />
                 <Route path="/concern/:slug" element={<ConcernRoute />} />
+                <Route path="/:slug" element={<ConcernRoute />} />
 
                 <Route path="/login" element={<Login />} />
                 <Route path="*" element={<NotFound />} />

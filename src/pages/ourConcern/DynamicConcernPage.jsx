@@ -1,38 +1,80 @@
 import { useEffect, useState } from "react";
+import Spinner from "../../components/Spinner";
+import NotFound from "../../components/NotFound";
 import ConcernPageTemplate from "./ConcernPageTemplate";
-import { getDefaultConcern } from "./defaultConcernData";
+import { getDefaultConcern, hasDefaultConcern } from "./defaultConcernData";
 import { useConcernStore } from "../../store/concern/concernStore";
+import { slugify } from "../../utils/entity";
+
+const normalizeConcernSlug = (value = "") => {
+  const decoded = decodeURIComponent(String(value || "").trim());
+  return slugify(decoded);
+};
 
 const DynamicConcernPage = ({ slug }) => {
-  const [data, setData] = useState(getDefaultConcern(slug));
-  const [loading, setLoading] = useState(true);
+  const lookupSlug = normalizeConcernSlug(slug);
+  const defaultSlug = lookupSlug || slug;
+  const [resolved, setResolved] = useState({
+    key: defaultSlug,
+    data: null,
+    isResolving: true,
+    notFound: false,
+  });
   const { loadConcernBySlug } = useConcernStore();
 
   useEffect(() => {
     let mounted = true;
-    setLoading(true);
+    const fallbackConcern = getDefaultConcern(defaultSlug);
 
-    loadConcernBySlug(slug)
+    loadConcernBySlug(slug || lookupSlug)
       .then((concern) => {
-        if (mounted && concern?.isPublished !== false) {
-          setData({ ...getDefaultConcern(slug), ...concern });
+        if (!mounted) return;
+        if (concern?.isPublished === false) {
+          setResolved({
+            key: defaultSlug,
+            data: null,
+            isResolving: false,
+            notFound: true,
+          });
+          return;
         }
+        setResolved({
+          key: defaultSlug,
+          data: { ...(fallbackConcern || {}), ...concern },
+          isResolving: false,
+          notFound: false,
+        });
       })
       .catch(() => {
-        if (mounted) setData(getDefaultConcern(slug));
-      })
-      .finally(() => {
-        if (mounted) setLoading(false);
+        if (!mounted) return;
+        if (hasDefaultConcern(defaultSlug)) {
+          setResolved({
+            key: defaultSlug,
+            data: fallbackConcern,
+            isResolving: false,
+            notFound: false,
+          });
+        } else {
+          setResolved({
+            key: defaultSlug,
+            data: null,
+            isResolving: false,
+            notFound: true,
+          });
+        }
       });
 
     return () => {
       mounted = false;
     };
-  }, [loadConcernBySlug, slug]);
+  }, [defaultSlug, loadConcernBySlug, lookupSlug, slug]);
+
+  if (resolved.key !== defaultSlug || resolved.isResolving) return <Spinner />;
+  if (resolved.notFound || !resolved.data) return <NotFound />;
 
   return (
-    <div className={loading ? "opacity-95 transition-opacity" : "opacity-100 transition-opacity"}>
-      <ConcernPageTemplate {...data} />
+    <div className="opacity-100 transition-opacity">
+      <ConcernPageTemplate {...resolved.data} />
     </div>
   );
 };

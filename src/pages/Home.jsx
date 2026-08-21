@@ -20,21 +20,21 @@ const slides = [
       "Residential, hospitality, and land development projects shaped around trust, location, and long-term value.",
   },
   {
-    image: "/assets/Land%201.png",
+    image: "/assets/Land1.png",
     eyebrow: "Land Development",
     title: "Invest For A Better Tomorrow",
     subtitle:
       "Planned communities and strategic land opportunities for buyers, investors, and landowners.",
   },
   {
-    image: "/assets/Land%202.png",
+    image: "/assets/Land2.png",
     eyebrow: "Trusted Partnership",
     title: "Build Your Sanctuary With Credibility",
     subtitle:
       "A practical route for landowners and families looking for reliable real estate development.",
   },
   {
-    image: "/assets/Apartment.jpg",
+    image: "/assets/apartment.jpg",
     eyebrow: "Real Estate",
     title: "A New Standard Of Living",
     subtitle:
