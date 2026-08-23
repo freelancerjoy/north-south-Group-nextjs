@@ -542,12 +542,12 @@ export default function ProjectDetails() {
         </div>
         {/* Modal */}
         {keyPlanOpen && selectedKey && (
-          <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40">
-            <div className="bg-white rounded-lg shadow-lg max-w-2xl w-full relative">
+          <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40" onClick={handleKeyPlanClose}>
+            <div className="bg-white rounded-lg shadow-lg max-w-2xl w-full relative" onClick={(e) => e.stopPropagation()}>
               {/* Close Button */}
               <button
                 onClick={handleKeyPlanClose}
-                className="absolute top-4 right-4 text-gray-600 hover:text-gray-800 text-4xl"
+                className="absolute top-4 right-4 z-10 text-gray-600 hover:text-gray-800 text-4xl"
               >
                 <IoCloseOutline />
               </button>
@@ -600,16 +600,16 @@ export default function ProjectDetails() {
           </div>
 
           {projectGalleryOpen && selectedProjectGallery && (
-            <div className="fixed inset-0 z-[200] flex items-center justify-center bg-black/90 p-4">
+            <div className="fixed inset-0 z-[200] flex items-center justify-center bg-black/90 p-4" onClick={(e) => e.target === e.currentTarget && handleProjectGalleryClose()}>
               <button
                 onClick={handleProjectGalleryClose}
-                className="absolute right-5 top-5 flex h-10 w-10 items-center justify-center rounded-full bg-white/10 text-white hover:bg-white/20"
+                className="absolute right-5 top-5 z-10 flex h-10 w-10 items-center justify-center rounded-full bg-white/10 text-white hover:bg-white/20"
               >
                 <IoCloseOutline />
               </button>
               <button
                 onClick={handleProjectGalleryPrev}
-                className="absolute left-5 top-1/2 flex h-11 w-11 -translate-y-1/2 items-center justify-center rounded-full bg-white/10 text-3xl text-white hover:bg-white/20"
+                className="absolute left-5 top-1/2 z-10 flex h-11 w-11 -translate-y-1/2 items-center justify-center rounded-full bg-white/10 text-3xl text-white hover:bg-white/20"
               >
                 ‹
               </button>
@@ -623,7 +623,7 @@ export default function ProjectDetails() {
               </div>
               <button
                 onClick={handleProjectGalleryNext}
-                className="absolute right-5 top-1/2 flex h-11 w-11 -translate-y-1/2 items-center justify-center rounded-full bg-white/10 text-3xl text-white hover:bg-white/20"
+                className="absolute right-5 top-1/2 z-10 flex h-11 w-11 -translate-y-1/2 items-center justify-center rounded-full bg-white/10 text-3xl text-white hover:bg-white/20"
               >
                 ›
               </button>
@@ -636,11 +636,11 @@ export default function ProjectDetails() {
 
       {/* ENQUIRY MODAL (from SPECIFICATION button) */}
       {enquiryOpen && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40">
-          <div className="bg-white rounded-lg shadow-lg max-w-2xl w-full relative h-screen overflow-auto scrollbar-hide">
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40" onClick={() => setEnquiryOpen(false)}>
+          <div className="bg-white rounded-lg shadow-lg max-w-2xl w-full relative h-screen overflow-auto scrollbar-hide" onClick={(e) => e.stopPropagation()}>
             <button
               onClick={() => setEnquiryOpen(false)}
-              className="absolute top-4 right-4 text-white hover:text-gray-800 text-4xl"
+              className="absolute top-4 right-4 z-10 text-gray-600 hover:text-gray-800 text-4xl"
             >
               <IoCloseOutline />
             </button>

@@ -57,8 +57,8 @@ export default function RealEstate() {
           <div
             className="
   absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2
-  p-4 sm:p-6 md:p-8 lg:p-10
-  z-50
+  p-3 sm:p-4 md:p-5 lg:p-6
+  z-10
   bg-white/70
   border-4 border-dotted border-gray-500
   rounded-full
@@ -68,18 +68,18 @@ export default function RealEstate() {
               src={heroLogo}
               alt="Centered"
               className="
-      w-24 h-24
-      sm:w-32 sm:h-32
-      md:w-40 md:h-40
-      lg:w-60 lg:h-60
+      w-20 h-20
+      sm:w-24 sm:h-24
+      md:w-32 md:h-32
+      lg:w-40 lg:h-40
       object-contain
     "
             />
           </div>
           <div
             className="absolute top-1/2 left-1/2 transform -translate-x-1/2
-  mt-[180px]
-  p-2 sm:p-4 z-50 flex flex-col items-center justify-center gap-6"
+  mt-[140px] md:mt-[160px]
+  p-2 sm:p-4 z-10 flex flex-col items-center justify-center gap-6"
           >
             <div className="flex flex-wrap justify-center gap-3 sm:gap-6">
               <button

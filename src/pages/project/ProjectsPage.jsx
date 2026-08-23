@@ -101,8 +101,8 @@ export default function ProjectsPage() {
   }, [allProjects]);
 
   const heroSlides = useMemo(() => {
-    const slides = allProjects.map(getProjectImage).filter(Boolean).slice(0, 5);
-    return slides.length > 0 ? slides : [heroImage, fallbackImage];
+    const slides = allProjects.filter(p => getProjectImage(p)).slice(0, 5);
+    return slides.length > 0 ? slides : fallbackProjects;
   }, [allProjects]);
 
   useEffect(() => {
@@ -152,40 +152,89 @@ export default function ProjectsPage() {
 
   return (
     <main className="bg-white pt-24 text-slate-950">
-      <section className="relative min-h-[420px] overflow-hidden bg-slate-950">
+      <section className="relative min-h-[500px] md:min-h-[600px] overflow-hidden bg-slate-950 flex items-center">
         {heroSlides.map((slide, index) => (
-          <OptimizedImage
+          <div
             key={index}
-            src={slide}
-            alt="North South Group projects"
-            priority={index === 0}
-            sizes="100vw"
-            className={`transition-opacity duration-1000 ${
-              index === currentHero ? "opacity-60" : "opacity-0"
+            className={`absolute inset-0 w-full h-full transition-opacity duration-1000 ease-in-out ${
+              index === currentHero ? "opacity-100 z-10" : "opacity-0 z-0"
             }`}
-          />
+          >
+            <OptimizedImage
+              src={getProjectImage(slide)}
+              alt={slide.title || "North South Group projects"}
+              priority={index === 0}
+              sizes="100vw"
+              className={`w-full h-full object-cover transition-transform duration-[6000ms] ease-out ${
+                index === currentHero ? "scale-105" : "scale-100"
+              }`}
+            />
+          </div>
         ))}
-        <div className="absolute inset-0 bg-gradient-to-r from-slate-950/90 via-slate-950/60 to-slate-950/20" />
-        <div className="absolute bottom-8 right-8 z-10 hidden gap-2 md:flex">
+        {/* Gradients for depth and text readability */}
+        <div className="absolute inset-0 bg-gradient-to-t from-slate-950/90 via-slate-950/30 to-transparent z-10" />
+        <div className="absolute inset-0 bg-gradient-to-r from-slate-950/80 via-slate-950/40 to-transparent z-10" />
+        
+        {/* Navigation Indicators */}
+        <div className="absolute bottom-10 left-1/2 -translate-x-1/2 z-20 flex items-center gap-3">
           {heroSlides.map((_, index) => (
             <button
               key={index}
               type="button"
               onClick={() => setCurrentHero(index)}
-              className={`h-1.5 transition-all ${
-                index === currentHero ? "w-10 bg-white" : "w-5 bg-white/40"
+              className={`h-1.5 rounded-full transition-all duration-500 ${
+                index === currentHero ? "w-12 bg-emerald-400" : "w-4 bg-white/40 hover:bg-white/70"
               }`}
               aria-label={`Show project slide ${index + 1}`}
             />
           ))}
         </div>
-        <div className="relative mx-auto flex min-h-[420px] max-w-7xl flex-col justify-center px-5 py-20 lg:px-8">
-          <p className="text-xs font-bold uppercase tracking-[0.32em] text-emerald-300">
-            North South Group
-          </p>
-          <h1 className="mt-4 text-5xl font-black leading-none text-white md:text-7xl">
-            Projects
-          </h1>
+
+        {/* Content */}
+        <div className="relative z-20 mx-auto w-full max-w-7xl px-6 lg:px-8 flex flex-col justify-center h-full min-h-[500px] md:min-h-[600px]">
+          {heroSlides.map((slide, index) => (
+            <div
+              key={`content-${index}`}
+              className={`absolute top-1/2 -translate-y-1/2 left-6 right-6 lg:left-8 lg:right-8 transition-all duration-1000 ease-in-out ${
+                index === currentHero
+                  ? "opacity-100 translate-x-0 pointer-events-auto"
+                  : "opacity-0 -translate-x-10 pointer-events-none"
+              }`}
+            >
+              <div className="flex items-center gap-4 mb-5">
+                <span
+                  className={`text-[10px] sm:text-xs font-bold px-3.5 py-1.5 rounded-full uppercase tracking-[0.2em] text-white shadow-lg border border-white/20 backdrop-blur-sm ${
+                    (slide.status?.toLowerCase() === 'ready' || slide.status?.toLowerCase() === 'handed over') ? 'bg-emerald-600/80' :
+                    slide.status?.toLowerCase() === 'ongoing' ? 'bg-amber-500/80' :
+                    'bg-blue-600/80'
+                  }`}
+                >
+                  {slide.status || 'Upcoming'}
+                </span>
+                <p className="text-xs font-bold uppercase tracking-[0.25em] text-emerald-300 drop-shadow-md">
+                  North South Group
+                </p>
+              </div>
+              <h1 className="text-4xl md:text-5xl lg:text-7xl font-black leading-tight text-white max-w-3xl drop-shadow-xl mb-6">
+                {slide.title || "Projects"}
+              </h1>
+              {getLocation(slide) && (
+                <div className="flex items-center gap-2 text-white/90 mb-8 max-w-2xl">
+                  <span className="w-8 h-px bg-emerald-400 shrink-0" />
+                  <p className="text-sm md:text-base font-light tracking-wide truncate">{getLocation(slide)}</p>
+                </div>
+              )}
+              {slide._id && slide.title && (
+                <Link
+                  to={projectDetailsPath(slide)}
+                  state={{ project: slide }}
+                  className="inline-flex items-center justify-center bg-emerald-600 hover:bg-emerald-500 text-white font-bold py-3.5 px-8 rounded-sm tracking-widest uppercase text-xs transition-colors shadow-lg shadow-emerald-900/30"
+                >
+                  View Details
+                </Link>
+              )}
+            </div>
+          ))}
         </div>
       </section>
 
@@ -317,6 +366,18 @@ function ProjectCard({ project }) {
         />
         <div className="absolute inset-0 bg-gradient-to-b from-black/5 via-black/10 to-black/62 transition duration-500 group-hover:from-black/20 group-hover:via-black/30 group-hover:to-black/78" />
         <div className="absolute inset-0 bg-black/0 transition duration-500 group-hover:bg-black/18" />
+
+        <div className="absolute top-6 left-6 z-10">
+          <span
+            className={`text-xs font-bold px-3 py-1.5 uppercase tracking-[0.15em] text-white ${
+              (project.status?.toLowerCase() === 'ready' || project.status?.toLowerCase() === 'handed over') ? 'bg-emerald-600' :
+              project.status?.toLowerCase() === 'ongoing' ? 'bg-amber-500' :
+              'bg-blue-600'
+            }`}
+          >
+            {project.status || 'Upcoming'}
+          </span>
+        </div>
 
         <div className="absolute inset-x-0 bottom-0 p-8 text-white sm:p-10">
           <div className="transition duration-500 group-hover:-translate-y-6">
