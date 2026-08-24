@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import { MdArrowBack, MdAdd, MdClose, MdCloudUpload, MdDelete } from "react-icons/md";
 import { FaSpinner } from "react-icons/fa";
@@ -278,6 +278,7 @@ const ConcernForm = () => {
   const { concern, isLoading, createConcern, updateConcern, loadConcernById } = useConcernStore();
   const [form, setForm] = useState(emptyConcern);
   const [booting, setBooting] = useState(isEdit);
+  const hasHydratedRef = useRef(false);
   const [imageFiles, setImageFiles] = useState({ heroImage: null, aboutImage: null });
   const [imagePreviews, setImagePreviews] = useState({ heroImage: null, aboutImage: null });
   const [serviceImageFiles, setServiceImageFiles] = useState({});
@@ -305,13 +306,15 @@ const ConcernForm = () => {
   );
 
   useEffect(() => {
+    hasHydratedRef.current = false;
     if (!isEdit) return;
     loadConcernById(id).finally(() => setBooting(false));
   }, [id, isEdit, loadConcernById]);
 
   useEffect(() => {
-    if (isEdit && concern?._id === id) {
+    if (isEdit && concern?._id === id && !hasHydratedRef.current) {
       setForm({ ...emptyConcern, ...concern });
+      hasHydratedRef.current = true;
       setImageFiles({ heroImage: null, aboutImage: null });
       setImagePreviews({ heroImage: null, aboutImage: null });
       setServiceImageFiles({});

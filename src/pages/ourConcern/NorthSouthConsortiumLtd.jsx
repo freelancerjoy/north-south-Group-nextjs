@@ -5,13 +5,13 @@ const NorthSouthConsortiumLtd = () => {
     <ConcernPageTemplate
       theme="teal"
       eyebrow="Diversified Business Platform"
-      title="North South Consortium L.T.D"
+      title="North South Consortium Ltd."
       subtitle="A future-focused concern of North South Group, connecting real estate, business development, investment thinking, and responsible project delivery under one trusted platform."
       heroImage="https://images.unsplash.com/photo-1497366754035-f200968a6e72?auto=format&fit=crop&w=1200&q=75"
       aboutImage="https://images.unsplash.com/photo-1556761175-4b46a572b786?auto=format&fit=crop&w=900&q=75"
       aboutTitle="A strategic engine for sustainable growth"
       aboutParagraphs={[
-        "North South Consortium L.T.D brings together the group's development vision, operational discipline, and partnership network to build value-driven businesses across multiple sectors.",
+        "North South Consortium Ltd. brings together the group's development vision, operational discipline, and partnership network to build value-driven businesses across multiple sectors.",
         "The company focuses on structured planning, market understanding, reliable execution, and long-term stakeholder confidence. Every initiative is shaped around trust, professionalism, and measurable impact.",
         "From early opportunity mapping to implementation support, the concern works as a bridge between ambitious ideas and practical business outcomes.",
       ]}

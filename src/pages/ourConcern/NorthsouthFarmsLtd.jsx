@@ -5,13 +5,13 @@ const NorthsouthFarmsLtd = () => {
     <ConcernPageTemplate
       theme="emerald"
       eyebrow="Sustainable Agriculture"
-      title="Northsouth Farms L.T.D"
+      title="Northsouth Farms Ltd."
       subtitle="Cultivating healthier food systems through responsible farming, modern practices, community connection, and long-term environmental care."
       heroImage="https://images.unsplash.com/photo-1501004318641-b39e6451bec6?auto=format&fit=crop&w=1200&q=75"
       aboutImage="https://images.unsplash.com/photo-1589923188900-85dae523342b?auto=format&fit=crop&w=900&q=75"
       aboutTitle="Farming with responsibility and innovation"
       aboutParagraphs={[
-        "Northsouth Farms L.T.D focuses on sustainable agricultural development by combining practical farming knowledge with modern cultivation methods.",
+        "Northsouth Farms Ltd. focuses on sustainable agricultural development by combining practical farming knowledge with modern cultivation methods.",
         "The concern supports healthier production, responsible land use, and a future-ready approach to agriculture that respects both people and nature.",
         "Through ethical operations and community-minded practices, the farm concern aims to contribute to food security and greener growth.",
       ]}

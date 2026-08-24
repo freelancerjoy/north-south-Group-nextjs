@@ -17,25 +17,25 @@ import { useContactInfoStore } from "../store/contactInfo/contactInfoStore";
 import { useMenuStore } from "../store/menu/menuStore";
 
 const fallbackConcerns = [
-  { label: "North South Consortium L.T.D", to: "/northSouthConsortiumLtd" },
-  { label: "Northsouth Green City L.T.D", to: "/greenCity" },
+  { label: "North South Consortium Ltd.", to: "/northSouthConsortiumLtd" },
+  { label: "Northsouth Green City Ltd.", to: "/greenCity" },
   { label: "Northsouth Industrial City", to: "/industrialCity" },
   { label: "Northsouth Square City", to: "/squareCity" },
   { label: "Nirapad Valley Condominium Project", to: "/purbachalNirapadValley" },
   { label: "Northsouth Duplex Home", to: "/conceptDetails" },
-  { label: "Northsouth Farms L.T.D", to: "/northsouthFarmsLtd" },
+  { label: "Northsouth Farms Ltd.", to: "/northsouthFarmsLtd" },
   { label: "Northsouth Garments", to: "/northsouthGarments" },
   { label: "Northsouth Foundation", to: "/northsouthFoundation" },
   { label: "Northsouth Butterfly Resort & Park", to: "/northsouthButterfly" },
   { label: "Northsouth Tours & Travels", to: "/northsouthToursTravels" },
-  { label: "Titanic Bay Hotel & Resort L.T.D", to: "/titanicBayHotelResort" },
+  { label: "Titanic Bay Hotel & Resort Ltd.", to: "/titanicBayHotelResort" },
 ];
 
 const normalizeConcernLabel = (label = "") => {
   const key = label.trim().toLowerCase();
   if (key === "purbachal nirapad valley") return "Nirapad Valley Condominium Project";
-  if (key === "dailyadin" || key === "daily adin") return "Daily Adin Press Media L.T.D";
-  return label.replace(/\bltd\b/gi, "L.T.D");
+  if (key === "dailyadin" || key === "daily adin") return "Daily Adin Press Media Ltd.";
+  return label.replace(/\bltd\b/gi, "Ltd.");
 };
 
 const buildConcernItems = (menuItems = []) => {

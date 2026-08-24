@@ -58,11 +58,11 @@ const projectItems = [
 
 const fallbackConcernItems = [
   {
-    label: "North South Consortium L.T.D",
+    label: "North South Consortium Ltd.",
     to: "/northSouthConsortiumLtd",
   },
   {
-    label: "Northsouth Green City L.T.D",
+    label: "Northsouth Green City Ltd.",
     to: "/greenCity",
   },
   {
@@ -82,7 +82,7 @@ const fallbackConcernItems = [
     to: "/conceptDetails",
   },
   {
-    label: "Northsouth Farms L.T.D",
+    label: "Northsouth Farms Ltd.",
     to: "/northsouthFarmsLtd",
   },
   {
@@ -90,12 +90,12 @@ const fallbackConcernItems = [
     to: "/northsouthGarments",
   },
   {
-    label: "Daily Adin Press Media L.T.D",
+    label: "Daily Adin Press Media Ltd.",
     href: "https://www.dailyadin.com/",
     external: true,
   },
   {
-    label: "Titanic Bay Hotel & Resort L.T.D",
+    label: "Titanic Bay Hotel & Resort Ltd.",
     href: "https://www.titanicbay.com/",
     external: true,
   },
@@ -109,10 +109,10 @@ const normalizeConcernLabel = (label = "") => {
   }
 
   if (key === "dailyadin" || key === "daily adin") {
-    return "Daily Adin Press Media L.T.D";
+    return "Daily Adin Press Media Ltd.";
   }
 
-  return label.replace(/\bltd\b/gi, "L.T.D");
+  return label.replace(/\bL\.T\.D\.?|\bltd\.?\b/gi, "Ltd.");
 };
 
 const buildConcernItems = (menuItems = []) => {

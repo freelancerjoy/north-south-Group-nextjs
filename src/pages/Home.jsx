@@ -34,7 +34,7 @@ const slides = [
       "A practical route for landowners and families looking for reliable real estate development.",
   },
   {
-    image: "/assets/apartment.jpg",
+    image: "/assets/Apartment.jpg",
     eyebrow: "Real Estate",
     title: "A New Standard Of Living",
     subtitle:

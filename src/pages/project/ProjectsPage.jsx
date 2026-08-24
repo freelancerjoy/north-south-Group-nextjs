@@ -28,7 +28,7 @@ import fallbackImage from "../../assets/images/bannerProjectImg2.jpg";
 const fallbackProjects = [
   {
     _id: "titanic-bay-project",
-    title: "Titanic Bay Hotel & Resort L.T.D",
+    title: "Titanic Bay Hotel & Resort Ltd.",
     status: "upcoming",
     image: [fallbackImage],
     description: {

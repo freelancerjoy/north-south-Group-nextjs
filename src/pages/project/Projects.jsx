@@ -11,7 +11,7 @@ import { entityId } from "../../utils/entity";
 const fallbackProjects = [
   {
     _id: "titanic-bay-project",
-    title: "Titanic Bay Hotel & Resort L.T.D",
+    title: "Titanic Bay Hotel & Resort Ltd.",
     status: "upcoming",
     image: [hotelImage],
     description: {

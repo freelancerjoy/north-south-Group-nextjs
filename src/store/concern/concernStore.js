@@ -117,19 +117,26 @@ export const useConcernStore = create((set, get) => ({
     set({ isLoading: true, error: null });
     try {
       const response = await apiInstance.put(`/concern/${id}`, concernData);
-      const concern = normalizeConcern(unwrap(response));
+      const returnedConcern = normalizeConcern(unwrap(response));
+      const mergedConcern = normalizeConcern({
+        ...(get().concern && entityId(get().concern) === id ? get().concern : {}),
+        ...returnedConcern,
+        ...concernData,
+        _id: id,
+        id,
+      });
       set((state) => ({
         concerns: sortConcernList(state.concerns.map((item) =>
-          entityId(item) === id ? concern : item
+          entityId(item) === id ? mergedConcern : item
         )),
-        concern,
+        concern: mergedConcern,
         isLoading: false,
       }));
       concernsFetchedAt = Date.now();
       concernsLoaded = true;
       await refreshConcernMenu();
       toast.success("Concern updated successfully!");
-      return concern;
+      return mergedConcern;
     } catch (err) {
       set({ error: err.message, isLoading: false });
       toast.error(err?.response?.data?.message || "Failed to update concern.");
