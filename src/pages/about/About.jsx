@@ -54,7 +54,7 @@ export default function About({ className = "" }) {
           </h2>
 
           <div className="space-y-4 text-base text-gray-300">
-            <p className={`leading-relaxed transition-all duration-300 ${expanded ? "" : "line-clamp-10"}`}>
+            <p className={`text-justify leading-relaxed transition-all duration-300 ${expanded ? "" : "line-clamp-10"}`}>
               North South Group is a pioneering housing and real estate company in Bangladesh, dedicated to addressing the accommodation challenges faced by the residents of Dhaka City and its surrounding regions. With a vision to transform lives through exceptional living spaces, our company takes pride in offering a diverse range of residential, land, industrial, and hospitality projects. The group continues to grow through planned communities, trusted project delivery, and sister concerns that support long-term value for clients and investors.
             </p>
 

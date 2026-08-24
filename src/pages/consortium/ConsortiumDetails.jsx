@@ -250,12 +250,17 @@ export default function ProjectDetails() {
               {heroSummary}
             </p>
             <div className="flex gap-3 shrink-0">
-              <button
-                onClick={() => setEnquiryOpen(true)}
-                className="px-6 py-3 bg-green-600 hover:bg-green-500 text-white text-sm font-bold rounded-md tracking-wide uppercase transition-all duration-300"
-              >
-                Download Brochure
-              </button>
+              {project.status && (
+                <div
+                  className={`px-6 py-3 text-white text-sm font-bold rounded-md tracking-wide uppercase shadow-lg ${
+                    (project.status.toLowerCase() === 'ready' || project.status.toLowerCase() === 'handed over') ? 'bg-emerald-600' :
+                    project.status.toLowerCase() === 'ongoing' ? 'bg-amber-500' :
+                    'bg-blue-600'
+                  }`}
+                >
+                  {project.status} Project
+                </div>
+              )}
             </div>
           </div>
 

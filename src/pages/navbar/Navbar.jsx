@@ -39,7 +39,7 @@ const projectItems = [
   },
   {
     label: "Commercial Project",
-    to: "/industrialCity",
+    to: "/commercial-project",
   },
   {
     label: "Duplex Project",

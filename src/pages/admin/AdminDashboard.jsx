@@ -68,6 +68,12 @@ const navSections = [
         match: ["viewIndustrialCity", "createIndustrialCity", "updateIndustrialCity"],
       },
       {
+        label: "Commercial Project",
+        to: "viewCommercialProject",
+        icon: <MdApartment size={18} />,
+        match: ["viewCommercialProject", "createCommercialProject", "updateCommercialProject"],
+      },
+      {
         label: "Reviews",
         to: "viewReview",
         icon: <MdRateReview size={20} />,

@@ -27,6 +27,7 @@ const Gallery = lazy(() => import("./pages/Gallery"));
 const Login = lazy(() => import("./pages/user/Login.jsx"));
 const DynamicConcernPage = lazy(() => import("./pages/ourConcern/DynamicConcernPage.jsx"));
 const ProjectsPage = lazy(() => import("./pages/project/ProjectsPage.jsx"));
+const CommercialProject = lazy(() => import("./pages/commercial-project/CommercialProject.jsx"));
 
 const AdminDashboard = lazy(() => import("./pages/admin/AdminDashboard"));
 const ViewDashboard = lazy(() => import("./pages/admin/ViewDashboard"));
@@ -49,9 +50,12 @@ const CreateIndustrialCity = lazy(() => import("./pages/admin/bannerProjects/Cre
 const ViewGreenCity = lazy(() => import("./pages/admin/bannerProjects/ViewGreenCity"));
 const ViewSquareCity = lazy(() => import("./pages/admin/bannerProjects/ViewSquareCity"));
 const ViewIndustrialCity = lazy(() => import("./pages/admin/bannerProjects/ViewIndustrialCity"));
+const ViewCommercialProject = lazy(() => import("./pages/admin/commercialProject/ViewCommercialProject"));
 const UpdateGreenCity = lazy(() => import("./pages/admin/bannerProjects/UpdateGreenCity"));
 const UpdateSquareCity = lazy(() => import("./pages/admin/bannerProjects/UpdateSquareCity"));
 const UpdateIndustrialCity = lazy(() => import("./pages/admin/bannerProjects/UpdateIndustrialCity"));
+const UpdateCommercialProject = lazy(() => import("./pages/admin/commercialProject/UpdateCommercialProject"));
+const CreateCommercialProject = lazy(() => import("./pages/admin/commercialProject/CreateCommercialProject"));
 const CreateReview = lazy(() => import("./pages/admin/review/CreateReview"));
 const ViewReview = lazy(() => import("./pages/admin/review/ViewReview.jsx"));
 const UpdateReview = lazy(() => import("./pages/admin/review/UpdateReview.jsx"));
@@ -157,6 +161,7 @@ function App({ scaling }) {
                   path="/projects"
                   element={<ProjectsPage />}
                 />
+                <Route path="/commercial-project" element={<CommercialProject />} />
                 <Route path="/landWanted" element={<LandWanted />} />
                 <Route path="/bannerProject" element={<BannerProject />} />
                 <Route path="/greenCity" element={<GreenCity />} />
@@ -267,7 +272,10 @@ function App({ scaling }) {
                   path="updateIndustrialCity/:id"
                   element={<UpdateIndustrialCity />}
                 />
-                 <Route
+                <Route path="viewCommercialProject" element={<ViewCommercialProject />} />
+                <Route path="createCommercialProject" element={<CreateCommercialProject />} />
+                <Route path="updateCommercialProject/:id" element={<UpdateCommercialProject />} />
+                <Route
                   path="createReview"
                   element={<CreateReview />}
                 />
