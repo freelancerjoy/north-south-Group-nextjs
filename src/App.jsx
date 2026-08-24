@@ -56,6 +56,9 @@ const UpdateSquareCity = lazy(() => import("./pages/admin/bannerProjects/UpdateS
 const UpdateIndustrialCity = lazy(() => import("./pages/admin/bannerProjects/UpdateIndustrialCity"));
 const UpdateCommercialProject = lazy(() => import("./pages/admin/commercialProject/UpdateCommercialProject"));
 const CreateCommercialProject = lazy(() => import("./pages/admin/commercialProject/CreateCommercialProject"));
+const ViewHomeSlider = lazy(() => import("./pages/admin/homeSlider/ViewHomeSlider.jsx"));
+const CreateHomeSlider = lazy(() => import("./pages/admin/homeSlider/CreateHomeSlider.jsx"));
+const UpdateHomeSlider = lazy(() => import("./pages/admin/homeSlider/UpdateHomeSlider.jsx"));
 const CreateReview = lazy(() => import("./pages/admin/review/CreateReview"));
 const ViewReview = lazy(() => import("./pages/admin/review/ViewReview.jsx"));
 const UpdateReview = lazy(() => import("./pages/admin/review/UpdateReview.jsx"));
@@ -251,10 +254,22 @@ function App({ scaling }) {
                 <Route path="createGreenCity" element={<CreateGreenCity />} />
                 <Route path="createSquareCity" element={<CreateSquareCity />} />
                 <Route
-                  path="createIndustrialCity"
-                  element={<CreateIndustrialCity />}
+                  path="updateIndustrialCity/:id"
+                  element={<UpdateIndustrialCity />}
                 />
-                <Route path="viewGreenCity" element={<ViewGreenCity />} />
+                <Route
+                  path="viewHomeSlider"
+                  element={<ViewHomeSlider />}
+                />
+                <Route
+                  path="createHomeSlider"
+                  element={<CreateHomeSlider />}
+                />
+                <Route
+                  path="updateHomeSlider/:id"
+                  element={<UpdateHomeSlider />}
+                />
+                <Route path="createReview" element={<CreateReview />} />
                 <Route path="viewSquareCity" element={<ViewSquareCity />} />
                 <Route
                   path="viewIndustrialCity"

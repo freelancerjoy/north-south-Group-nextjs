@@ -95,6 +95,11 @@ const fallbackConcernItems = [
     external: true,
   },
   {
+    label: "Daily Adin (NewsPaper)",
+    href: "https://www.dailyadin.com/",
+    external: true,
+  },
+  {
     label: "Titanic Bay Hotel & Resort Ltd.",
     href: "https://www.titanicbay.com/",
     external: true,
@@ -166,6 +171,19 @@ const buildConcernItems = (menuItems = []) => {
 
   if (!Array.isArray(menuItems) || !menuItems.length) {
     fallbackConcernItems.forEach(addItem);
+  }
+
+  // Always ensure Daily Adin (NewsPaper) is present as a static link
+  // Force-push directly to bypass href-duplicate check (same domain as Daily Adin Press Media)
+  const alreadyHasNewspaper = items.some(
+    (i) => i.label?.toLowerCase().includes("newspaper") || i.label?.toLowerCase().includes("daily adin (")
+  );
+  if (!alreadyHasNewspaper) {
+    items.push({
+      label: "Daily Adin (NewsPaper)",
+      href: "https://www.dailyadin.com/",
+      external: true,
+    });
   }
 
   return items;

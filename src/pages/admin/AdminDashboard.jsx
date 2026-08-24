@@ -17,6 +17,7 @@ import {
   MdLogout,
   MdManageAccounts,
   MdChevronRight,
+  MdViewCarousel,
 } from "react-icons/md";
 import { FaLeaf, FaCity, FaIndustry } from "react-icons/fa";
 
@@ -66,6 +67,12 @@ const navSections = [
         to: "viewIndustrialCity",
         icon: <FaIndustry size={18} />,
         match: ["viewIndustrialCity", "createIndustrialCity", "updateIndustrialCity"],
+      },
+      {
+        label: "Home Slider",
+        to: "viewHomeSlider",
+        icon: <MdViewCarousel size={20} />,
+        match: ["viewHomeSlider", "createHomeSlider", "updateHomeSlider"],
       },
       {
         label: "Commercial Project",
