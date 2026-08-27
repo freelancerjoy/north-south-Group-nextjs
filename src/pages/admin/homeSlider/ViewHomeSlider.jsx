@@ -27,7 +27,7 @@ const ViewHomeSlider = () => {
             width: 150,
             renderCell: (params) => (
                 <img 
-                    src={params.row.image} 
+                    src={params.row.image?.url || params.row.image || ""} 
                     alt="slide" 
                     className="h-10 w-10 object-cover rounded-md"
                 />

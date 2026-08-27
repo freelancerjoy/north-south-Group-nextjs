@@ -91,7 +91,6 @@ const albums = [
     label: "Event album",
     description: "Press, event, and publication moments from Daily Adin news paper activities.",
     folder: "Daily adin",
-    externalUrl: "https://www.dailyadin.com/",
     images: makeImages("Daily adin", dailyAdinImages),
   },
   {

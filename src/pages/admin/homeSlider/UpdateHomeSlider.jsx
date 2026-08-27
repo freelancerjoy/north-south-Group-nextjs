@@ -28,7 +28,7 @@ const UpdateHomeSlider = () => {
                     subtitle: slide.subtitle || '',
                     sortOrder: slide.sortOrder || 0
                 });
-                setCurrentImage(slide.image);
+                setCurrentImage(slide.image?.url || slide.image || '');
             }
         }
     }, [id, slides, loadSlides]);

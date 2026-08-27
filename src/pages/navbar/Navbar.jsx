@@ -36,6 +36,13 @@ const projectItems = [
   {
     label: "Apartment Project",
     to: "/projects",
+    submenu: [
+      { label: "All Project", to: "/projects" },
+      { label: "Ongoing", to: "/projects?status=Ongoing" },
+      { label: "Upcoming", to: "/projects?status=Upcoming" },
+      { label: "Ready", to: "/projects?status=Ready" },
+      { label: "Handed Over", to: "/projects?status=Handed Over" },
+    ],
   },
   {
     label: "Commercial Project",
@@ -117,7 +124,7 @@ const normalizeConcernLabel = (label = "") => {
     return "Daily Adin Press Media Ltd.";
   }
 
-  return label.replace(/\bL\.T\.D\.?|\bltd\.?\b/gi, "Ltd.");
+  return label.replace(/\bL\.T\.D\b\.?|\bltd\b\.?/gi, "Ltd.");
 };
 
 const buildConcernItems = (menuItems = []) => {
@@ -193,7 +200,7 @@ function Navbar() {
   const [open, setOpen] = useState(false);
   const [openSub, setOpenSub] = useState(false);
   const [openProjectSub, setOpenProjectSub] = useState(false);
-  const [openLandSub, setOpenLandSub] = useState(false);
+  const [activeProjectSub, setActiveProjectSub] = useState(null);
   const [scrolled, setScrolled] = useState(false);
 
   const { user, logoutUser, isLoggedIn } = useAuthStore();
@@ -1002,9 +1009,8 @@ function Navbar() {
                       <>
                         <button
                           onClick={() =>
-                            setOpenLandSub(
-                              (prev) =>
-                                !prev
+                            setActiveProjectSub((prev) =>
+                              prev === item.label ? null : item.label
                             )
                           }
                           className="
@@ -1033,7 +1039,7 @@ function Navbar() {
                           <MdKeyboardArrowDown
                             size={15}
                             className={`ml-auto transition-transform duration-300 ${
-                              openLandSub
+                              activeProjectSub === item.label
                                 ? "rotate-180 text-green-500"
                                 : "text-gray-300"
                             }`}
@@ -1041,10 +1047,10 @@ function Navbar() {
 
                         </button>
 
-                        {/* Land mobile submenu */}
+                        {/* Mobile submenu items */}
                         <ul
                           className={`overflow-hidden transition-all duration-300 bg-white ${
-                            openLandSub
+                            activeProjectSub === item.label
                               ? "max-h-60 opacity-100"
                               : "max-h-0 opacity-0"
                           }`}
