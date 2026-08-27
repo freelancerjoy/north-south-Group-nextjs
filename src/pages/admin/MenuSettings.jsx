@@ -59,20 +59,12 @@ export default function MenuSettings() {
     await saveConcernMenuItems(draftItems);
   };
 
-  const moveItem = (index, direction) => {
+  const moveItem = async (index, direction) => {
     const nextIndex = index + direction;
     if (nextIndex < 0 || nextIndex >= draftItems.length) return;
-
-    const nextItems = [...draftItems];
-    [nextItems[index], nextItems[nextIndex]] = [nextItems[nextIndex], nextItems[index]];
-    markDraftItems(nextItems);
-  };
-
-  const toggleItem = (index) => {
-    const nextItems = draftItems.map((item, itemIndex) =>
-      itemIndex === index ? { ...item, isVisible: item.isVisible === false } : item
-    );
-    markDraftItems(nextItems);
+    const nextItems = reorderItems(draftItems, getItemId(draftItems[index]), getItemId(draftItems[nextIndex]));
+    setDraftItems(nextItems);
+    await saveConcernMenuItems(nextItems);
   };
 
   const refreshMenu = async () => {
@@ -100,16 +92,18 @@ export default function MenuSettings() {
     event.dataTransfer.dropEffect = "move";
   };
 
-  const handleDrop = (event, item) => {
+  const handleDrop = async (event, item) => {
     event.preventDefault();
     const fromId = event.dataTransfer.getData("text/plain") || draggingId;
     const toId = getItemId(item);
     const nextItems = reorderItems(draftItems, fromId, toId);
 
-    setDraggingId(null);
     setDragOverId(null);
 
-    if (nextItems !== draftItems) markDraftItems(nextItems);
+    if (nextItems !== draftItems) {
+      setDraftItems(nextItems);
+      await saveConcernMenuItems(nextItems);
+    }
   };
 
   const handleDragEnd = () => {

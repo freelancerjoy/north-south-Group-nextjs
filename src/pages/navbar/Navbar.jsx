@@ -129,7 +129,8 @@ const normalizeConcernLabel = (label = "") => {
 
 const buildConcernItems = (menuItems = []) => {
   const items = [];
-  const seen = new Set();
+  const seenLabels = new Set();
+  const seenRoutes = new Set();
 
   const addItem = (item) => {
     const normalizedItem = {
@@ -141,25 +142,17 @@ const buildConcernItems = (menuItems = []) => {
     const routeKey = item.to?.trim().toLowerCase();
     const hrefKey = item.href?.trim().toLowerCase();
 
-    if (
-      !labelKey ||
-      (!routeKey && !hrefKey) ||
-      seen.has(labelKey) ||
-      seen.has(routeKey) ||
-      seen.has(hrefKey)
-    ) {
-      return;
-    }
+    // Must have a label and at least one destination
+    if (!labelKey || (!routeKey && !hrefKey)) return;
 
-    seen.add(labelKey);
+    // Deduplicate by label always
+    if (seenLabels.has(labelKey)) return;
 
-    if (routeKey) {
-      seen.add(routeKey);
-    }
+    // Deduplicate by internal route (to), but NOT by href (external links can share the same href)
+    if (routeKey && seenRoutes.has(routeKey)) return;
 
-    if (hrefKey) {
-      seen.add(hrefKey);
-    }
+    seenLabels.add(labelKey);
+    if (routeKey) seenRoutes.add(routeKey);
 
     items.push(normalizedItem);
   };
@@ -181,7 +174,6 @@ const buildConcernItems = (menuItems = []) => {
   }
 
   // Always ensure Daily Adin (NewsPaper) is present as a static link
-  // Force-push directly to bypass href-duplicate check (same domain as Daily Adin Press Media)
   const alreadyHasNewspaper = items.some(
     (i) => i.label?.toLowerCase().includes("newspaper") || i.label?.toLowerCase().includes("daily adin (")
   );
