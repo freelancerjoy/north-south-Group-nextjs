@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useState } from "react";
-import { Link } from "react-router-dom";
+import { Link, useSearchParams } from "react-router-dom";
 import { FaSpinner } from "react-icons/fa";
 import {
   MdKeyboardArrowDown,
@@ -119,6 +119,7 @@ function CornerFrame({ inset = "inset-6", color = "border-white/70", className =
 
 export default function ProjectsPage() {
   const { projects, loadProjects, isLoading } = useProjectStore();
+  const [searchParams] = useSearchParams();
   const [status, setStatus] = useState("all");
   const [location, setLocation] = useState("all");
   const [size, setSize] = useState("all");
@@ -129,6 +130,19 @@ export default function ProjectsPage() {
   useEffect(() => {
     loadProjects();
   }, [loadProjects]);
+
+  // Read ?status= from URL and apply as filter, then scroll to grid
+  useEffect(() => {
+    const urlStatus = searchParams.get("status");
+    if (urlStatus) {
+      setStatus(urlStatus.toLowerCase());
+      // Scroll to projects grid after a short delay
+      setTimeout(() => {
+        const el = document.getElementById("projects-grid");
+        if (el) el.scrollIntoView({ behavior: "smooth", block: "start" });
+      }, 300);
+    }
+  }, [searchParams]);
 
   const allProjects = useMemo(() => {
     const projectList = Array.isArray(projects) ? projects : [];
@@ -312,7 +326,7 @@ export default function ProjectsPage() {
       </section>
 
       {/* --------------------------------------------------------- FILTER DECK */}
-      <section className="relative z-30 mx-auto -mt-14 max-w-6xl px-5 md:-mt-16 lg:px-8">
+      <section id="projects-grid" className="relative z-30 mx-auto -mt-14 max-w-6xl px-5 md:-mt-16 lg:px-8">
         <div className="border border-stone-200 bg-white/95 p-6 shadow-[0_20px_60px_-15px_rgba(15,23,42,0.25)] backdrop-blur-sm md:p-8">
           <div className="mb-6 flex items-center gap-2 text-slate-400">
             <MdOutlineTune className="text-base" />

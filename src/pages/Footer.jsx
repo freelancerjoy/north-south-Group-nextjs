@@ -64,8 +64,8 @@ const Footer = () => {
 
   useEffect(() => {
     loadContactInfo();
-    if (!concernMenuItems?.length) loadConcernMenuItems();
-  }, [loadContactInfo, loadConcernMenuItems, concernMenuItems?.length]);
+    loadConcernMenuItems();
+  }, [loadContactInfo, loadConcernMenuItems]);
 
   const socialLinks = [
     {

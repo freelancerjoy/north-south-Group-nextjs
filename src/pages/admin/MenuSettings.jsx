@@ -9,6 +9,7 @@ import {
   MdRefresh,
   MdVisibility,
   MdVisibilityOff,
+  MdDelete,
 } from "react-icons/md";
 import { useMenuStore } from "../../store/menu/menuStore";
 import { cardClass, sectionTitleClass } from "./projects/projectFormUi";
@@ -16,6 +17,7 @@ import { cardClass, sectionTitleClass } from "./projects/projectFormUi";
 const itemTypeClass = {
   static: "border-sky-100 bg-sky-50 text-sky-700",
   concern: "border-emerald-100 bg-emerald-50 text-emerald-700",
+  custom: "border-purple-100 bg-purple-50 text-purple-700",
 };
 
 const getItemId = (item) => item?._id || item?.key;
@@ -35,11 +37,24 @@ const reorderItems = (items, fromId, toId) => {
 };
 
 export default function MenuSettings() {
-  const { concernMenuItems, isLoading, loadConcernMenuItems, saveConcernMenuItems } = useMenuStore();
+  const { concernMenuItems, isLoading, loadConcernMenuItems, saveConcernMenuItems, addCustomMenuItem, deleteCustomMenuItem } = useMenuStore();
   const [draftItems, setDraftItems] = useState([]);
   const [draggingId, setDraggingId] = useState(null);
   const [dragOverId, setDragOverId] = useState(null);
   const [hasChanges, setHasChanges] = useState(false);
+
+  const [customLabel, setCustomLabel] = useState("");
+  const [customUrl, setCustomUrl] = useState("");
+  const [customExternal, setCustomExternal] = useState(false);
+
+  const handleAddCustom = async (e) => {
+    e.preventDefault();
+    if (!customLabel || !customUrl) return;
+    await addCustomMenuItem({ label: customLabel, url: customUrl, external: customExternal });
+    setCustomLabel("");
+    setCustomUrl("");
+    setCustomExternal(false);
+  };
 
   useEffect(() => {
     loadConcernMenuItems();
@@ -154,6 +169,48 @@ export default function MenuSettings() {
           </div>
         </div>
 
+        <form onSubmit={handleAddCustom} className="mb-6 flex flex-wrap items-end gap-3 rounded-2xl bg-slate-50 p-4 border border-slate-100">
+          <div className="flex-1 min-w-[200px]">
+            <label className="block text-xs font-bold text-slate-700 mb-1">Label</label>
+            <input 
+              type="text" 
+              required
+              placeholder="e.g. Google"
+              value={customLabel}
+              onChange={e => setCustomLabel(e.target.value)}
+              className="w-full rounded-xl border-slate-200 bg-white px-3 py-2 text-sm text-slate-900 focus:border-emerald-500 focus:ring-emerald-500" 
+            />
+          </div>
+          <div className="flex-1 min-w-[200px]">
+            <label className="block text-xs font-bold text-slate-700 mb-1">URL / Link</label>
+            <input 
+              type="text" 
+              required
+              placeholder="https://... or /path"
+              value={customUrl}
+              onChange={e => setCustomUrl(e.target.value)}
+              className="w-full rounded-xl border-slate-200 bg-white px-3 py-2 text-sm text-slate-900 focus:border-emerald-500 focus:ring-emerald-500" 
+            />
+          </div>
+          <div className="flex items-center gap-2 h-10 px-2">
+            <input 
+              type="checkbox" 
+              id="ext"
+              checked={customExternal}
+              onChange={e => setCustomExternal(e.target.checked)}
+              className="h-4 w-4 rounded border-slate-300 text-emerald-600 focus:ring-emerald-600" 
+            />
+            <label htmlFor="ext" className="text-sm font-bold text-slate-700">External</label>
+          </div>
+          <button 
+            type="submit" 
+            disabled={isLoading}
+            className="flex h-10 items-center justify-center rounded-xl bg-slate-900 px-5 text-sm font-bold text-white transition hover:bg-slate-800 disabled:opacity-50"
+          >
+            Add Custom Link
+          </button>
+        </form>
+
         <div className="space-y-3">
           {draftItems.map((item, index) => {
             const url = item.href || item.to || "";
@@ -246,6 +303,21 @@ export default function MenuSettings() {
                   >
                     {hidden ? <MdVisibility size={20} /> : <MdVisibilityOff size={20} />}
                   </button>
+                  {item.source === "custom" && (
+                    <button
+                      type="button"
+                      title="Delete custom link"
+                      disabled={isLoading}
+                      onClick={async () => {
+                        if (window.confirm("Are you sure you want to delete this link?")) {
+                          await deleteCustomMenuItem(getItemId(item));
+                        }
+                      }}
+                      className="flex h-10 w-10 items-center justify-center rounded-xl transition bg-red-50 text-red-600 hover:bg-red-100 disabled:cursor-not-allowed disabled:opacity-40"
+                    >
+                      <MdDelete size={20} />
+                    </button>
+                  )}
                 </div>
               </div>
             );

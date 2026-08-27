@@ -4,7 +4,7 @@ import apiInstance from "../../config/axios";
 import { entityId } from "../../utils/entity";
 
 const unwrap = (response) => response.data?.data ?? response.data;
-const CACHE_TTL = 5 * 60 * 1000;
+const CACHE_TTL = 30 * 1000; // 30 seconds — so menu updates show fast
 let menuRequest = null;
 let menuFetchedAt = 0;
 let menuLoaded = false;
@@ -130,11 +130,45 @@ export const useMenuStore = create((set, get) => ({
       set({ concernMenuItems: items, isLoading: false });
       menuFetchedAt = Date.now();
       menuLoaded = true;
-      toast.success("Menu order updated successfully!");
+      // toast.success("Menu order updated successfully!");
       return items;
     } catch (err) {
       set({ concernMenuItems: previousItems, error: err.message, isLoading: false });
       toast.error(err?.response?.data?.message || "Failed to update menu order.");
+      throw err;
+    }
+  },
+
+  addCustomMenuItem: async (data) => {
+    set({ isLoading: true, error: null });
+    try {
+      const response = await apiInstance.post("/menu/custom", data);
+      const items = sortMenuItems(unwrap(response));
+      set({ concernMenuItems: items, isLoading: false });
+      menuFetchedAt = Date.now();
+      menuLoaded = true;
+      toast.success("Custom link added successfully!");
+      return items;
+    } catch (err) {
+      set({ error: err.message, isLoading: false });
+      toast.error(err?.response?.data?.message || "Failed to add custom link.");
+      throw err;
+    }
+  },
+
+  deleteCustomMenuItem: async (id) => {
+    set({ isLoading: true, error: null });
+    try {
+      const response = await apiInstance.delete(`/menu/custom/${id}`);
+      const items = sortMenuItems(unwrap(response));
+      set({ concernMenuItems: items, isLoading: false });
+      menuFetchedAt = Date.now();
+      menuLoaded = true;
+      toast.success("Custom link deleted!");
+      return items;
+    } catch (err) {
+      set({ error: err.message, isLoading: false });
+      toast.error(err?.response?.data?.message || "Failed to delete custom link.");
       throw err;
     }
   },

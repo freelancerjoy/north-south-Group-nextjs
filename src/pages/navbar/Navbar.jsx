@@ -97,11 +97,6 @@ const fallbackConcernItems = [
     to: "/northsouthGarments",
   },
   {
-    label: "Daily Adin Press Media Ltd.",
-    href: "https://www.dailyadin.com/",
-    external: true,
-  },
-  {
     label: "Daily Adin (NewsPaper)",
     href: "https://www.dailyadin.com/",
     external: true,
@@ -118,10 +113,6 @@ const normalizeConcernLabel = (label = "") => {
 
   if (key === "purbachal nirapad valley") {
     return "Nirapad Valley Condominium Project";
-  }
-
-  if (key === "dailyadin" || key === "daily adin") {
-    return "Daily Adin Press Media Ltd.";
   }
 
   return label.replace(/\bL\.T\.D\b\.?|\bltd\b\.?/gi, "Ltd.");
@@ -231,15 +222,10 @@ function Navbar() {
     };
   }, []);
 
-  // Load concern menu
+  // Load concern menu (cache handled inside store)
   useEffect(() => {
-    if (!concernMenuItems?.length) {
-      loadConcernMenuItems();
-    }
-  }, [
-    concernMenuItems?.length,
-    loadConcernMenuItems,
-  ]);
+    loadConcernMenuItems();
+  }, [loadConcernMenuItems]);
 
   // Logout
   const logOut = async () => {
