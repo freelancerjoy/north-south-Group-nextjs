@@ -99,6 +99,12 @@ export default function AboutUs() {
   );
 
   const [hero1 = defaultAboutContent.heroSlides[0]] = data.heroSlides || [];
+  const overviewImage = data.heroSlides?.[1] || hero1;
+  const overviewGallery = [
+    overviewImage,
+    data.csrImages?.[0]?.img,
+    data.csrImages?.[2]?.img,
+  ].filter(Boolean);
   const embedUrl = getYouTubeEmbedUrl(data.videoUrl);
   const sortedLeaders = useMemo(() => {
     return [...data.leaders].sort((a, b) => {
@@ -192,24 +198,16 @@ export default function AboutUs() {
             </div>
           </MotionDiv>
 
-          <div className="self-end">
-            <div className="grid grid-cols-2 gap-px overflow-hidden border border-[#f3b128]/25 bg-[#f3b128]/25 backdrop-blur-md sm:grid-cols-4 lg:grid-cols-2">
-              {data.stats.map((stat, index) => {
-                const Icon = statIcons[index % statIcons.length];
-                return (
-                  <div key={stat.label} className="bg-[#06211f]/72 p-5">
-                    <Icon className="mb-4 text-[#0f7771]" />
-                    <p className="about-display text-3xl font-semibold champagne-text">
-                      {stat.value}
-                    </p>
-                    <p className="about-body mt-1 text-[11px] font-bold uppercase tracking-[0.18em] text-[#cdece7]">
-                      {stat.label}
-                    </p>
-                  </div>
-                );
-              })}
+          <div className="self-end justify-self-start lg:justify-self-end">
+            <div className="border-l-2 border-[#f3b128] bg-[#06211f]/55 p-5 backdrop-blur-md">
+              <p className="about-body text-[11px] font-extrabold uppercase tracking-[0.24em] text-[#f3b128]">
+                {data.overviewBadge}
+              </p>
+              <p className="about-display mt-2 max-w-sm text-2xl font-semibold uppercase leading-tight text-white">
+                {data.overviewHighlightTitle}
+              </p>
             </div>
-            <div className="mt-5 flex items-center gap-3">
+            <div className="mt-6 flex items-center gap-3">
               {data.heroSlides.map((_, idx) => (
                 <button
                   key={idx}
@@ -226,38 +224,136 @@ export default function AboutUs() {
         </div>
       </section>
 
-      <section id="overview" className="bg-[#f4fbf9] py-24 text-[#0a2a66] md:py-32">
-        <div className="mx-auto grid max-w-7xl gap-12 px-4 sm:px-6 lg:grid-cols-[0.75fr_1.25fr] lg:px-8">
-          <div>
-            <p className="about-body text-xs font-extrabold uppercase tracking-[0.28em] text-[#0f7771]">
-              {data.overviewEyebrow}
-            </p>
-            <h2 className="about-display mt-4 text-4xl font-semibold uppercase leading-[1.08] sm:text-5xl">
-              {data.overviewTitle}
-            </h2>
-          </div>
-          <div className="space-y-7">
-            <p className="about-body text-xl leading-9 text-[#0a2a66]">{data.overviewText}</p>
-            <div className="grid gap-4">
-              {data.overviewParagraphs.map((paragraph, index) => (
-                <div key={index} className="grid grid-cols-[52px_1fr] border-t border-[#b7dad4] pt-5">
-                  <span className="about-display text-2xl text-[#0f7771]">
-                    {String(index + 1).padStart(2, "0")}
-                  </span>
-                  <p className="about-body leading-8 text-[#315b67]">{paragraph}</p>
-                </div>
-              ))}
-            </div>
-            <div className="flex flex-wrap gap-2 pt-3">
-              {signatureVentures.map((venture) => (
-                <span
-                  key={venture}
-                  className="about-body border border-[#7bc1b8] bg-white/45 px-4 py-2 text-[11px] font-extrabold uppercase tracking-[0.16em] text-[#0a2a66]"
+      <section className="relative z-10 bg-[#06211f] text-white">
+        <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+          <div className="-mt-8 grid overflow-hidden border border-[#0f7771]/35 bg-[#082b28] shadow-[0_30px_90px_rgba(0,0,0,0.28)] sm:grid-cols-2 lg:grid-cols-4">
+            {data.stats.map((stat, index) => {
+              const Icon = statIcons[index % statIcons.length];
+              return (
+                <div
+                  key={stat.label}
+                  className="group relative min-h-[150px] border-b border-[#0f7771]/20 p-6 transition hover:bg-[#0b3a36] sm:border-r lg:border-b-0"
                 >
-                  {venture}
+                  <div className="absolute inset-x-0 top-0 h-1 bg-[#f3b128] opacity-0 transition group-hover:opacity-100" />
+                  <div className="mb-5 flex items-center justify-between">
+                    <Icon className="text-2xl text-[#0f7771]" />
+                    <span className="about-body text-[11px] font-bold uppercase tracking-[0.18em] text-[#7bc1b8]">
+                      0{index + 1}
+                    </span>
+                  </div>
+                  <p className="about-display text-4xl font-semibold leading-none champagne-text">
+                    {stat.value}
+                  </p>
+                  <p className="about-body mt-3 text-xs font-extrabold uppercase tracking-[0.2em] text-[#cdece7]">
+                    {stat.label}
+                  </p>
+                </div>
+              );
+            })}
+          </div>
+        </div>
+      </section>
+
+      <section id="overview" className="relative overflow-hidden bg-[#f4fbf9] py-24 text-[#0a2a66] md:py-32">
+        <div className="absolute inset-x-0 top-0 h-32 bg-gradient-to-b from-[#06211f] to-transparent" />
+        <div className="absolute inset-0 bg-[linear-gradient(120deg,rgba(15,119,113,0.08)_0%,rgba(244,251,249,0)_52%,rgba(243,177,40,0.1)_100%)]" />
+        <div className="relative mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+          <div className="mb-12 grid gap-8 lg:grid-cols-[0.8fr_1.2fr] lg:items-end">
+            <div>
+              <div className="inline-flex items-center gap-3 border-y border-[#0f7771]/25 py-2 pr-4">
+                <span className="h-px w-10 bg-[#0f7771]" />
+                <span className="about-body text-xs font-extrabold uppercase tracking-[0.28em] text-[#0f7771]">
+                  {data.overviewEyebrow}
                 </span>
-              ))}
+              </div>
+              <h2 className="about-display mt-5 max-w-3xl text-4xl font-semibold uppercase leading-[1.02] text-[#0a2a66] sm:text-6xl">
+                {data.overviewTitle}
+              </h2>
             </div>
+            <p className="about-body max-w-2xl border-l-4 border-[#f3b128] pl-6 text-lg leading-9 text-[#315b67] lg:justify-self-end">
+              {data.overviewText}
+            </p>
+          </div>
+
+          <div className="grid gap-8 lg:grid-cols-[1.1fr_0.9fr] lg:items-stretch">
+            <MotionDiv
+              initial={{ opacity: 0, y: 22 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true, margin: "-80px" }}
+              transition={{ duration: 0.7 }}
+              className="relative min-h-[620px] overflow-hidden bg-[#06211f] shadow-[0_35px_120px_rgba(10,42,102,0.2)]"
+            >
+              <img
+                src={overviewGallery[0]}
+                alt={data.overviewTitle}
+                className="absolute inset-0 h-full w-full object-cover"
+              />
+              <div className="absolute inset-0 bg-gradient-to-t from-[#06211f]/94 via-[#06211f]/18 to-transparent" />
+              <div className="absolute left-6 top-6 bg-[#f3b128] px-5 py-3">
+                <p className="about-body text-[11px] font-extrabold uppercase tracking-[0.24em] text-[#0a2a66]">
+                  {data.overviewBadge}
+                </p>
+              </div>
+              <div className="absolute bottom-0 left-0 right-0 p-6 sm:p-8">
+                <p className="about-body text-[11px] font-extrabold uppercase tracking-[0.26em] text-[#f3b128]">
+                  {data.overviewHighlightEyebrow}
+                </p>
+                <h3 className="about-display mt-3 max-w-2xl text-3xl font-semibold uppercase leading-tight text-white sm:text-5xl">
+                  {data.overviewHighlightTitle}
+                </h3>
+              </div>
+            </MotionDiv>
+
+            <MotionDiv
+              initial={{ opacity: 0, y: 22 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true, margin: "-80px" }}
+              transition={{ duration: 0.7, delay: 0.08 }}
+              className="grid gap-5"
+            >
+              <div className="grid grid-cols-2 gap-5">
+                {overviewGallery.slice(1, 3).map((image, index) => (
+                  <div key={`${image}-${index}`} className="relative min-h-[220px] overflow-hidden bg-[#06211f]">
+                    <img
+                      src={image}
+                      alt={`North South Group overview ${index + 1}`}
+                      className="absolute inset-0 h-full w-full object-cover transition duration-700 hover:scale-105"
+                    />
+                    <div className="absolute inset-0 bg-gradient-to-t from-[#06211f]/50 to-transparent" />
+                  </div>
+                ))}
+              </div>
+
+              <div className="bg-white p-6 shadow-[0_24px_80px_rgba(15,119,113,0.12)] ring-1 ring-[#b7dad4] sm:p-8">
+                <div className="grid gap-5">
+                  {data.overviewParagraphs.map((paragraph, index) => (
+                    <div
+                      key={index}
+                      className="grid gap-4 border-b border-[#b7dad4] pb-5 last:border-b-0 last:pb-0 sm:grid-cols-[76px_1fr]"
+                    >
+                      <div>
+                        <span className="about-display block text-5xl font-semibold leading-none text-[#0f7771]">
+                          {String(index + 1).padStart(2, "0")}
+                        </span>
+                        <span className="mt-2 block h-1 w-10 bg-[#f3b128]" />
+                      </div>
+                      <p className="about-body leading-8 text-[#315b67]">{paragraph}</p>
+                    </div>
+                  ))}
+                </div>
+              </div>
+
+              <div className="grid grid-cols-2 gap-px overflow-hidden bg-[#0f7771] sm:grid-cols-3">
+                {signatureVentures.map((venture) => (
+                  <div
+                    key={venture}
+                    className="about-body flex min-h-[74px] items-center justify-center bg-[#06211f] px-4 text-center text-[11px] font-extrabold uppercase tracking-[0.14em] text-white transition hover:bg-[#0f7771]"
+                  >
+                    {venture}
+                  </div>
+                ))}
+              </div>
+            </MotionDiv>
           </div>
         </div>
       </section>
