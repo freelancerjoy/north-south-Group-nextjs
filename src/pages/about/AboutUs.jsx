@@ -544,37 +544,22 @@ export default function AboutUs() {
                 <button
                   type="button"
                   onClick={() => setSelectedLeader(leader)}
-                  className="group flex h-full w-full flex-col justify-between border border-[#b7dad4] bg-[#ffffff] text-left transition hover:-translate-y-1 hover:border-[#0f7771] hover:shadow-[0_24px_60px_rgba(15,119,113,0.18)]"
+                  className="group flex h-full w-full flex-col justify-between border border-[#b7dad4] bg-[#ffffff] text-left transition hover:-translate-y-1 hover:border-[#0f7771] hover:shadow-[0_20px_50px_rgba(15,119,113,0.16)]"
                 >
-                  <div className="relative flex h-[360px] shrink-0 items-center justify-center overflow-hidden bg-[#e8f5f2]">
+                  <div className="relative flex h-[280px] sm:h-[300px] shrink-0 items-center justify-center overflow-hidden bg-[#e8f5f2]">
                     <img
                       src={leader.img}
                       alt={leader.name}
                       className="h-full w-full object-contain object-center transition duration-700 group-hover:scale-[1.03]"
                     />
-                    <div className="absolute left-0 right-0 top-0 flex justify-between p-4">
-                      <span className="about-body bg-[#06211f]/75 px-3 py-1 text-[10px] font-extrabold uppercase tracking-[0.18em] text-[#f3b128] backdrop-blur">
-                        Board
-                      </span>
-                      <span className="about-body bg-[#f4fbf9] px-3 py-1 text-[10px] font-extrabold uppercase tracking-[0.18em] text-[#0a2a66]">
-                        Profile
-                      </span>
-                    </div>
                   </div>
-                  <div className="flex flex-1 flex-col justify-between p-6">
-                    <div>
-                      <p className="about-body min-h-[1.25rem] text-[11px] font-extrabold uppercase tracking-[0.18em] text-[#0f7771]">
-                        {leader.role}
-                      </p>
-                      <h3 className="about-display mt-2 min-h-[3.75rem] text-2xl font-semibold leading-tight text-[#0a2a66] flex items-start">
-                        {leader.name}
-                      </h3>
-                    </div>
-                    <p className="about-body mt-3 line-clamp-2 min-h-[3.5rem] text-sm leading-7 text-[#315b67]">
-                      {leader.description ||
-                        leader.text ||
-                        "Distinguished executive guiding North South Group's strategic urban planning and corporate vision."}
+                  <div className="flex flex-1 flex-col justify-center p-5">
+                    <p className="about-body text-[11px] font-extrabold uppercase tracking-[0.18em] text-[#0f7771]">
+                      {leader.role}
                     </p>
+                    <h3 className="about-display mt-1.5 min-h-[3.2rem] text-xl sm:text-2xl font-semibold leading-tight text-[#0a2a66] flex items-start">
+                      {leader.name}
+                    </h3>
                   </div>
                 </button>
               </SwiperSlide>
@@ -715,11 +700,11 @@ export default function AboutUs() {
                 <h3 className="about-display mt-3 text-4xl font-semibold leading-tight">
                   {selectedLeader.name}
                 </h3>
-                <p className="about-body mt-6 leading-8 text-[#315b67]">
-                  {selectedLeader.description ||
-                    selectedLeader.text ||
-                    "Distinguished executive guiding North South Group's long-term institutional vision and community developments."}
-                </p>
+                {(selectedLeader.description || selectedLeader.text) && (
+                  <p className="about-body mt-6 leading-8 text-[#315b67]">
+                    {selectedLeader.description || selectedLeader.text}
+                  </p>
+                )}
               </div>
             </MotionDiv>
           </MotionDiv>

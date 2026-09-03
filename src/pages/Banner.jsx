@@ -1,5 +1,6 @@
 import { useState, useEffect, useMemo } from "react";
 import { Link } from "react-router-dom";
+import { motion, AnimatePresence } from "framer-motion";
 import OptimizedImage, { imageSrc } from "../components/OptimizedImage";
 
 const heroLogo = "/images/heroLogo.gif";
@@ -18,9 +19,10 @@ export default function Banner({ slides, buttons }) {
   const [current, setCurrent] = useState(0);
 
   useEffect(() => {
+    if (!slideItems.length) return;
     const interval = setInterval(() => {
       setCurrent((prev) => (prev + 1) % slideItems.length);
-    }, 3000);
+    }, 4500);
     return () => clearInterval(interval);
   }, [slideItems.length]);
 
@@ -35,13 +37,37 @@ export default function Banner({ slides, buttons }) {
         lg:h-screen
         overflow-hidden
         flex items-center justify-center
+        bg-black
       "
     >
+      {/* ── SMOOTH TRANSITION SLIDES (Exact smooth crossfade & gentle scale as in AboutUs) ── */}
+      <AnimatePresence mode="sync">
+        {slideItems[current] && (
+          <motion.div
+            key={current}
+            initial={{ opacity: 0, scale: 1.025 }}
+            animate={{ opacity: 1, scale: 1 }}
+            exit={{ opacity: 0 }}
+            transition={{ duration: 1.2, ease: "easeInOut" }}
+            className="absolute inset-0 w-full h-full max-h-screen"
+          >
+            <OptimizedImage
+              src={slideItems[current].src}
+              alt="banner"
+              priority
+              sizes="100vw"
+              objectFit={slideItems[current].objectFit}
+            />
+          </motion.div>
+        )}
+      </AnimatePresence>
+
+      {/* ── CENTER LOGO (Original Design Preserved) ── */}
       <div
         className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2
           h-24 w-24 sm:h-32 sm:w-32 md:h-48 md:w-48 lg:h-60 lg:w-60
           p-3 sm:p-4 md:p-6 lg:p-7 z-50 bg-white/70 border-4 border-dotted
-          border-gray-500 rounded-full"
+          border-gray-500 rounded-full pointer-events-none"
       >
         <img
           src={heroLogo}
@@ -53,6 +79,7 @@ export default function Banner({ slides, buttons }) {
         />
       </div>
 
+      {/* ── ACTION BUTTONS (Original Design Preserved) ── */}
       <div
         className="absolute bottom-10 sm:bottom-14 left-1/2 -translate-x-1/2
           z-30 flex flex-nowrap justify-center gap-3 sm:gap-5"
@@ -72,31 +99,14 @@ export default function Banner({ slides, buttons }) {
         ))}
       </div>
 
-      {slideItems.map((slide, index) => (
-        <div
-          key={index}
-          className={`absolute inset-0 w-full h-full bg-white
-            max-h-screen
-            transition-opacity duration-300
-            ${current === index ? "opacity-100" : "opacity-0"}`}
-        >
-          <OptimizedImage
-            src={slide.src}
-            alt="banner"
-            priority={index === 0}
-            sizes="100vw"
-            objectFit={slide.objectFit}
-          />
-        </div>
-      ))}
-
+      {/* ── RIGHT SLIDE DOT INDICATORS (Original Design Preserved) ── */}
       <div className="absolute right-4 top-1/2 z-40 flex -translate-y-1/2 flex-col gap-3 sm:right-8">
         {slideItems.map((_, i) => (
           <button
             key={i}
             onClick={() => setCurrent(i)}
-            className={`w-2.5 h-2.5 sm:w-3 sm:h-3 rounded-full transition
-              ${current === i ? "bg-white scale-125" : "bg-gray-400"}`}
+            className={`w-2.5 h-2.5 sm:w-3 sm:h-3 rounded-full transition-all duration-300
+              ${current === i ? "bg-white scale-125 shadow-md" : "bg-gray-400 hover:bg-white/80"}`}
             aria-label={`Go to slide ${i + 1}`}
           />
         ))}
