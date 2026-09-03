@@ -17,6 +17,12 @@ import {
   FaTimes,
 } from "react-icons/fa";
 import { IoIosArrowBack, IoIosArrowForward } from "react-icons/io";
+import {
+  HiOutlineClock,
+  HiOutlineChartBar,
+  HiOutlineBuildingOffice2,
+  HiOutlineShieldCheck,
+} from "react-icons/hi2";
 import { getYouTubeEmbedUrl } from "../../components/VideoUtility";
 import { defaultAboutContent } from "./defaultAboutContent";
 import { useAboutStore } from "../../store/about/aboutStore";
@@ -254,107 +260,174 @@ export default function AboutUs() {
         </div>
       </section>
 
-      <section id="overview" className="relative overflow-hidden bg-[#f4fbf9] py-24 text-[#0a2a66] md:py-32">
-        <div className="absolute inset-x-0 top-0 h-32 bg-gradient-to-b from-[#06211f] to-transparent" />
-        <div className="absolute inset-0 bg-[linear-gradient(120deg,rgba(15,119,113,0.08)_0%,rgba(244,251,249,0)_52%,rgba(243,177,40,0.1)_100%)]" />
-        <div className="relative mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-          <div className="mb-12 grid gap-8 lg:grid-cols-[0.8fr_1.2fr] lg:items-end">
-            <div>
-              <div className="inline-flex items-center gap-3 border-y border-[#0f7771]/25 py-2 pr-4">
-                <span className="h-px w-10 bg-[#0f7771]" />
-                <span className="about-body text-xs font-extrabold uppercase tracking-[0.28em] text-[#0f7771]">
-                  {data.overviewEyebrow}
+      <section id="overview" className="bg-white py-20 lg:py-28 text-slate-800">
+        <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+          
+          {/* ── ROW 1: Solution 1 (Text Left, Image Right) ── */}
+          <div className="grid items-center gap-12 lg:grid-cols-2 lg:gap-16">
+            <div className="space-y-5">
+              <div>
+                <span className="inline-block rounded bg-[#0f7771]/10 px-3 py-1 font-brand-body text-[11px] font-bold uppercase tracking-wider text-[#0f7771]">
+                  SOLUTION
                 </span>
               </div>
-              <h2 className="about-display mt-5 max-w-3xl text-4xl font-semibold uppercase leading-[1.02] text-[#0a2a66] sm:text-6xl">
-                {data.overviewTitle}
+              <h2 className="font-brand-body text-3xl font-bold tracking-tight text-slate-900 sm:text-4xl lg:text-[2.6rem] leading-tight">
+                Delivering Certainty
               </h2>
-            </div>
-            <p className="about-body max-w-2xl border-l-4 border-[#f3b128] pl-6 text-lg leading-9 text-[#315b67] lg:justify-self-end">
-              {data.overviewText}
-            </p>
-          </div>
+              <p className="font-brand-body text-sm sm:text-base leading-relaxed text-slate-600 font-light">
+                {data.overviewText ||
+                  "North South Group empowers customers and communities to overcome critical housing and infrastructure challenges with planned reliability and trust."}
+              </p>
 
-          <div className="grid gap-8 lg:grid-cols-[1.1fr_0.9fr] lg:items-stretch">
-            <MotionDiv
-              initial={{ opacity: 0, y: 22 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true, margin: "-80px" }}
-              transition={{ duration: 0.7 }}
-              className="relative min-h-[620px] overflow-hidden bg-[#06211f] shadow-[0_35px_120px_rgba(10,42,102,0.2)]"
-            >
-              <img
-                src={overviewGallery[0]}
-                alt={data.overviewTitle}
-                className="absolute inset-0 h-full w-full object-cover"
-              />
-              <div className="absolute inset-0 bg-gradient-to-t from-[#06211f]/94 via-[#06211f]/18 to-transparent" />
-              <div className="absolute left-6 top-6 bg-[#f3b128] px-5 py-3">
-                <p className="about-body text-[11px] font-extrabold uppercase tracking-[0.24em] text-[#0a2a66]">
-                  {data.overviewBadge}
-                </p>
-              </div>
-              <div className="absolute bottom-0 left-0 right-0 p-6 sm:p-8">
-                <p className="about-body text-[11px] font-extrabold uppercase tracking-[0.26em] text-[#f3b128]">
-                  {data.overviewHighlightEyebrow}
-                </p>
-                <h3 className="about-display mt-3 max-w-2xl text-3xl font-semibold uppercase leading-tight text-white sm:text-5xl">
-                  {data.overviewHighlightTitle}
-                </h3>
-              </div>
-            </MotionDiv>
-
-            <MotionDiv
-              initial={{ opacity: 0, y: 22 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true, margin: "-80px" }}
-              transition={{ duration: 0.7, delay: 0.08 }}
-              className="grid gap-5"
-            >
-              <div className="grid grid-cols-2 gap-5">
-                {overviewGallery.slice(1, 3).map((image, index) => (
-                  <div key={`${image}-${index}`} className="relative min-h-[220px] overflow-hidden bg-[#06211f]">
-                    <img
-                      src={image}
-                      alt={`North South Group overview ${index + 1}`}
-                      className="absolute inset-0 h-full w-full object-cover transition duration-700 hover:scale-105"
-                    />
-                    <div className="absolute inset-0 bg-gradient-to-t from-[#06211f]/50 to-transparent" />
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-6 pt-6 mt-4 border-t border-slate-100">
+                <div>
+                  <div className="mb-2.5 flex h-9 w-9 items-center justify-center rounded-full bg-[#0f7771]/10 text-[#0f7771]">
+                    <HiOutlineClock size={19} />
                   </div>
-                ))}
-              </div>
-
-              <div className="bg-white p-6 shadow-[0_24px_80px_rgba(15,119,113,0.12)] ring-1 ring-[#b7dad4] sm:p-8">
-                <div className="grid gap-5">
-                  {data.overviewParagraphs.map((paragraph, index) => (
-                    <div
-                      key={index}
-                      className="grid gap-4 border-b border-[#b7dad4] pb-5 last:border-b-0 last:pb-0 sm:grid-cols-[76px_1fr]"
-                    >
-                      <div>
-                        <span className="about-display block text-5xl font-semibold leading-none text-[#0f7771]">
-                          {String(index + 1).padStart(2, "0")}
-                        </span>
-                        <span className="mt-2 block h-1 w-10 bg-[#f3b128]" />
-                      </div>
-                      <p className="about-body leading-8 text-[#315b67]">{paragraph}</p>
-                    </div>
-                  ))}
+                  <h4 className="font-brand-body text-sm font-bold text-slate-900">
+                    Faster Decision
+                  </h4>
+                  <p className="font-brand-body mt-1 text-xs leading-relaxed text-slate-500 font-light">
+                    Real-time insights to act quickly and respond to changing conditions.
+                  </p>
+                </div>
+                <div>
+                  <div className="mb-2.5 flex h-9 w-9 items-center justify-center rounded-full bg-[#0f7771]/10 text-[#0f7771]">
+                    <HiOutlineChartBar size={19} />
+                  </div>
+                  <h4 className="font-brand-body text-sm font-bold text-slate-900">
+                    Sustainable Growth
+                  </h4>
+                  <p className="font-brand-body mt-1 text-xs leading-relaxed text-slate-500 font-light">
+                    Supporting long-term growth while maintaining resilience, profitability.
+                  </p>
                 </div>
               </div>
+            </div>
 
-              <div className="grid grid-cols-2 gap-px overflow-hidden bg-[#0f7771] sm:grid-cols-3">
-                {signatureVentures.map((venture) => (
-                  <div
-                    key={venture}
-                    className="about-body flex min-h-[74px] items-center justify-center bg-[#06211f] px-4 text-center text-[11px] font-extrabold uppercase tracking-[0.14em] text-white transition hover:bg-[#0f7771]"
-                  >
-                    {venture}
+            {/* Right: Rounded Image with 2 Floating Stat Cards */}
+            <div className="relative">
+              <div className="relative h-[360px] sm:h-[420px] lg:h-[450px] w-full overflow-hidden rounded-3xl bg-slate-100 shadow-2xl">
+                <img
+                  src={overviewGallery[0] || hero2}
+                  alt="Delivering Certainty"
+                  className="h-full w-full object-cover object-center"
+                />
+                <div className="pointer-events-none absolute inset-0 bg-slate-900/10" />
+
+                {/* Floating Card 1 (Top right) */}
+                <div className="absolute right-6 top-6 sm:right-8 sm:top-8 flex min-w-[160px] items-start justify-between gap-4 rounded-2xl border border-slate-100/90 bg-white/95 p-4 sm:p-5 shadow-2xl backdrop-blur-md">
+                  <div>
+                    <p className="font-brand-body text-2xl sm:text-3xl font-black leading-none text-slate-900">
+                      10x
+                    </p>
+                    <p className="font-brand-body mt-1 text-xs font-medium text-slate-500">
+                      Faster decisions
+                    </p>
                   </div>
-                ))}
+                  <span className="mt-1 h-2.5 w-2.5 shrink-0 rounded-full bg-[#0f7771]" />
+                </div>
+
+                {/* Floating Card 2 (Bottom right) */}
+                <div className="absolute bottom-6 right-6 sm:bottom-8 sm:right-8 flex min-w-[175px] items-start justify-between gap-4 rounded-2xl border border-slate-100/90 bg-white/95 p-4 sm:p-5 shadow-2xl backdrop-blur-md">
+                  <div>
+                    <p className="font-brand-body text-2xl sm:text-3xl font-black leading-none text-slate-900">
+                      95%
+                    </p>
+                    <p className="font-brand-body mt-1 text-xs font-medium text-slate-500">
+                      Sustainable growth
+                    </p>
+                  </div>
+                  <span className="mt-1 h-2.5 w-2.5 shrink-0 rounded-sm bg-amber-400" />
+                </div>
               </div>
-            </MotionDiv>
+            </div>
           </div>
+
+          {/* ── SUBTLE DOTTED DIVIDER ── */}
+          <div className="my-16 lg:my-24 border-t border-dashed border-slate-200" />
+
+          {/* ── ROW 2: Solution 2 (Image Left, Text Right — Zigzag) ── */}
+          <div className="grid items-center gap-12 lg:grid-cols-2 lg:gap-16">
+            {/* Left: Rounded Image with Testimonial/Quote Card */}
+            <div className="relative order-2 lg:order-1">
+              <div className="relative h-[360px] sm:h-[420px] lg:h-[450px] w-full overflow-hidden rounded-3xl bg-slate-100 shadow-2xl">
+                <img
+                  src={overviewGallery[1] || overviewGallery[0] || hero1}
+                  alt="Unparalleled Experience"
+                  className="h-full w-full object-cover object-center"
+                />
+                <div className="pointer-events-none absolute inset-0 bg-slate-900/10" />
+
+                {/* Floating Quote Card at bottom */}
+                <div className="absolute bottom-5 left-5 right-5 sm:max-w-sm rounded-2xl border border-slate-100/90 bg-white/95 p-5 sm:p-6 shadow-2xl backdrop-blur-md">
+                  <p className="font-brand-body text-xs sm:text-sm font-medium leading-relaxed text-slate-700">
+                    "North South brings results, better efficiency, and consistent performance we can rely on."
+                  </p>
+                  <div className="mt-4 flex items-center gap-3 border-t border-slate-100 pt-3">
+                    <div className="flex h-7 w-7 shrink-0 items-center justify-center rounded-lg bg-[#0f7771] text-xs font-bold text-white shadow-sm">
+                      NS
+                    </div>
+                    <div>
+                      <p className="font-brand-body text-xs font-bold uppercase tracking-wider text-slate-900">
+                        North South Group
+                      </p>
+                      <p className="font-brand-body text-[10px] text-slate-400">
+                        Corporate Development
+                      </p>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            {/* Right: Content, Solution Tag, Title, Paragraph, Stacked List */}
+            <div className="space-y-5 order-1 lg:order-2">
+              <div>
+                <span className="inline-block rounded bg-[#0f7771]/10 px-3 py-1 font-brand-body text-[11px] font-bold uppercase tracking-wider text-[#0f7771]">
+                  SOLUTION
+                </span>
+              </div>
+              <h2 className="font-brand-body text-3xl font-bold tracking-tight text-slate-900 sm:text-4xl lg:text-[2.6rem] leading-tight">
+                Unparalleled Experience
+              </h2>
+              <p className="font-brand-body text-sm sm:text-base leading-relaxed text-slate-600 font-light">
+                {data.overviewParagraphs?.[0] ||
+                  "We bring years of experience delivering strong results, faster value, and measurable quality across residential, industrial, and township development at scale consistently."}
+              </p>
+
+              <div className="space-y-5 pt-4">
+                <div className="flex items-start gap-3.5">
+                  <div className="mt-0.5 flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-[#0f7771]/10 text-[#0f7771]">
+                    <HiOutlineBuildingOffice2 size={19} />
+                  </div>
+                  <div>
+                    <h4 className="font-brand-body text-sm sm:text-base font-bold text-slate-900">
+                      Deep Industry Expertise
+                    </h4>
+                    <p className="font-brand-body mt-1 text-xs sm:text-sm leading-relaxed text-slate-500 font-light">
+                      Built on real planned township and development experience across diverse industries.
+                    </p>
+                  </div>
+                </div>
+
+                <div className="flex items-start gap-3.5">
+                  <div className="mt-0.5 flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-[#0f7771]/10 text-[#0f7771]">
+                    <HiOutlineShieldCheck size={19} />
+                  </div>
+                  <div>
+                    <h4 className="font-brand-body text-sm sm:text-base font-bold text-slate-900">
+                      Consistent Performance Outcomes
+                    </h4>
+                    <p className="font-brand-body mt-1 text-xs sm:text-sm leading-relaxed text-slate-500 font-light">
+                      Delivering stable results with clear impact on efficiency, client trust, and long-term community value.
+                    </p>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
         </div>
       </section>
 
