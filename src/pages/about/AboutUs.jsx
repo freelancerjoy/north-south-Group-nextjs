@@ -1,722 +1,579 @@
-import { useEffect, useRef, useState } from "react";
-import { Autoplay, Navigation, Pagination, EffectFade } from "swiper/modules";
+import React, { useEffect, useMemo, useRef, useState } from "react";
+import { AnimatePresence, motion } from "framer-motion";
 import { Swiper, SwiperSlide } from "swiper/react";
-import {
-  motion,
-  useScroll,
-  useTransform,
-  useInView,
-  useMotionValue,
-  useSpring,
-  AnimatePresence,
-} from "framer-motion";
+import { Autoplay, Navigation } from "swiper/modules";
 import {
   FaArrowRight,
+  FaAward,
   FaBuilding,
   FaCheckCircle,
+  FaCity,
+  FaCompass,
   FaHandshake,
   FaLeaf,
   FaPlay,
+  FaQuoteLeft,
   FaShieldAlt,
   FaTimes,
-  FaQuoteLeft,
 } from "react-icons/fa";
-import { HiOutlineArrowLongRight } from "react-icons/hi2";
 import { IoIosArrowBack, IoIosArrowForward } from "react-icons/io";
 import { getYouTubeEmbedUrl } from "../../components/VideoUtility";
 import { defaultAboutContent } from "./defaultAboutContent";
 import { useAboutStore } from "../../store/about/aboutStore";
 
-/* ── Typography ── */
-const serif = { fontFamily: '"Playfair Display", Georgia, "Times New Roman", serif' };
-const sans = { fontFamily: '"Inter", "Montserrat", system-ui, sans-serif' };
+import "swiper/css";
+import "swiper/css/navigation";
 
-/* ── Icons ── */
-const iconRegistry = { FaBuilding, FaLeaf, FaShieldAlt, FaHandshake };
+const MotionDiv = motion.div;
+const MotionImg = motion.img;
 
-/* ── Animated counter ── */
-function Counter({ value }) {
-  const ref = useRef(null);
-  const inView = useInView(ref, { once: true, margin: "-40px" });
-  const num = parseInt(value.replace(/[^\d]/g, ""), 10) || 0;
-  const mv = useMotionValue(0);
-  const spring = useSpring(mv, { damping: 35, stiffness: 80 });
-  const [d, setD] = useState("0");
-  useEffect(() => { if (inView) mv.set(num); }, [inView, num, mv]);
-  useEffect(() => spring.on("change", (v) => setD(Math.round(v).toString())), [spring]);
-  const suffix = value.replace(/[\d]/g, "").trim();
-  return <span ref={ref}>{d}{suffix}</span>;
-}
+const strengthIcons = {
+  FaBuilding,
+  FaLeaf,
+  FaShieldAlt,
+  FaHandshake,
+};
 
-/* ── Reveal on scroll ── */
-function Reveal({ children, delay = 0, className = "", y = 50 }) {
-  const ref = useRef(null);
-  const inView = useInView(ref, { once: true, margin: "-60px" });
-  return (
-    <motion.div
-      ref={ref}
-      initial={{ opacity: 0, y }}
-      animate={inView ? { opacity: 1, y: 0 } : { opacity: 0, y }}
-      transition={{ duration: 0.8, delay, ease: [0.22, 1, 0.36, 1] }}
-      className={className}
-    >
-      {children}
-    </motion.div>
-  );
-}
+const defaultStrengthIconList = [FaBuilding, FaLeaf, FaShieldAlt, FaHandshake];
+const statIcons = [FaAward, FaCity, FaBuilding, FaCompass];
 
-/* ── Parallax image wrapper ── */
-function ParallaxImg({ src, alt, className = "", speed = 0.15 }) {
-  const ref = useRef(null);
-  const { scrollYProgress } = useScroll({ target: ref, offset: ["start end", "end start"] });
-  const y = useTransform(scrollYProgress, [0, 1], [`${-speed * 100}%`, `${speed * 100}%`]);
-  return (
-    <div ref={ref} className={`overflow-hidden ${className}`}>
-      <motion.img src={src} alt={alt} className="h-[120%] w-full object-cover" style={{ y }} />
-    </div>
-  );
-}
+const signatureVentures = [
+  "Green City Ltd.",
+  "Industrial City",
+  "Nirapad Valley",
+  "Duplex Home",
+  "Auto Rice Mill",
+  "Agro Farm",
+];
 
-/* ════════════════════════════════════════════════════════════
-   MAIN COMPONENT
-   ════════════════════════════════════════════════════════════ */
-const AboutUs = () => {
-  const prevRef = useRef(null);
-  const nextRef = useRef(null);
-  const heroRef = useRef(null);
-  const [swiperInstance, setSwiperInstance] = useState(null);
+export default function AboutUs() {
+  const [currentSlide, setCurrentSlide] = useState(0);
   const [selectedLeader, setSelectedLeader] = useState(null);
   const [selectedCsrImage, setSelectedCsrImage] = useState(null);
-  const [activeStrength, setActiveStrength] = useState(0);
+  const [swiperReady, setSwiperReady] = useState(false);
+  const swiperRef = useRef(null);
+  const prevRef = useRef(null);
+  const nextRef = useRef(null);
+
   const { aboutContent, loadAboutContent } = useAboutStore();
 
-  /* Hero parallax */
-  const { scrollYProgress: heroProgress } = useScroll({
-    target: heroRef,
-    offset: ["start start", "end start"],
-  });
-  const heroY = useTransform(heroProgress, [0, 1], ["0%", "40%"]);
-  const heroOpacity = useTransform(heroProgress, [0, 0.6], [1, 0]);
-  const heroScale = useTransform(heroProgress, [0, 1], [1, 1.2]);
+  useEffect(() => {
+    loadAboutContent().catch(() => {});
+  }, [loadAboutContent]);
 
-  useEffect(() => { loadAboutContent().catch(() => {}); }, [loadAboutContent]);
+  const data = useMemo(
+    () => ({
+      ...defaultAboutContent,
+      ...(aboutContent || {}),
+      heroSlides:
+        Array.isArray(aboutContent?.heroSlides) && aboutContent.heroSlides.length > 0
+          ? aboutContent.heroSlides
+          : defaultAboutContent.heroSlides,
+      stats:
+        Array.isArray(aboutContent?.stats) && aboutContent.stats.length > 0
+          ? aboutContent.stats
+          : defaultAboutContent.stats,
+      strengths:
+        Array.isArray(aboutContent?.strengths) && aboutContent.strengths.length > 0
+          ? aboutContent.strengths
+          : defaultAboutContent.strengths,
+      leaders:
+        Array.isArray(aboutContent?.leaders) && aboutContent.leaders.length > 0
+          ? aboutContent.leaders
+          : defaultAboutContent.leaders,
+      csrImages:
+        Array.isArray(aboutContent?.csrImages) && aboutContent.csrImages.length > 0
+          ? aboutContent.csrImages
+          : defaultAboutContent.csrImages,
+      missionCards:
+        Array.isArray(aboutContent?.missionCards) && aboutContent.missionCards.length > 0
+          ? aboutContent.missionCards
+          : defaultAboutContent.missionCards,
+      overviewParagraphs:
+        Array.isArray(aboutContent?.overviewParagraphs) &&
+        aboutContent.overviewParagraphs.length > 0
+          ? aboutContent.overviewParagraphs
+          : defaultAboutContent.overviewParagraphs,
+    }),
+    [aboutContent]
+  );
 
-  /* ── Data merge ── */
-  const data = {
-    ...defaultAboutContent,
-    ...(aboutContent || {}),
-    heroSlides: Array.isArray(aboutContent?.heroSlides) && aboutContent.heroSlides.length > 0 ? aboutContent.heroSlides : defaultAboutContent.heroSlides,
-    stats: Array.isArray(aboutContent?.stats) && aboutContent.stats.length > 0 ? aboutContent.stats : defaultAboutContent.stats,
-    strengths: Array.isArray(aboutContent?.strengths) && aboutContent.strengths.length > 0 ? aboutContent.strengths : defaultAboutContent.strengths,
-    leaders: Array.isArray(aboutContent?.leaders) && aboutContent.leaders.length > 0 ? aboutContent.leaders : defaultAboutContent.leaders,
-    csrImages: Array.isArray(aboutContent?.csrImages) && aboutContent.csrImages.length > 0 ? aboutContent.csrImages : defaultAboutContent.csrImages,
-    missionCards: Array.isArray(aboutContent?.missionCards) && aboutContent.missionCards.length > 0 ? aboutContent.missionCards : defaultAboutContent.missionCards,
-    overviewParagraphs: Array.isArray(aboutContent?.overviewParagraphs) && aboutContent.overviewParagraphs.length > 0 ? aboutContent.overviewParagraphs : defaultAboutContent.overviewParagraphs,
-  };
-
-  const [hero1 = defaultAboutContent.heroSlides[0], hero2 = defaultAboutContent.heroSlides[1]] = data.heroSlides || [];
+  const [hero1 = defaultAboutContent.heroSlides[0]] = data.heroSlides || [];
   const embedUrl = getYouTubeEmbedUrl(data.videoUrl);
 
   useEffect(() => {
+    if (!data.heroSlides || data.heroSlides.length <= 1) return undefined;
+    const interval = setInterval(() => {
+      setCurrentSlide((prev) => (prev + 1) % data.heroSlides.length);
+    }, 5200);
+    return () => clearInterval(interval);
+  }, [data.heroSlides]);
+
+  useEffect(() => {
+    const swiperInstance = swiperRef.current;
     if (swiperInstance && prevRef.current && nextRef.current) {
       swiperInstance.params.navigation.prevEl = prevRef.current;
       swiperInstance.params.navigation.nextEl = nextRef.current;
       swiperInstance.navigation.init();
       swiperInstance.navigation.update();
     }
-  }, [swiperInstance]);
+  }, [swiperReady]);
 
   return (
-    <main className="overflow-hidden bg-white" style={sans}>
+    <div className="min-h-screen bg-[#080706] text-[#f8f1e6] selection:bg-[#d7b46a] selection:text-[#15100a]">
+      <style>{`
+        @import url('https://fonts.googleapis.com/css2?family=Cinzel:wght@400;500;600;700&family=Manrope:wght@400;500;600;700;800&display=swap');
+        .about-display { font-family: 'Cinzel', Georgia, serif; }
+        .about-body { font-family: 'Manrope', sans-serif; }
+        .champagne-text {
+          background: linear-gradient(120deg, #fff8ea 0%, #d7b46a 45%, #8fae52 100%);
+          -webkit-background-clip: text;
+          -webkit-text-fill-color: transparent;
+        }
+      `}</style>
 
-      {/* ═══════════════════════════════════════════════════
-          1. HERO — Full-screen cinematic with parallax
-      ═══════════════════════════════════════════════════ */}
-      <section ref={heroRef} className="relative h-[100vh] min-h-[750px]">
-        {/* Background with parallax + Ken Burns */}
-        <motion.div className="absolute inset-0" style={{ y: heroY, scale: heroScale }}>
-          <Swiper
-            modules={[Autoplay, EffectFade]}
-            effect="fade"
-            fadeEffect={{ crossFade: true }}
-            loop speed={2000}
-            autoplay={{ delay: 5000, disableOnInteraction: false }}
-            className="h-full w-full [&_.swiper-slide_img]:transition-transform [&_.swiper-slide_img]:duration-[8000ms] [&_.swiper-slide-active_img]:scale-110"
-          >
-            {data.heroSlides.map((slide, idx) => (
-              <SwiperSlide key={idx}>
-                <img src={slide} alt="" className="h-full w-full object-cover scale-100" />
-              </SwiperSlide>
-            ))}
-          </Swiper>
-        </motion.div>
-
-        {/* Multi-layer overlay */}
-        <div className="absolute inset-0 z-[1]">
-          <div className="absolute inset-0 bg-gradient-to-b from-black/60 via-black/30 to-black/80" />
-          <div className="absolute inset-0 bg-gradient-to-r from-black/70 via-transparent to-transparent" />
-          <div className="absolute inset-0 bg-[radial-gradient(circle_at_25%_45%,rgba(22,163,74,0.12),transparent_50%)]" />
-          {/* Diagonal lines pattern */}
-          <div className="absolute inset-0 opacity-[0.015]" style={{
-            backgroundImage: "repeating-linear-gradient(45deg, transparent, transparent 40px, white 40px, white 41px)",
-          }} />
-        </div>
-
-        {/* Hero content */}
-        <motion.div className="relative z-10 flex h-full items-end" style={{ opacity: heroOpacity }}>
-          <div className="w-full pb-20 lg:pb-28">
-            <div className="mx-auto max-w-[90rem] px-6 lg:px-12">
-              <div className="grid gap-12 lg:grid-cols-[1.2fr_0.8fr] lg:items-end">
-                {/* Left text */}
-                <div>
-                  <motion.div
-                    initial={{ scaleX: 0 }} animate={{ scaleX: 1 }}
-                    transition={{ duration: 1.2, delay: 0.2, ease: [0.22, 1, 0.36, 1] }}
-                    className="mb-8 h-[3px] w-24 origin-left bg-gradient-to-r from-green-500 to-green-300"
-                  />
-                  <motion.p
-                    initial={{ opacity: 0, x: -30 }} animate={{ opacity: 1, x: 0 }}
-                    transition={{ duration: 0.8, delay: 0.5 }}
-                    className="text-[11px] font-semibold uppercase tracking-[0.4em] text-green-400"
-                  >
-                    {data.heroEyebrow}
-                  </motion.p>
-                  <motion.h1
-                    initial={{ opacity: 0, y: 50 }} animate={{ opacity: 1, y: 0 }}
-                    transition={{ duration: 1.2, delay: 0.7, ease: [0.22, 1, 0.36, 1] }}
-                    className="mt-7 text-[clamp(2.8rem,7vw,6rem)] font-bold leading-[0.95] tracking-[-0.03em] text-white"
-                    style={serif}
-                  >
-                    {data.heroTitle}
-                  </motion.h1>
-                  <motion.p
-                    initial={{ opacity: 0, y: 30 }} animate={{ opacity: 1, y: 0 }}
-                    transition={{ duration: 0.8, delay: 1 }}
-                    className="mt-8 max-w-xl text-base leading-relaxed text-white/60 lg:text-lg"
-                  >
-                    {data.heroSubtitle}
-                  </motion.p>
-                  <motion.div
-                    initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }}
-                    transition={{ duration: 0.8, delay: 1.3 }}
-                    className="mt-10 flex flex-wrap gap-4"
-                  >
-                    <a href="#overview" className="group inline-flex items-center gap-3 bg-green-600 px-8 py-4 text-[11px] font-bold uppercase tracking-[0.2em] text-white transition-all duration-500 hover:bg-green-500 hover:shadow-[0_20px_60px_-15px_rgba(34,197,94,0.5)] hover:translate-y-[-2px]">
-                      Discover More <HiOutlineArrowLongRight className="text-lg transition-transform duration-300 group-hover:translate-x-2" />
-                    </a>
-                    <a href="#leadership" className="inline-flex items-center gap-3 border border-white/25 px-8 py-4 text-[11px] font-bold uppercase tracking-[0.2em] text-white/80 backdrop-blur-sm transition-all duration-300 hover:border-white/50 hover:bg-white/5">
-                      Our Leaders
-                    </a>
-                  </motion.div>
-                </div>
-
-                {/* Right — Stats overlay card */}
-                <motion.div
-                  initial={{ opacity: 0, y: 40, x: 20 }}
-                  animate={{ opacity: 1, y: 0, x: 0 }}
-                  transition={{ duration: 1, delay: 1.2 }}
-                >
-                  <div className="border border-white/10 bg-white/[0.04] backdrop-blur-2xl">
-                    <div className="grid grid-cols-2">
-                      {data.stats.map((item, i) => (
-                        <div
-                          key={item.label}
-                          className={`group relative p-7 lg:p-8 transition-colors duration-300 hover:bg-white/[0.04] ${
-                            i < 2 ? "border-b border-white/10" : ""
-                          } ${i % 2 === 0 ? "border-r border-white/10" : ""}`}
-                        >
-                          <p className="text-4xl font-bold text-white lg:text-5xl" style={serif}>
-                            <Counter value={item.value} />
-                          </p>
-                          <p className="mt-2 text-[9px] font-bold uppercase tracking-[0.25em] text-white/40">
-                            {item.label}
-                          </p>
-                          <div className="absolute bottom-0 left-0 h-[2px] w-0 bg-green-500 transition-all duration-500 group-hover:w-full" />
-                        </div>
-                      ))}
-                    </div>
-                  </div>
-                </motion.div>
-              </div>
-            </div>
-          </div>
-        </motion.div>
-
-        {/* Scroll indicator */}
-        <motion.div
-          initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 2.5 }}
-          className="absolute bottom-6 left-1/2 z-10 -translate-x-1/2 flex flex-col items-center gap-2"
-        >
-          <motion.div
-            animate={{ y: [0, 10, 0] }}
-            transition={{ repeat: Infinity, duration: 2, ease: "easeInOut" }}
-            className="h-14 w-px bg-gradient-to-b from-white/50 to-transparent"
-          />
-        </motion.div>
-      </section>
-
-      {/* ═══════════════════════════════════════════════════
-          2. OVERVIEW — Luxury editorial split layout
-      ═══════════════════════════════════════════════════ */}
-      <section id="overview" className="relative">
-        {/* Top accent bar */}
-        <div className="h-1 bg-gradient-to-r from-green-600 via-green-400 to-emerald-500" />
-
-        <div className="relative bg-[#f8f7f4] py-28 lg:py-36 px-6 lg:px-12 overflow-hidden">
-          {/* Decorative background elements */}
-          <div className="absolute right-0 top-0 h-full w-1/2 opacity-[0.025]" style={{
-            backgroundImage: "repeating-linear-gradient(0deg, transparent, transparent 80px, #166534 80px, #166534 81px), repeating-linear-gradient(90deg, transparent, transparent 80px, #166534 80px, #166534 81px)",
-          }} />
-          <div className="absolute -left-20 top-1/3 h-96 w-96 rounded-full bg-green-100/40 blur-[120px]" />
-
-          <div className="relative mx-auto max-w-[90rem]">
-            {/* Eyebrow row */}
-            <Reveal>
-              <div className="mb-20 flex items-center gap-6">
-                <div className="h-px flex-1 bg-slate-200" />
-                <p className="text-[11px] font-bold uppercase tracking-[0.4em] text-green-700 shrink-0">
-                  {data.overviewEyebrow}
-                </p>
-                <div className="h-px flex-1 bg-slate-200" />
-              </div>
-            </Reveal>
-
-            <div className="grid gap-16 lg:grid-cols-12 lg:gap-20">
-              {/* Left — Big title & image */}
-              <div className="lg:col-span-5 space-y-12">
-                <Reveal>
-                  <h2
-                    className="text-[clamp(2.2rem,4.5vw,3.8rem)] font-bold leading-[1.05] tracking-[-0.02em] text-slate-900"
-                    style={serif}
-                  >
-                    {data.overviewTitle}
-                  </h2>
-                </Reveal>
-
-                <Reveal delay={0.15}>
-                  <p className="text-lg leading-relaxed text-slate-500 border-l-[3px] border-green-500 pl-6">
-                    {data.overviewText}
-                  </p>
-                </Reveal>
-
-                {/* Image with overlay */}
-                <Reveal delay={0.2}>
-                  <div className="group relative overflow-hidden shadow-[0_40px_100px_-30px_rgba(0,0,0,0.15)]">
-                    <div className="aspect-[4/5]">
-                      <img src={hero2} alt="Project" className="h-full w-full object-cover transition-transform duration-[2s] group-hover:scale-110" />
-                    </div>
-                    <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-transparent to-black/20" />
-
-                    {/* Badge */}
-                    <div className="absolute left-0 top-8">
-                      <div className="bg-green-600 px-6 py-3 text-[10px] font-bold uppercase tracking-[0.3em] text-white shadow-lg">
-                        {data.overviewBadge}
-                      </div>
-                    </div>
-
-                    {/* Bottom glass card */}
-                    <div className="absolute bottom-0 left-0 right-0 p-6">
-                      <div className="border border-white/15 bg-black/30 p-6 backdrop-blur-2xl">
-                        <p className="text-[9px] font-bold uppercase tracking-[0.4em] text-green-300">{data.overviewHighlightEyebrow}</p>
-                        <h3 className="mt-3 text-xl font-bold leading-snug text-white" style={serif}>{data.overviewHighlightTitle}</h3>
-                      </div>
-                    </div>
-                  </div>
-                </Reveal>
-              </div>
-
-              {/* Right — Paragraphs + strengths */}
-              <div className="lg:col-span-7 space-y-16">
-                {/* Paragraphs with drop cap style */}
-                <Reveal delay={0.1}>
-                  <div className="space-y-8">
-                    {data.overviewParagraphs.map((paragraph, index) => (
-                      <p key={index} className={`text-[1.05rem] leading-[2] text-slate-600 ${index === 0 ? "first-letter:float-left first-letter:mr-3 first-letter:mt-1 first-letter:text-[3.5rem] first-letter:font-bold first-letter:leading-[0.8] first-letter:text-green-700" : ""}`} style={index === 0 ? serif : undefined}>
-                        {paragraph}
-                      </p>
-                    ))}
-                  </div>
-                </Reveal>
-
-                {/* Divider */}
-                <Reveal delay={0.15}>
-                  <div className="flex items-center gap-4">
-                    <div className="h-3 w-3 rotate-45 border-2 border-green-500" />
-                    <div className="h-px flex-1 bg-slate-200" />
-                  </div>
-                </Reveal>
-
-                {/* Strengths — Interactive accordion style */}
-                <div className="space-y-4">
-                  {data.strengths.map((item, i) => {
-                    const Icon = iconRegistry[item.iconKey] || FaBuilding;
-                    const isActive = activeStrength === i;
-                    return (
-                      <Reveal key={item.title} delay={i * 0.08}>
-                        <button
-                          type="button"
-                          onClick={() => setActiveStrength(isActive ? -1 : i)}
-                          className={`group block w-full text-left transition-all duration-500 ${
-                            isActive
-                              ? "bg-gradient-to-r from-green-600 to-emerald-600 shadow-[0_20px_60px_-15px_rgba(22,163,74,0.35)]"
-                              : "bg-white border border-slate-100 hover:border-green-100 hover:shadow-lg"
-                          }`}
-                        >
-                          <div className="flex items-start gap-5 p-6 lg:p-8">
-                            <div className={`flex h-14 w-14 shrink-0 items-center justify-center text-xl transition-all duration-500 ${
-                              isActive ? "bg-white/20 text-white" : "bg-green-50 text-green-600 group-hover:bg-green-100"
-                            }`}>
-                              <Icon />
-                            </div>
-                            <div className="flex-1 min-w-0">
-                              <div className="flex items-center justify-between gap-4">
-                                <h3 className={`text-lg font-bold transition-colors duration-300 ${isActive ? "text-white" : "text-slate-900"}`}>
-                                  {item.title}
-                                </h3>
-                                <span className={`text-[10px] font-bold tracking-[0.2em] transition-colors duration-300 shrink-0 ${isActive ? "text-white/60" : "text-slate-300"}`}>
-                                  {String(i + 1).padStart(2, "0")}
-                                </span>
-                              </div>
-                              <AnimatePresence>
-                                {isActive && (
-                                  <motion.div
-                                    initial={{ height: 0, opacity: 0 }}
-                                    animate={{ height: "auto", opacity: 1 }}
-                                    exit={{ height: 0, opacity: 0 }}
-                                    transition={{ duration: 0.4, ease: [0.22, 1, 0.36, 1] }}
-                                    className="overflow-hidden"
-                                  >
-                                    <p className="mt-3 text-sm leading-relaxed text-white/80">{item.text}</p>
-                                  </motion.div>
-                                )}
-                              </AnimatePresence>
-                              {!isActive && (
-                                <p className="mt-2 text-sm leading-relaxed text-slate-500 line-clamp-1">{item.text}</p>
-                              )}
-                            </div>
-                          </div>
-                        </button>
-                      </Reveal>
-                    );
-                  })}
-                </div>
-
-                {/* Stats row */}
-                <Reveal delay={0.2}>
-                  <div className="grid grid-cols-4 border border-slate-100">
-                    {data.stats.map((item, i) => (
-                      <div key={item.label} className={`group relative p-6 text-center transition-colors duration-300 hover:bg-green-50 ${i < 3 ? "border-r border-slate-100" : ""}`}>
-                        <p className="text-3xl font-bold text-green-700 lg:text-4xl" style={serif}>
-                          <Counter value={item.value} />
-                        </p>
-                        <p className="mt-2 text-[8px] font-bold uppercase tracking-[0.2em] text-slate-400">{item.label}</p>
-                      </div>
-                    ))}
-                  </div>
-                </Reveal>
-              </div>
-            </div>
-          </div>
-        </div>
-      </section>
-
-      {/* ═══════════════════════════════════════════════════
-          3. VIDEO — Immersive theater section
-      ═══════════════════════════════════════════════════ */}
-      {embedUrl && (
-        <section className="relative bg-slate-950 overflow-hidden">
-          {/* Ambient glow */}
-          <div className="absolute inset-0 bg-[radial-gradient(ellipse_60%_50%_at_50%_50%,rgba(22,163,74,0.08),transparent)]" />
-          <div className="absolute left-0 top-0 h-full w-px bg-gradient-to-b from-transparent via-green-500/20 to-transparent" />
-          <div className="absolute right-0 top-0 h-full w-px bg-gradient-to-b from-transparent via-green-500/20 to-transparent" />
-
-          <div className="relative py-32 lg:py-40 px-6 lg:px-12">
-            <div className="mx-auto max-w-[85rem]">
-              <div className="grid lg:grid-cols-[0.85fr_1.15fr] gap-16 lg:gap-20 items-center">
-                {/* Left text */}
-                <Reveal>
-                  <div>
-                    <div className="mb-8 h-[3px] w-16 bg-gradient-to-r from-green-500 to-green-300" />
-                    <p className="text-[11px] font-bold uppercase tracking-[0.4em] text-green-400">{data.videoEyebrow}</p>
-                    <h2 className="mt-6 text-4xl font-bold leading-tight text-white lg:text-5xl" style={serif}>{data.videoTitle}</h2>
-                    <p className="mt-6 text-base leading-relaxed text-slate-400">{data.videoText}</p>
-                    <div className="mt-10 flex items-center gap-4 text-green-400">
-                      <div className="flex h-12 w-12 items-center justify-center rounded-full border border-green-500/30 bg-green-500/10">
-                        <FaPlay className="ml-1 text-sm" />
-                      </div>
-                      <span className="text-sm font-bold uppercase tracking-[0.15em]">Watch Video</span>
-                    </div>
-                  </div>
-                </Reveal>
-
-                {/* Right video */}
-                <Reveal delay={0.2}>
-                  <div className="relative">
-                    {/* Decorative frame */}
-                    <div className="absolute -inset-3 border border-white/[0.06]" />
-                    <div className="absolute -inset-6 border border-white/[0.03]" />
-                    <div className="relative overflow-hidden bg-black shadow-[0_0_100px_rgba(22,163,74,0.1)]">
-                      <div className="aspect-video">
-                        <iframe
-                          className="h-full w-full"
-                          src={embedUrl}
-                          title="About North South Group"
-                          frameBorder="0"
-                          allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-                          allowFullScreen
-                        />
-                      </div>
-                    </div>
-                  </div>
-                </Reveal>
-              </div>
-            </div>
-          </div>
-        </section>
-      )}
-
-      {/* ═══════════════════════════════════════════════════
-          4. LEADERSHIP — Premium portrait gallery
-      ═══════════════════════════════════════════════════ */}
-      <section id="leadership" className="relative overflow-hidden py-32 lg:py-40 px-6 lg:px-12">
-        {/* Decorative watermark */}
-        <div className="absolute -right-20 top-1/2 -translate-y-1/2 text-[28vw] font-black leading-none text-slate-50 pointer-events-none select-none" style={serif}>
-          NSG
-        </div>
-        <div className="absolute left-0 top-0 h-full w-px bg-gradient-to-b from-transparent via-slate-200 to-transparent lg:left-12" />
-
-        <div className="relative mx-auto max-w-[90rem]">
-          <div className="mb-20 flex flex-col gap-8 lg:flex-row lg:items-end lg:justify-between">
-            <Reveal>
-              <div className="max-w-2xl">
-                <p className="text-[11px] font-bold uppercase tracking-[0.4em] text-green-700">{data.leadershipEyebrow}</p>
-                <h2 className="mt-6 text-[clamp(2.2rem,4.5vw,3.8rem)] font-bold leading-[1.05] text-slate-900" style={serif}>
-                  {data.leadershipTitle}
-                </h2>
-                <p className="mt-6 text-lg leading-relaxed text-slate-500">{data.leadershipText}</p>
-              </div>
-            </Reveal>
-
-            <Reveal delay={0.2}>
-              <div className="flex gap-3">
-                <button ref={prevRef} className="group flex h-16 w-16 items-center justify-center border border-slate-200 bg-white text-slate-500 transition-all duration-400 hover:border-green-600 hover:bg-green-600 hover:text-white hover:shadow-[0_15px_40px_-10px_rgba(22,163,74,0.4)]" aria-label="Previous">
-                  <IoIosArrowBack size={22} />
-                </button>
-                <button ref={nextRef} className="group flex h-16 w-16 items-center justify-center border border-slate-200 bg-white text-slate-500 transition-all duration-400 hover:border-green-600 hover:bg-green-600 hover:text-white hover:shadow-[0_15px_40px_-10px_rgba(22,163,74,0.4)]" aria-label="Next">
-                  <IoIosArrowForward size={22} />
-                </button>
-              </div>
-            </Reveal>
-          </div>
-
-          <Reveal>
-            <Swiper
-              modules={[Autoplay, Pagination, Navigation]}
-              slidesPerView={1}
-              spaceBetween={24}
-              loop
-              autoplay={{ delay: 4000, disableOnInteraction: false }}
-              onSwiper={setSwiperInstance}
-              breakpoints={{ 640: { slidesPerView: 2 }, 1024: { slidesPerView: 3 }, 1400: { slidesPerView: 4 } }}
-              className="!pb-16"
+      <section className="relative overflow-hidden bg-[#080706] pt-24">
+        <div className="absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-[#d7b46a]/70 to-transparent" />
+        <div className="mx-auto grid min-h-[86vh] max-w-[1500px] grid-cols-1 items-stretch gap-0 px-4 pb-8 sm:px-6 lg:grid-cols-[0.95fr_1.25fr] lg:px-8">
+          <div className="relative z-10 flex flex-col justify-center py-16 lg:pr-12">
+            <MotionDiv
+              initial={{ opacity: 0, y: 24 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.7 }}
+              className="max-w-3xl"
             >
-              {data.leaders.map((leader, idx) => (
-                <SwiperSlide key={leader.id}>
+              <div className="mb-6 inline-flex items-center gap-3 border-y border-[#d7b46a]/30 py-2">
+                <span className="h-px w-10 bg-[#8fae52]" />
+                <span className="about-body text-[11px] font-bold uppercase tracking-[0.32em] text-[#d7b46a]">
+                  {data.heroEyebrow}
+                </span>
+              </div>
+              <h1 className="about-display max-w-4xl text-4xl font-semibold uppercase leading-[1.04] text-[#fff8ea] sm:text-6xl lg:text-7xl">
+                {data.heroTitle}
+              </h1>
+              <p className="about-body mt-6 max-w-2xl text-base leading-8 text-[#cfc5b3] sm:text-lg">
+                {data.heroSubtitle}
+              </p>
+              <div className="mt-9 flex flex-wrap items-center gap-4">
+                <a
+                  href="#overview"
+                  className="about-body inline-flex items-center gap-3 bg-[#d7b46a] px-7 py-3 text-xs font-extrabold uppercase tracking-[0.2em] text-[#15100a] shadow-[0_18px_60px_rgba(215,180,106,0.22)] transition hover:bg-[#fff1c9]"
+                >
+                  Explore Legacy <FaArrowRight className="text-[11px]" />
+                </a>
+                <a
+                  href="#leadership"
+                  className="about-body inline-flex items-center gap-3 border border-[#8fae52]/50 bg-[#1a2119]/70 px-7 py-3 text-xs font-bold uppercase tracking-[0.2em] text-[#fff8ea] transition hover:border-[#d7b46a] hover:text-[#d7b46a]"
+                >
+                  Leadership
+                </a>
+              </div>
+            </MotionDiv>
+
+            <div className="mt-14 grid grid-cols-2 gap-px overflow-hidden border border-[#2d281e] bg-[#2d281e] sm:grid-cols-4">
+              {data.stats.map((stat, index) => {
+                const Icon = statIcons[index % statIcons.length];
+                return (
+                  <div key={stat.label} className="bg-[#10110d] p-5">
+                    <Icon className="mb-4 text-[#8fae52]" />
+                    <p className="about-display text-3xl font-semibold champagne-text">
+                      {stat.value}
+                    </p>
+                    <p className="about-body mt-1 text-[11px] font-bold uppercase tracking-[0.18em] text-[#a99d8a]">
+                      {stat.label}
+                    </p>
+                  </div>
+                );
+              })}
+            </div>
+          </div>
+
+          <div className="relative min-h-[520px] overflow-hidden border border-[#2d281e] bg-[#14120e] lg:min-h-[760px]">
+            <AnimatePresence mode="wait">
+              <MotionImg
+                key={currentSlide}
+                src={data.heroSlides[currentSlide] || hero1}
+                alt="North South Group development"
+                initial={{ opacity: 0, scale: 1.04 }}
+                animate={{ opacity: 1, scale: 1 }}
+                exit={{ opacity: 0 }}
+                transition={{ duration: 1.1, ease: "easeInOut" }}
+                className="absolute inset-0 h-full w-full object-cover"
+              />
+            </AnimatePresence>
+            <div className="absolute inset-0 bg-gradient-to-t from-[#080706] via-transparent to-[#080706]/45" />
+            <div className="absolute inset-y-0 left-0 hidden w-1/3 bg-gradient-to-r from-[#080706] to-transparent lg:block" />
+            <div className="absolute bottom-0 left-0 right-0 p-5 sm:p-8">
+              <div className="max-w-md border-l border-[#d7b46a] bg-[#080706]/72 p-5 backdrop-blur-md">
+                <p className="about-body text-[11px] font-bold uppercase tracking-[0.25em] text-[#8fae52]">
+                  {data.overviewBadge}
+                </p>
+                <p className="about-display mt-2 text-2xl leading-snug text-[#fff8ea]">
+                  {data.overviewHighlightTitle}
+                </p>
+              </div>
+              <div className="mt-5 flex items-center gap-3">
+                {data.heroSlides.map((_, idx) => (
                   <button
+                    key={idx}
                     type="button"
-                    onClick={() => setSelectedLeader(leader)}
-                    className="group block w-full text-left"
-                    aria-label={`View ${leader.name}`}
-                  >
-                    <div className="relative overflow-hidden bg-slate-50">
-                      <div className="aspect-[3/4] overflow-hidden">
-                        <img src={leader.img} alt={leader.name} className="h-full w-full object-cover grayscale transition-all duration-[1.5s] group-hover:grayscale-0 group-hover:scale-110" />
-                      </div>
-                      {/* Overlay on hover */}
-                      <div className="absolute inset-0 bg-gradient-to-t from-green-900/90 via-green-900/20 to-transparent opacity-0 transition-opacity duration-700 group-hover:opacity-100" />
-                      <div className="absolute bottom-0 left-0 right-0 translate-y-full p-6 transition-transform duration-700 group-hover:translate-y-0">
-                        <span className="inline-block border border-white/30 bg-white/10 px-5 py-2 text-[10px] font-bold uppercase tracking-[0.25em] text-white backdrop-blur-md">
-                          View Profile
-                        </span>
-                      </div>
-                    </div>
-                    <div className="p-6 bg-white border-x border-b border-slate-100">
-                      <div className="flex items-start justify-between gap-4">
-                        <div>
-                          <h3 className="text-lg font-bold text-slate-900" style={serif}>{leader.name}</h3>
-                          <p className="mt-1 text-[10px] font-bold uppercase tracking-[0.2em] text-green-600">{leader.role}</p>
-                        </div>
-                        <span className="text-xs font-bold text-slate-200">{String(idx + 1).padStart(2, "0")}</span>
-                      </div>
-                    </div>
-                  </button>
-                </SwiperSlide>
-              ))}
-            </Swiper>
-          </Reveal>
+                    onClick={() => setCurrentSlide(idx)}
+                    aria-label={`Show slide ${idx + 1}`}
+                    className={`h-1.5 transition-all ${
+                      currentSlide === idx ? "w-14 bg-[#d7b46a]" : "w-7 bg-white/35 hover:bg-white"
+                    }`}
+                  />
+                ))}
+              </div>
+            </div>
+          </div>
         </div>
       </section>
 
-      {/* ═══════════════════════════════════════════════════
-          5. CSR — Masonry bento gallery
-      ═══════════════════════════════════════════════════ */}
-      <section className="relative bg-[#f8f7f4] py-32 lg:py-40 px-6 lg:px-12 overflow-hidden">
-        <div className="absolute inset-0 bg-[radial-gradient(circle_at_20%_80%,rgba(22,163,74,0.04),transparent_40%)]" />
-
-        <div className="relative mx-auto max-w-[90rem]">
-          <Reveal>
-            <div className="mb-20 flex flex-col items-center text-center">
-              <div className="mb-6 flex items-center gap-4">
-                <div className="h-px w-12 bg-green-500" />
-                <p className="text-[11px] font-bold uppercase tracking-[0.4em] text-green-700">{data.csrEyebrow}</p>
-                <div className="h-px w-12 bg-green-500" />
-              </div>
-              <h2 className="max-w-2xl text-4xl font-bold leading-tight text-slate-900 sm:text-5xl" style={serif}>{data.csrTitle}</h2>
-              <p className="mx-auto mt-6 max-w-xl text-base leading-relaxed text-slate-500">{data.csrText}</p>
+      <section id="overview" className="bg-[#f8f1e6] py-24 text-[#15100a] md:py-32">
+        <div className="mx-auto grid max-w-7xl gap-12 px-4 sm:px-6 lg:grid-cols-[0.75fr_1.25fr] lg:px-8">
+          <div>
+            <p className="about-body text-xs font-extrabold uppercase tracking-[0.28em] text-[#8a6a2d]">
+              {data.overviewEyebrow}
+            </p>
+            <h2 className="about-display mt-4 text-4xl font-semibold uppercase leading-[1.08] sm:text-5xl">
+              {data.overviewTitle}
+            </h2>
+          </div>
+          <div className="space-y-7">
+            <p className="about-body text-xl leading-9 text-[#403726]">{data.overviewText}</p>
+            <div className="grid gap-4">
+              {data.overviewParagraphs.map((paragraph, index) => (
+                <div key={index} className="grid grid-cols-[52px_1fr] border-t border-[#d8c7a4] pt-5">
+                  <span className="about-display text-2xl text-[#8a6a2d]">
+                    {String(index + 1).padStart(2, "0")}
+                  </span>
+                  <p className="about-body leading-8 text-[#5b503b]">{paragraph}</p>
+                </div>
+              ))}
             </div>
-          </Reveal>
+            <div className="flex flex-wrap gap-2 pt-3">
+              {signatureVentures.map((venture) => (
+                <span
+                  key={venture}
+                  className="about-body border border-[#c3a665] bg-white/45 px-4 py-2 text-[11px] font-extrabold uppercase tracking-[0.16em] text-[#2f291d]"
+                >
+                  {venture}
+                </span>
+              ))}
+            </div>
+          </div>
+        </div>
+      </section>
 
-          {/* Bento grid */}
-          <div className="grid grid-cols-2 gap-3 lg:grid-cols-4 lg:grid-rows-[repeat(2,260px)] lg:gap-4">
-            {data.csrImages.slice(0, 8).map((item, i) => {
-              const span = i === 0 ? "lg:col-span-2 lg:row-span-2" : i === 3 ? "lg:col-span-2" : "";
+      <section className="bg-[#10110d] py-24 md:py-32">
+        <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+          <div className="mb-14 flex flex-col justify-between gap-6 border-b border-[#2d281e] pb-8 md:flex-row md:items-end">
+            <div className="max-w-2xl">
+              <p className="about-body text-xs font-extrabold uppercase tracking-[0.28em] text-[#d7b46a]">
+                Institutional Capabilities
+              </p>
+              <h2 className="about-display mt-4 text-4xl font-semibold uppercase leading-tight text-[#fff8ea] sm:text-5xl">
+                Core Pillars of Excellence
+              </h2>
+            </div>
+            <p className="about-body max-w-md text-sm leading-7 text-[#b7ac99]">
+              Disciplined planning, client trust, and long-term community value guide every concern of the group.
+            </p>
+          </div>
+
+          <div className="grid gap-px overflow-hidden border border-[#2d281e] bg-[#2d281e] sm:grid-cols-2 lg:grid-cols-4">
+            {data.strengths.map((item, idx) => {
+              const IconComp =
+                strengthIcons[item.iconKey] || defaultStrengthIconList[idx % defaultStrengthIconList.length];
               return (
-                <Reveal key={item.id || item.title} delay={i * 0.04}>
-                  <button
-                    type="button"
-                    onClick={() => setSelectedCsrImage(item)}
-                    className={`group relative h-full w-full overflow-hidden ${span}`}
-                    aria-label={`View ${item.title}`}
-                  >
-                    <img src={item.img} alt={item.title} className="h-full w-full object-cover transition-transform duration-[1.5s] group-hover:scale-110" />
-                    <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-transparent opacity-0 transition-all duration-500 group-hover:opacity-100" />
-                    <div className="absolute bottom-0 left-0 right-0 translate-y-full p-5 text-left transition-transform duration-500 group-hover:translate-y-0">
-                      <p className="text-[9px] font-bold uppercase tracking-[0.3em] text-green-400">{data.csrEyebrow}</p>
-                      <h3 className="mt-1 text-sm font-bold text-white">{item.title}</h3>
-                    </div>
-                  </button>
-                </Reveal>
+                <div key={item.title} className="group bg-[#080706] p-8 transition hover:bg-[#141812]">
+                  <div className="mb-10 flex items-center justify-between">
+                    <span className="about-display text-sm text-[#6f6145]">
+                      {String(idx + 1).padStart(2, "0")}
+                    </span>
+                    <span className="flex h-12 w-12 items-center justify-center border border-[#d7b46a]/35 text-xl text-[#d7b46a] transition group-hover:bg-[#d7b46a] group-hover:text-[#15100a]">
+                      <IconComp />
+                    </span>
+                  </div>
+                  <h3 className="about-display text-2xl text-[#fff8ea]">{item.title}</h3>
+                  <p className="about-body mt-4 text-sm leading-7 text-[#b7ac99]">{item.text}</p>
+                </div>
               );
             })}
           </div>
         </div>
       </section>
 
-      {/* ═══════════════════════════════════════════════════
-          6. MISSION / VISION / PROMISE — Dark with typography
-      ═══════════════════════════════════════════════════ */}
-      <section className="relative overflow-hidden bg-slate-950 py-32 lg:py-40 px-6 lg:px-12">
-        {/* Pattern background */}
-        <div className="absolute inset-0 opacity-[0.03]" style={{
-          backgroundImage: "radial-gradient(circle at 1px 1px, white 1px, transparent 0)",
-          backgroundSize: "40px 40px",
-        }} />
-        <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_30%_50%,rgba(22,163,74,0.1),transparent_50%)]" />
-
-        <div className="relative mx-auto max-w-[90rem]">
-          <Reveal>
-            <div className="mb-20 text-center">
-              <p className="text-[11px] font-bold uppercase tracking-[0.4em] text-green-400">What Drives Us</p>
-              <h2 className="mt-6 text-4xl font-bold text-white sm:text-5xl" style={serif}>The Foundation We Build On</h2>
+      <section id="leadership" className="bg-[#f8f1e6] py-24 text-[#15100a] md:py-32">
+        <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+          <div className="mb-12 flex flex-col justify-between gap-6 md:flex-row md:items-end">
+            <div className="max-w-3xl">
+              <p className="about-body text-xs font-extrabold uppercase tracking-[0.28em] text-[#8a6a2d]">
+                {data.leadershipEyebrow}
+              </p>
+              <h2 className="about-display mt-4 text-4xl font-semibold uppercase leading-tight sm:text-5xl">
+                {data.leadershipTitle}
+              </h2>
+              <p className="about-body mt-4 max-w-2xl leading-8 text-[#5b503b]">{data.leadershipText}</p>
             </div>
-          </Reveal>
+            <div className="flex gap-3">
+              <button
+                ref={prevRef}
+                type="button"
+                aria-label="Previous leader"
+                className="flex h-12 w-12 items-center justify-center border border-[#b99a55] bg-transparent text-[#15100a] transition hover:bg-[#15100a] hover:text-[#f8f1e6]"
+              >
+                <IoIosArrowBack size={20} />
+              </button>
+              <button
+                ref={nextRef}
+                type="button"
+                aria-label="Next leader"
+                className="flex h-12 w-12 items-center justify-center border border-[#b99a55] bg-transparent text-[#15100a] transition hover:bg-[#15100a] hover:text-[#f8f1e6]"
+              >
+                <IoIosArrowForward size={20} />
+              </button>
+            </div>
+          </div>
 
-          <div className="grid gap-6 lg:grid-cols-3">
-            {data.missionCards.map((item, i) => (
-              <Reveal key={item.title} delay={i * 0.15}>
-                <div className="group relative h-full overflow-hidden border border-white/[0.05] bg-white/[0.02] p-10 lg:p-12 transition-all duration-700 hover:border-green-500/20 hover:bg-white/[0.04]">
-                  {/* Giant number */}
-                  <div className="absolute -right-6 -top-10 text-[12rem] font-black leading-none text-white/[0.015] transition-colors duration-700 group-hover:text-green-500/[0.06]" style={serif}>
-                    {String(i + 1).padStart(2, "0")}
+          <Swiper
+            modules={[Navigation, Autoplay]}
+            slidesPerView={1}
+            spaceBetween={18}
+            loop
+            autoplay={{ delay: 4500, disableOnInteraction: false }}
+            onSwiper={(swiper) => {
+              swiperRef.current = swiper;
+              setSwiperReady(true);
+            }}
+            breakpoints={{
+              700: { slidesPerView: 2 },
+              1100: { slidesPerView: 3 },
+            }}
+            className="!pb-2"
+          >
+            {data.leaders.map((leader) => (
+              <SwiperSlide key={leader.id || leader.name}>
+                <button
+                  type="button"
+                  onClick={() => setSelectedLeader(leader)}
+                  className="group block w-full border border-[#d8c7a4] bg-[#fffaf0] text-left transition hover:-translate-y-1 hover:border-[#8a6a2d] hover:shadow-[0_24px_60px_rgba(45,36,18,0.14)]"
+                >
+                  <div className="relative aspect-[4/5] overflow-hidden bg-[#17130d]">
+                    <img
+                      src={leader.img}
+                      alt={leader.name}
+                      className="h-full w-full object-cover object-top transition duration-700 group-hover:scale-105"
+                    />
+                    <div className="absolute left-0 right-0 top-0 flex justify-between p-4">
+                      <span className="about-body bg-[#080706]/75 px-3 py-1 text-[10px] font-extrabold uppercase tracking-[0.18em] text-[#d7b46a] backdrop-blur">
+                        Board
+                      </span>
+                      <span className="about-body bg-[#f8f1e6] px-3 py-1 text-[10px] font-extrabold uppercase tracking-[0.18em] text-[#15100a]">
+                        Profile
+                      </span>
+                    </div>
                   </div>
-
-                  <div className="relative">
-                    <div className="mb-8 h-[3px] w-12 bg-gradient-to-r from-green-500 to-green-300 transition-all duration-500 group-hover:w-20" />
-                    <FaCheckCircle className="mb-6 text-2xl text-green-500" />
-                    <h3 className="text-3xl font-bold text-white lg:text-4xl" style={serif}>{item.title}</h3>
-                    <p className="mt-6 text-base leading-[2] text-slate-400">{item.text}</p>
+                  <div className="p-6">
+                    <p className="about-body text-[11px] font-extrabold uppercase tracking-[0.18em] text-[#8a6a2d]">
+                      {leader.role}
+                    </p>
+                    <h3 className="about-display mt-2 text-2xl font-semibold leading-tight text-[#15100a]">
+                      {leader.name}
+                    </h3>
+                    <p className="about-body mt-4 line-clamp-2 text-sm leading-7 text-[#655943]">
+                      {leader.description ||
+                        leader.text ||
+                        "Distinguished executive guiding North South Group's strategic urban planning and corporate vision."}
+                    </p>
                   </div>
+                </button>
+              </SwiperSlide>
+            ))}
+          </Swiper>
+        </div>
+      </section>
 
-                  {/* Bottom accent line on hover */}
-                  <div className="absolute bottom-0 left-0 h-[2px] w-0 bg-green-500 transition-all duration-700 group-hover:w-full" />
+      {embedUrl && (
+        <section className="bg-[#15100a] py-24 md:py-32">
+          <div className="mx-auto grid max-w-7xl items-center gap-10 px-4 sm:px-6 lg:grid-cols-[0.65fr_1.35fr] lg:px-8">
+            <div>
+              <p className="about-body inline-flex items-center gap-2 text-xs font-extrabold uppercase tracking-[0.28em] text-[#d7b46a]">
+                <FaPlay className="text-[10px]" /> {data.videoEyebrow}
+              </p>
+              <h2 className="about-display mt-4 text-4xl font-semibold uppercase leading-tight text-[#fff8ea] sm:text-5xl">
+                {data.videoTitle}
+              </h2>
+              <p className="about-body mt-5 leading-8 text-[#cfc5b3]">{data.videoText}</p>
+            </div>
+            <div className="border border-[#3a3122] bg-[#080706] p-3 shadow-[0_30px_90px_rgba(0,0,0,0.45)]">
+              <div className="aspect-video overflow-hidden bg-black">
+                <iframe
+                  className="h-full w-full"
+                  src={embedUrl}
+                  title="Inside North South Group"
+                  frameBorder="0"
+                  allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                  allowFullScreen
+                />
+              </div>
+            </div>
+          </div>
+        </section>
+      )}
+
+      <section className="bg-[#f8f1e6] py-24 text-[#15100a] md:py-32">
+        <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+          <div className="mb-12 grid gap-6 lg:grid-cols-[0.8fr_1fr]">
+            <div>
+              <p className="about-body text-xs font-extrabold uppercase tracking-[0.28em] text-[#8a6a2d]">
+                {data.csrEyebrow}
+              </p>
+              <h2 className="about-display mt-4 text-4xl font-semibold uppercase leading-tight sm:text-5xl">
+                {data.csrTitle}
+              </h2>
+            </div>
+            <p className="about-body max-w-2xl text-lg leading-9 text-[#5b503b] lg:justify-self-end">
+              {data.csrText}
+            </p>
+          </div>
+
+          <div className="grid auto-rows-[190px] grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
+            {data.csrImages.slice(0, 8).map((item, idx) => (
+              <button
+                key={item.id || idx}
+                type="button"
+                onClick={() => setSelectedCsrImage(item)}
+                className={`group relative overflow-hidden bg-[#15100a] text-left ${
+                  idx === 0 ? "sm:col-span-2 sm:row-span-2" : ""
+                } ${idx === 5 ? "lg:col-span-2" : ""}`}
+              >
+                <img
+                  src={item.img}
+                  alt={item.title}
+                  className="h-full w-full object-cover transition duration-700 group-hover:scale-105"
+                />
+                <div className="absolute inset-0 bg-gradient-to-t from-[#080706]/90 via-[#080706]/12 to-transparent" />
+                <div className="absolute bottom-0 left-0 right-0 p-5">
+                  <p className="about-body text-[10px] font-extrabold uppercase tracking-[0.22em] text-[#d7b46a]">
+                    Community
+                  </p>
+                  <h3 className="about-display mt-1 text-xl leading-tight text-[#fff8ea]">
+                    {item.title}
+                  </h3>
                 </div>
-              </Reveal>
+              </button>
             ))}
           </div>
         </div>
       </section>
 
-      {/* ═══════════════════════════════════════════════════
-          MODALS
-      ═══════════════════════════════════════════════════ */}
+      <section className="bg-[#080706] py-24 md:py-32">
+        <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+          <div className="grid gap-px overflow-hidden border border-[#2d281e] bg-[#2d281e] md:grid-cols-3">
+            {data.missionCards.map((card, index) => (
+              <div key={card.title} className="bg-[#10110d] p-8 md:p-10">
+                <div className="mb-10 flex items-start justify-between">
+                  <FaCheckCircle className="text-2xl text-[#8fae52]" />
+                  <span className="about-display text-sm text-[#6f6145]">
+                    {String(index + 1).padStart(2, "0")}
+                  </span>
+                </div>
+                <h3 className="about-display text-3xl font-semibold text-[#fff8ea]">{card.title}</h3>
+                <p className="about-body mt-5 text-sm leading-8 text-[#b7ac99]">{card.text}</p>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
       <AnimatePresence>
         {selectedLeader && (
-          <motion.div
-            initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
-            className="fixed inset-0 z-[100] flex items-center justify-center bg-black/85 backdrop-blur-md p-4"
+          <MotionDiv
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            className="fixed inset-0 z-50 flex items-center justify-center bg-black/85 p-4 backdrop-blur-md"
             onClick={() => setSelectedLeader(null)}
           >
-            <motion.div
-              initial={{ opacity: 0, scale: 0.92, y: 30 }}
-              animate={{ opacity: 1, scale: 1, y: 0 }}
-              exit={{ opacity: 0, scale: 0.95 }}
-              transition={{ type: "spring", damping: 25, stiffness: 200 }}
-              className="relative w-full max-w-4xl overflow-hidden bg-white shadow-2xl"
-              onClick={(e) => e.stopPropagation()}
+            <MotionDiv
+              initial={{ opacity: 0, y: 18 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: 18 }}
+              className="relative grid w-full max-w-4xl overflow-hidden bg-[#f8f1e6] text-[#15100a] shadow-2xl sm:grid-cols-[0.85fr_1.15fr]"
+              onClick={(event) => event.stopPropagation()}
             >
-              <button onClick={() => setSelectedLeader(null)} className="absolute right-5 top-5 z-10 flex h-12 w-12 items-center justify-center bg-white text-slate-600 shadow-lg transition-all hover:bg-slate-50" aria-label="Close">
+              <button
+                type="button"
+                onClick={() => setSelectedLeader(null)}
+                aria-label="Close leader profile"
+                className="absolute right-4 top-4 z-10 flex h-10 w-10 items-center justify-center bg-[#15100a] text-[#f8f1e6] transition hover:bg-[#d7b46a] hover:text-[#15100a]"
+              >
                 <FaTimes />
               </button>
-              <div className="grid md:grid-cols-[1fr_1.2fr]">
-                <div className="relative min-h-[400px] overflow-hidden">
-                  <img src={selectedLeader.img} alt={selectedLeader.name} className="h-full w-full object-cover" />
-                </div>
-                <div className="flex flex-col justify-center p-10 lg:p-14">
-                  <div className="mb-6 h-[3px] w-12 bg-green-500" />
-                  <h3 className="text-3xl font-bold text-slate-900" style={serif}>{selectedLeader.name}</h3>
-                  <p className="mt-2 text-[11px] font-bold uppercase tracking-[0.2em] text-green-600">{selectedLeader.role}</p>
-                  {(selectedLeader.description || selectedLeader.text) && (
-                    <>
-                      <div className="my-8 h-px bg-slate-100" />
-                      <div className="relative pl-8">
-                        <FaQuoteLeft className="absolute left-0 top-0 text-xl text-slate-200" />
-                        <p className="text-base leading-[1.9] text-slate-600">{selectedLeader.description || selectedLeader.text}</p>
-                      </div>
-                    </>
-                  )}
-                </div>
+              <div className="min-h-[320px] bg-[#15100a]">
+                <img
+                  src={selectedLeader.img}
+                  alt={selectedLeader.name}
+                  className="h-full max-h-[560px] w-full object-cover object-top"
+                />
               </div>
-            </motion.div>
-          </motion.div>
+              <div className="flex flex-col justify-center p-8 sm:p-10">
+                <FaQuoteLeft className="mb-7 text-3xl text-[#b99a55]" />
+                <p className="about-body text-xs font-extrabold uppercase tracking-[0.2em] text-[#8a6a2d]">
+                  {selectedLeader.role}
+                </p>
+                <h3 className="about-display mt-3 text-4xl font-semibold leading-tight">
+                  {selectedLeader.name}
+                </h3>
+                <p className="about-body mt-6 leading-8 text-[#5b503b]">
+                  {selectedLeader.description ||
+                    selectedLeader.text ||
+                    "Distinguished executive guiding North South Group's long-term institutional vision and community developments."}
+                </p>
+              </div>
+            </MotionDiv>
+          </MotionDiv>
         )}
       </AnimatePresence>
 
       <AnimatePresence>
         {selectedCsrImage && (
-          <motion.div
-            initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
-            className="fixed inset-0 z-[100] flex items-center justify-center bg-black/90 backdrop-blur-md p-4"
+          <MotionDiv
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            className="fixed inset-0 z-50 flex items-center justify-center bg-black/90 p-4 backdrop-blur-md"
             onClick={() => setSelectedCsrImage(null)}
           >
-            <motion.div
-              initial={{ opacity: 0, scale: 0.92 }} animate={{ opacity: 1, scale: 1 }} exit={{ opacity: 0, scale: 0.95 }}
-              className="relative w-full max-w-5xl overflow-hidden bg-white shadow-2xl"
-              onClick={(e) => e.stopPropagation()}
+            <MotionDiv
+              initial={{ opacity: 0, y: 16 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: 16 }}
+              className="relative max-h-[90vh] w-full max-w-5xl overflow-hidden bg-[#080706] p-3"
+              onClick={(event) => event.stopPropagation()}
             >
-              <button onClick={() => setSelectedCsrImage(null)} className="absolute right-5 top-5 z-10 flex h-12 w-12 items-center justify-center bg-black/40 text-white backdrop-blur transition hover:bg-black/70" aria-label="Close">
+              <button
+                type="button"
+                onClick={() => setSelectedCsrImage(null)}
+                aria-label="Close image"
+                className="absolute right-5 top-5 z-10 flex h-10 w-10 items-center justify-center bg-[#f8f1e6] text-[#15100a] transition hover:bg-[#d7b46a]"
+              >
                 <FaTimes />
               </button>
-              <img src={selectedCsrImage.img} alt={selectedCsrImage.title} className="max-h-[75vh] w-full bg-slate-100 object-contain" />
-              <div className="p-8 text-center">
-                <p className="text-[10px] font-bold uppercase tracking-[0.25em] text-green-600">{data.csrEyebrow}</p>
-                <h3 className="mt-2 text-xl font-bold text-slate-900" style={serif}>{selectedCsrImage.title}</h3>
+              <img
+                src={selectedCsrImage.img}
+                alt={selectedCsrImage.title}
+                className="max-h-[78vh] w-full object-contain"
+              />
+              <div className="px-4 py-5 text-center">
+                <h4 className="about-display text-2xl text-[#fff8ea]">{selectedCsrImage.title}</h4>
               </div>
-            </motion.div>
-          </motion.div>
+            </MotionDiv>
+          </MotionDiv>
         )}
       </AnimatePresence>
-    </main>
+    </div>
   );
-};
-
-export default AboutUs;
+}
