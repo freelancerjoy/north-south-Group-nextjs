@@ -1,340 +1,603 @@
 import React, { useState, useRef, useEffect } from "react";
 import { Link } from "react-router-dom";
 import { motion, AnimatePresence, useScroll, useTransform } from "framer-motion";
-
 import { useCommercialProjectStore } from "../../store/commercialProject/commercialProjectStore";
 
-import fallbackImage from "../../assets/images/bannerProjectImg2.jpg";
-import heroImageFallback from "../../assets/images/realEstateImg3.jpg";
-import extImg1Fallback from "../../assets/images/realEstateImg1.jpg";
-import extImg2Fallback from "../../assets/images/realEstateImg2.jpg";
-
 /* ---------------------------------------------------------
-   Luxury Brand Palette (Based on Logo + Cinematic Design)
-   Ink         : #0A0A0A (Cinematic Dark Background)
-   Ivory       : #F5F0E6 (Warm Premium Light Background)
-   Brand Green : #006253 (Logo's Primary Dark Green)
-   Brand Olive : #9EBC3A (Logo's Secondary Green - glowing accents)
+   North South Group Signature Luxury Palette
+   Canvas Deep    : #0E231C (Deep Forest Jade)
+   Surface Dark   : #15342B (Subtle Pine Stone)
+   Surface Raised : #1C4438 (Elevated Moss Container)
+   Brand Accent   : #9EBC3A (Signature Olive-Lime Glow)
+   Gold Accent    : #C5A869 (Warm Champagne Gold)
+   Linen Light    : #F5F2EB (Warm Alabaster Typography)
+   Sage Muted     : #B2C0B9 (Soft Cashmere Gray)
 ----------------------------------------------------------- */
 
-const Marquee = ({ text, dark = false }) => (
-  <div className={`overflow-hidden py-4 border-y ${dark ? "bg-[#0A0A0A] border-white/10" : "bg-[#006253] border-black/10"}`}>
-    <div className="marquee-track flex whitespace-nowrap">
-      {[0, 1].map((i) => (
-        <span key={i} className={`font-tech text-sm font-bold uppercase tracking-[0.3em] pr-8 ${dark ? "text-[#9EBC3A]" : "text-[#F5F0E6]"}`}>
-          {Array.from({ length: 6 }).map((_, j) => (
-            <span key={j} className="mx-8">{text}</span>
-          ))}
-        </span>
-      ))}
-    </div>
-  </div>
-);
+const heroSliderImages = [
+  {
+    url: "https://images.unsplash.com/photo-1486406146926-c627a92ad1ab?q=80&w=2070&auto=format&fit=crop",
+    caption: "Tower Exterior Perspective",
+    tag: "25 Stories Landmark",
+  },
+  {
+    url: "https://images.unsplash.com/photo-1545324418-cc1a3fa10c00?q=80&w=2000&auto=format&fit=crop",
+    caption: "Parametric Glazed Facade",
+    tag: "Double-Glazed Low-E Glass",
+  },
+  {
+    url: "https://images.unsplash.com/photo-1497366216548-37526070297c?q=80&w=2069&auto=format&fit=crop",
+    caption: "Executive Corporate Suites",
+    tag: "Column-Free Modular Layout",
+  },
+  {
+    url: "https://images.unsplash.com/photo-1512917774080-9991f1c4c750?q=80&w=2070&auto=format&fit=crop",
+    caption: "Sky Lounge & Terrace Level",
+    tag: "Panoramic Rooftop Deck",
+  },
+];
 
-const SunArc = ({ title = "ZENITH" }) => (
-  <svg viewBox="0 0 600 200" className="w-full max-w-2xl mx-auto" fill="none">
-    <path d="M 20 180 A 280 280 0 0 1 580 180" stroke="#333333" strokeWidth="1.5" strokeDasharray="2 8" />
-    <circle cx="300" cy="20" r="16" fill="#9EBC3A" opacity="0.25" />
-    <circle cx="300" cy="20" r="10" fill="#9EBC3A" />
-    <text x="300" y="70" textAnchor="middle" className="font-tech" fill="#9EBC3A" fontSize="12" letterSpacing="2">{title.toUpperCase()}</text>
-    <text x="20" y="196" className="font-tech" fill="#666666" fontSize="11">SUNRISE</text>
-    <text x="580" y="196" textAnchor="end" className="font-tech" fill="#666666" fontSize="11">SUNSET</text>
-  </svg>
-);
+const floorPlans = [
+  {
+    level: "Levels 04–12",
+    title: "Corporate Enterprise Suites",
+    area: "18,500 Sq.Ft",
+    ceiling: "4.2m Height",
+    layout: "Column-free modular grid",
+  },
+  {
+    level: "Levels 13–20",
+    title: "Executive Headquarters",
+    area: "22,000 Sq.Ft",
+    ceiling: "4.8m Height",
+    layout: "360° Panoramic glass perimeter",
+  },
+  {
+    level: "Levels 21–24",
+    title: "Crown Penthouse Offices",
+    area: "14,200 Sq.Ft",
+    ceiling: "6.0m Double Height",
+    layout: "Private sky garden & boardroom",
+  },
+];
+
+const luxuryAmenities = [
+  {
+    icon: "⚡",
+    title: "100% Power Redundancy",
+    desc: "Dual-source grid interconnectivity alongside synchronized tier-1 diesel generators.",
+  },
+  {
+    icon: "🛗",
+    title: "Destination-Dispatch Lifts",
+    desc: "8 high-speed vertical units (4 m/s) with AI floor-optimization algorithms.",
+  },
+  {
+    icon: "🌿",
+    title: "LEED Gold Certified",
+    desc: "Low-E facade insulation, integrated solar harvesting, and greywater recycling.",
+  },
+  {
+    icon: "🛡️",
+    title: "Multi-Tier Access Control",
+    desc: "Biometric tourniquets, license-plate recognition, and 24/7 concierge security.",
+  },
+  {
+    icon: "🚗",
+    title: "Automated Basement Parking",
+    desc: "450+ secure multi-level bays featuring dedicated EV high-power fast charging.",
+  },
+  {
+    icon: "🍸",
+    title: "Sky Lounge & Boardrooms",
+    desc: "Private level-24 executive meeting facilities with dedicated culinary services.",
+  },
+];
 
 const CommercialProject = () => {
+  const [currentSlide, setCurrentSlide] = useState(0);
   const [selectedImage, setSelectedImage] = useState(null);
-  const heroRef = useRef(null);
-  const { scrollYProgress } = useScroll({ target: heroRef, offset: ["start start", "end start"] });
-  const heroScale = useTransform(scrollYProgress, [0, 1], [1, 1.2]);
-  const titleY = useTransform(scrollYProgress, [0, 1], [0, 120]);
+  const [activeFloor, setActiveFloor] = useState(0);
 
-  const { commercialProject: data, loadCommercialProject, isLoading } = useCommercialProjectStore();
+  const heroRef = useRef(null);
+  const { scrollYProgress } = useScroll({
+    target: heroRef,
+    offset: ["start start", "end start"],
+  });
+  const heroContentY = useTransform(scrollYProgress, [0, 1], [0, 60]);
+
+  const { commercialProject: data, loadCommercialProject, isLoading } =
+    useCommercialProjectStore();
 
   useEffect(() => {
     loadCommercialProject();
   }, [loadCommercialProject]);
 
-  // ── Fallback defaults (shown while loading or if no data in DB yet) ──
-  const heroTitle = data?.heroTitle || "Zenith";
-  const heroSubtitle = data?.heroSubtitle || "Tower";
-  const heroDescription = data?.heroDescription || "";
-  const heroBadge = data?.heroBadge || "Commercial Development";
-  const heroMarqueeText = data?.heroMarqueeText || "Downtown BD — 25 Stories — Est. 2028 — Premium Commercial —";
-  const heroImg = data?.heroImage?.url || heroImageFallback;
+  // Fast and smooth auto-slide interval (3.8s)
+  useEffect(() => {
+    const timer = setInterval(() => {
+      setCurrentSlide((prev) => (prev + 1) % heroSliderImages.length);
+    }, 3800);
+    return () => clearInterval(timer);
+  }, []);
 
-  const statsData = data?.stats?.length > 0
-    ? data.stats
-    : [
-        { value: "25", label: "Stories" },
-        { value: "500K", label: "Sq. Ft." },
-        { value: "120", label: "Offices" },
-        { value: "400+", label: "Parking" },
-      ];
+  const heroTitle = data?.heroTitle || "ZENITH";
+  const heroSubtitle = data?.heroSubtitle || "TOWER";
+  const heroBadge = data?.heroBadge || "Grade A+ Commercial Landmark";
 
-  const overviewTitle = data?.overviewTitle || "A Landmark\nof Excellence";
-  const overviewDescription = data?.overviewDescription || "Situated in the heart of the business district, The Zenith Tower offers state-of-the-art commercial spaces designed for forward-thinking enterprises — setting a new standard for corporate environments.";
-  const overviewStatusBadge = data?.overviewStatusBadge || "Ongoing";
-  const overviewStatusLabel = data?.overviewStatusLabel || "Construction Status";
-  const overviewImg = data?.overviewImage?.url || fallbackImage;
+  const overviewImg = data?.overviewImage?.url || heroSliderImages[1].url;
+  const architectureImg1 =
+    data?.architectureImage1?.url || heroSliderImages[0].url;
+  const architectureImg2 =
+    data?.architectureImage2?.url || heroSliderImages[2].url;
 
-  const signatureSubtitle = data?.signatureSubtitle || "The Name";
-  const signatureTitle = data?.signatureTitle || 'Why "Zenith"';
-  const signatureDescription = data?.signatureDescription || "The zenith is the sun's highest point in the sky — the peak of light, visibility, and reach. It's the vantage point this tower was built to command.";
+  const galleryImages =
+    data?.galleryImages?.length > 0
+      ? data.galleryImages.map((img) => ({
+          src: img.url,
+          title: img.title || "Architectural Detail",
+        }))
+      : [
+          { src: heroSliderImages[1].url, title: "Parametric Glazed Facade" },
+          {
+            src: "https://images.unsplash.com/photo-1497215728101-856f4ea42174?q=80&w=2070&auto=format&fit=crop",
+            title: "Triple-Height Grand Atrium",
+          },
+          { src: heroSliderImages[2].url, title: "Executive Floor Span" },
+          {
+            src: heroSliderImages[3].url,
+            title: "Skyline Lounge & Boardroom",
+          },
+          {
+            src: "https://images.unsplash.com/photo-1506146332389-18140dc7b2fb?q=80&w=2000&auto=format&fit=crop",
+            title: "Nocturnal Illumination",
+          },
+        ];
 
-  const highlightsTitle = data?.highlightsTitle || "Unmatched\nFeatures";
-  const highlightsSubtitle = data?.highlightsSubtitle || "Scroll to explore";
-  const highlightsData = data?.highlights?.length > 0
-    ? data.highlights
-    : [
-        { title: "Prime Location", desc: "Strategically located with excellent connectivity to major transport hubs." },
-        { title: "Modern Architecture", desc: "Contemporary design with a stunning glass facade and ample natural light." },
-        { title: "Premium Spaces", desc: "Flexible floor plans catering to diverse business needs and retail outlets." },
-        { title: "Smart Facilities", desc: "Integrated building management systems, high-speed elevators, and smart security." },
-        { title: "Sustainable Design", desc: "Energy-efficient systems, green spaces, and eco-friendly construction materials." },
-        { title: "Dedicated Parking", desc: "Multi-level automated parking facility for tenants and visitors." },
-      ];
-
-  const architectureTitle = data?.architectureTitle || "Architectural\nBrilliance";
-  const architectureDescription = data?.architectureDescription || "The exterior boasts a dynamic geometric design that reflects the sky, creating a visually striking landmark — with triple-height lobby ceilings and premium finishes.";
-  const architectureImg1 = data?.architectureImage1?.url || extImg1Fallback;
-  const workspaceTitle = data?.workspaceTitle || "Innovative\nWorkspaces";
-  const workspaceDescription = data?.workspaceDescription || "Column-free office floors built for productivity and well-being, with panoramic windows framing breathtaking views of the skyline.";
-  const architectureImg2 = data?.architectureImage2?.url || extImg2Fallback;
-
-  const galleryTitle = data?.galleryTitle || "Project\nGallery";
-  const galleryImagesData = data?.galleryImages?.length > 0
-    ? data.galleryImages.map((img) => ({ src: img.url, title: img.title || "Project View" }))
-    : [
-        { src: heroImageFallback, title: "Exterior View" },
-        { src: fallbackImage, title: "Modern Lobby" },
-        { src: extImg1Fallback, title: "Office Space" },
-        { src: extImg2Fallback, title: "Conference Hall" },
-        { src: heroImageFallback, title: "Night View" },
-      ];
-
-  const videoTitle = data?.videoTitle || "Experience\nThe Zenith";
-  const videoDescription = data?.videoDescription || "Watch our cinematic showcase to get a feel for the unparalleled luxury and scale of this development.";
-  const videoUrl = data?.videoUrl || "";
-  const videoThumbnail = data?.videoThumbnail?.url || heroImageFallback;
-
-  const specsTitle = data?.specsTitle || "Specifications";
-  const specsData = data?.specs?.length > 0
-    ? data.specs
-    : [
-        { label: "Land Area", value: "45 Katha" },
-        { label: "Built-up Area", value: "500,000 Sq. Ft." },
-        { label: "Total Floors", value: "3B + G + 24F" },
-        { label: "Commercial Units", value: "120 Offices" },
-        { label: "Retail Spaces", value: "3 Floors" },
-        { label: "Parking", value: "400+ Cars" },
-        { label: "Elevators", value: "8 High-Speed" },
-        { label: "Completion", value: "Q4 2028" },
-      ];
-
-  const locationTitle = data?.locationTitle || "Prime\nLocation";
-  const locationDescription = data?.locationDescription || "Centrally located in the premier business district, offering unparalleled convenience for businesses, employees, and clients alike.";
-  const locationBenefits = data?.locationBenefits?.length > 0
-    ? data.locationBenefits
-    : ["5 mins from Central Metro Station", "15 mins from International Airport", "Adjacent to 5-Star Hotels", "Walking distance to Major Banks"];
-  const mapImg = data?.mapImage?.url || null;
-
-  const ctaTitle = data?.ctaTitle || "Claim Your\nSpace Today";
-  const ctaDescription = data?.ctaDescription || "Contact our sales team for detailed floor plans, pricing, and availability.";
+  const specs =
+    data?.specs?.length > 0
+      ? data.specs
+      : [
+          { label: "Site Footprint", value: "45 Katha Prime" },
+          { label: "Total Gross Area", value: "500,000 Sq.Ft" },
+          { label: "Structure", value: "3B + Ground + 24 Floors" },
+          { label: "Floor-to-Ceiling", value: "4.2m Clear Height" },
+          { label: "Automated Parking", value: "450 Executive Bays" },
+          { label: "Vertical Transit", value: "8 High-Speed (4 m/s)" },
+          { label: "Green Standard", value: "LEED Gold Certified" },
+          { label: "Project Handover", value: "Q4 2028" },
+        ];
 
   if (isLoading) {
     return (
-      <div className="bg-[#0A0A0A] min-h-screen flex items-center justify-center pt-[72px]">
-        <div className="text-center">
-          <div className="w-12 h-12 border-2 border-[#9EBC3A] border-t-transparent rounded-full animate-spin mx-auto mb-4" />
-          <p className="font-tech text-xs uppercase tracking-[0.3em] text-[#9EBC3A]">Loading...</p>
+      <div className="bg-[#0E231C] min-h-screen flex items-center justify-center">
+        <div className="flex flex-col items-center gap-4">
+          <div className="w-12 h-12 rounded-full border-2 border-[#9EBC3A]/20 border-t-[#9EBC3A] animate-spin" />
+          <p className="font-tech text-xs uppercase tracking-[0.3em] text-[#9EBC3A]">
+            Loading Project Dossier...
+          </p>
         </div>
       </div>
     );
   }
 
   return (
-    <div className="bg-[#0A0A0A] min-h-screen text-[#F5F0E6] overflow-x-hidden pt-[72px]">
+    <div className="bg-[#0E231C] text-[#F5F2EB] min-h-screen selection:bg-[#9EBC3A] selection:text-[#0E231C] font-sans antialiased">
       <style>{`
-        @import url('https://fonts.googleapis.com/css2?family=Anton&family=Space+Grotesk:wght@400;500;700&family=Inter:wght@300;400;500&display=swap');
-        .font-display { font-family: 'Anton', sans-serif; }
+        @import url('https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,400&family=Plus+Jakarta+Sans:wght@300;400;500;600&family=Space+Grotesk:wght@400;500;600&display=swap');
+        .font-serif-luxury { font-family: 'Cormorant Garamond', serif; }
         .font-tech { font-family: 'Space Grotesk', sans-serif; }
-        .font-body { font-family: 'Inter', sans-serif; }
-        .marquee-track { animation: marquee 26s linear infinite; width: max-content; }
-        @keyframes marquee { from { transform: translateX(0); } to { transform: translateX(-50%); } }
-        @media (prefers-reduced-motion: reduce) {
-          .marquee-track { animation: none; }
-          * { animation-duration: 0.01ms !important; transition-duration: 0.01ms !important; }
+        .ns-gold-text {
+          background: linear-gradient(135deg, #F5F2EB 0%, #C5A869 50%, #9EBC3A 100%);
+          -webkit-background-clip: text;
+          -webkit-text-fill-color: transparent;
         }
       `}</style>
 
-      {/* 1. Hero */}
-      <section ref={heroRef} className="relative h-screen min-h-[640px] overflow-hidden">
-        <motion.div style={{ scale: heroScale }} className="absolute inset-0 z-0">
-          <img src={heroImg} alt="Commercial Project Hero" className="w-full h-full object-cover" />
-          <div className="absolute inset-0 bg-gradient-to-b from-[#0A0A0A]/70 via-transparent to-[#0A0A0A]" />
-        </motion.div>
-
-        <div className="absolute top-8 left-6 md:left-12 z-10 flex items-center gap-3">
-          <span className="w-2.5 h-2.5 rounded-full bg-[#9EBC3A]" />
-          <span className="font-tech text-xs tracking-[0.3em] uppercase text-white">{heroBadge}</span>
-        </div>
-
-        <motion.div style={{ y: titleY }} className="absolute inset-0 z-10 flex flex-col items-center justify-center text-center px-4">
-          <motion.h1
-            initial={{ opacity: 0, y: 60 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 1, ease: [0.16, 1, 0.3, 1] }}
-            className="font-display uppercase text-white leading-[0.85] text-[18vw] md:text-[13vw] lg:text-[11vw] tracking-tight"
-          >
-            {heroTitle}
-            <span className="block text-[#9EBC3A]">{heroSubtitle}</span>
-          </motion.h1>
-          {heroDescription && (
-            <motion.p
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 1, delay: 0.4, ease: [0.16, 1, 0.3, 1] }}
-              className="font-body font-light text-white/70 mt-6 max-w-xl text-base md:text-lg"
-            >
-              {heroDescription}
-            </motion.p>
-          )}
-        </motion.div>
-
-        <div className="absolute bottom-0 left-0 right-0 z-10">
-          <Marquee text={heroMarqueeText} />
-        </div>
-      </section>
-
-      {/* 2. Stat strip */}
-      <section className="bg-[#006253] py-14">
-        <div className="max-w-7xl mx-auto px-6 lg:px-12 grid grid-cols-2 md:grid-cols-4 gap-8">
-          {statsData.map((s) => (
+      {/* 1. FAST SMOOTH SLIDER WITH CLEAR VIEW & BOTTOM-LEFT HIGHLIGHT */}
+      <section
+        ref={heroRef}
+        className="relative h-screen min-h-[720px] flex items-end justify-start overflow-hidden"
+      >
+        {/* Crystal Clear Image Container */}
+        <div className="absolute inset-0 z-0">
+          <AnimatePresence mode="sync">
             <motion.div
-              key={s.label}
-              initial={{ opacity: 0, y: 20 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true }}
-              transition={{ duration: 0.5 }}
-              className="text-center md:text-left"
+              key={currentSlide}
+              initial={{ opacity: 0, scale: 1.02 }}
+              animate={{ opacity: 1, scale: 1 }}
+              exit={{ opacity: 0 }}
+              transition={{ duration: 0.8, ease: "easeInOut" }}
+              className="absolute inset-0"
             >
-              <p className="font-display text-[#F5F0E6] text-5xl md:text-6xl leading-none">{s.value}</p>
-              <p className="font-tech text-[#9EBC3A] text-xs uppercase tracking-[0.25em] mt-2">{s.label}</p>
+              <img
+                src={heroSliderImages[currentSlide].url}
+                alt={heroSliderImages[currentSlide].caption}
+                className="w-full h-full object-cover object-center"
+              />
             </motion.div>
-          ))}
-        </div>
-      </section>
+          </AnimatePresence>
 
-      {/* 3. Overview */}
-      <section id="overview" className="relative py-28 md:py-36 bg-[#0A0A0A]">
-        <span className="font-display absolute -top-6 md:-top-10 left-1/2 -translate-x-1/2 text-[26vw] text-white/[0.03] leading-none select-none pointer-events-none whitespace-nowrap">
-          ASCEND
-        </span>
-        <div className="relative max-w-6xl mx-auto px-6 lg:px-12">
-          <div className="grid lg:grid-cols-12 gap-12 items-end mb-16">
-            <h2 className="lg:col-span-8 font-display uppercase text-4xl md:text-6xl leading-[0.95] text-white whitespace-pre-line">
-              {overviewTitle}
-            </h2>
-            <p className="lg:col-span-4 font-body font-light text-[#B8B3A6] leading-relaxed">
-              {overviewDescription}
-            </p>
+          {/* Targeted Vignette Only at Top and Bottom to Preserve Clear Architecture Center */}
+          <div className="absolute top-0 left-0 right-0 h-40 bg-gradient-to-b from-[#0E231C]/80 to-transparent pointer-events-none" />
+          <div className="absolute bottom-0 left-0 right-0 h-72 bg-gradient-to-t from-[#0E231C] via-[#0E231C]/60 to-transparent pointer-events-none" />
+        </div>
+
+        {/* Top-Right Badge Indicator */}
+        <div className="absolute top-28 right-6 md:right-14 z-20 hidden sm:flex items-center gap-3 px-4 py-2 rounded-full border border-[#9EBC3A]/40 bg-[#0E231C]/70 backdrop-blur-md">
+          <span className="w-2 h-2 rounded-full bg-[#9EBC3A] animate-pulse" />
+          <span className="font-tech text-xs tracking-[0.25em] uppercase text-[#F5F2EB]/90">
+            {heroBadge}
+          </span>
+        </div>
+
+        {/* Minimal Bottom-Left Highlight */}
+        <motion.div
+          style={{ y: heroContentY }}
+          className="relative z-10 max-w-2xl px-6 md:px-14 pb-14 md:pb-16 flex flex-col items-start text-left"
+        >
+          <div className="inline-flex items-center gap-2 mb-3">
+            <span className="w-6 h-px bg-[#9EBC3A]" />
+            <span className="font-tech text-xs tracking-[0.3em] uppercase text-[#9EBC3A] font-semibold">
+              {heroSliderImages[currentSlide].tag}
+            </span>
           </div>
 
-          <div className="relative h-[70vh] min-h-[420px] w-full">
-            <img src={overviewImg} alt="Project Overview" className="w-full h-full object-cover" />
-            <div className="absolute -bottom-6 -right-6 md:-bottom-10 md:-right-10 bg-[#006253] text-[#F5F0E6] px-8 py-6 md:px-10 md:py-8 shadow-xl">
-              <p className="font-display text-3xl md:text-4xl leading-none">{overviewStatusBadge}</p>
-              <p className="font-tech text-[#9EBC3A] text-xs uppercase tracking-[0.2em] mt-2">{overviewStatusLabel}</p>
+          <h1 className="font-serif-luxury text-4xl sm:text-5xl md:text-7xl leading-tight text-[#F5F2EB] uppercase mb-2">
+            {heroTitle}{" "}
+            <span className="font-light italic ns-gold-text">
+              {heroSubtitle}
+            </span>
+          </h1>
+
+          <p className="font-tech text-sm md:text-base text-[#B2C0B9] max-w-lg mb-6 tracking-wide">
+            {heroSliderImages[currentSlide].caption}
+          </p>
+
+          <div className="flex items-center gap-4">
+            <a
+              href="#inquire"
+              className="font-tech px-7 py-3 bg-[#9EBC3A] text-[#0E231C] font-semibold text-xs uppercase tracking-[0.2em] rounded-full hover:bg-[#C5A869] transition duration-300 shadow-[0_0_20px_rgba(158,188,58,0.3)]"
+            >
+              Acquire Floorplate
+            </a>
+            <a
+              href="#floorplans"
+              className="font-tech px-7 py-3 border border-[#9EBC3A]/40 bg-[#15342B]/60 backdrop-blur-md text-[#F5F2EB] text-xs uppercase tracking-[0.2em] rounded-full hover:border-[#9EBC3A] hover:text-[#9EBC3A] transition duration-300"
+            >
+              Floorplans
+            </a>
+          </div>
+        </motion.div>
+
+        {/* Bottom-Right Fast Slide Indicators */}
+        <div className="absolute bottom-10 right-6 md:right-14 z-20 flex items-center gap-3 bg-[#0E231C]/60 backdrop-blur-md px-4 py-2 rounded-full border border-white/10">
+          {heroSliderImages.map((_, idx) => (
+            <button
+              key={idx}
+              onClick={() => setCurrentSlide(idx)}
+              aria-label={`Slide ${idx + 1}`}
+              className={`h-1.5 transition-all duration-300 rounded-full ${
+                currentSlide === idx
+                  ? "w-8 bg-[#9EBC3A]"
+                  : "w-2.5 bg-[#B2C0B9]/40 hover:bg-[#B2C0B9]"
+              }`}
+            />
+          ))}
+           
+        </div>
+      </section>
+
+      {/* 2. STATS BAR */}
+      <div className="border-y border-[#1C4438] bg-[#15342B] py-8">
+        <div className="max-w-7xl mx-auto px-6 grid grid-cols-2 md:grid-cols-4 gap-8 text-center">
+          <div>
+            <p className="font-serif-luxury text-3xl md:text-4xl ns-gold-text">
+              25
+            </p>
+            <p className="font-tech text-xs tracking-widest text-[#B2C0B9] uppercase mt-1">
+              Stories Monument
+            </p>
+          </div>
+          <div>
+            <p className="font-serif-luxury text-3xl md:text-4xl text-[#F5F2EB]">
+              500K
+            </p>
+            <p className="font-tech text-xs tracking-widest text-[#B2C0B9] uppercase mt-1">
+              Sq.Ft Usable Space
+            </p>
+          </div>
+          <div>
+            <p className="font-serif-luxury text-3xl md:text-4xl ns-gold-text">
+              LEED
+            </p>
+            <p className="font-tech text-xs tracking-widest text-[#B2C0B9] uppercase mt-1">
+              Gold Standard
+            </p>
+          </div>
+          <div>
+            <p className="font-serif-luxury text-3xl md:text-4xl text-[#F5F2EB]">
+              100%
+            </p>
+            <p className="font-tech text-xs tracking-widest text-[#B2C0B9] uppercase mt-1">
+              Power Redundancy
+            </p>
+          </div>
+        </div>
+      </div>
+
+      {/* 3. ARCHITECTURAL OVERVIEW */}
+      <section className="py-28 md:py-36 max-w-7xl mx-auto px-6">
+        <div className="grid lg:grid-cols-12 gap-16 items-center">
+          <div className="lg:col-span-6 space-y-6">
+            <div className="inline-flex items-center gap-2">
+              <span className="w-8 h-px bg-[#9EBC3A]" />
+              <span className="font-tech text-xs tracking-[0.3em] uppercase text-[#9EBC3A]">
+                Design Philosophy
+              </span>
+            </div>
+            <h2 className="font-serif-luxury text-4xl md:text-6xl text-[#F5F2EB] leading-tight">
+              An Icon Crafted for <br />
+              <span className="italic font-light ns-gold-text">
+                Global Industry Leaders
+              </span>
+            </h2>
+            <p className="text-[#B2C0B9] leading-relaxed font-light text-base md:text-lg">
+              Zenith Tower stands at the intersection of structural grace and high-yield efficiency. Designed with double-glazed acoustic curtain walls and dynamic air purification, creating an optimal setting for executive productivity.
+            </p>
+            <div className="grid grid-cols-2 gap-6 pt-4 border-t border-[#1C4438]">
+              <div>
+                <h4 className="font-tech text-sm uppercase tracking-wider text-[#F5F2EB]">
+                  Zero Column Spans
+                </h4>
+                <p className="text-xs text-[#B2C0B9] mt-1 font-light">
+                  Maximized open layout planning with 360° natural sunlight penetration.
+                </p>
+              </div>
+              <div>
+                <h4 className="font-tech text-sm uppercase tracking-wider text-[#F5F2EB]">
+                  Thermal Control
+                </h4>
+                <p className="text-xs text-[#B2C0B9] mt-1 font-light">
+                  Energy-optimized low-E glass facade reducing UV heat load significantly.
+                </p>
+              </div>
+            </div>
+          </div>
+
+          <div className="lg:col-span-6 relative">
+            <div className="relative rounded-2xl overflow-hidden border border-[#1C4438] group">
+              <img
+                src={overviewImg}
+                alt="Overview"
+                className="w-full h-[520px] object-cover transition duration-700 group-hover:scale-105"
+              />
+              <div className="absolute inset-0 bg-gradient-to-t from-[#0E231C]/90 via-transparent to-transparent" />
+              <div className="absolute bottom-6 left-6 right-6 p-6 rounded-xl bg-[#15342B]/85 backdrop-blur-md border border-[#1C4438]">
+                <p className="font-tech text-xs uppercase tracking-widest text-[#9EBC3A]">
+                  Master Architecture
+                </p>
+                <p className="font-serif-luxury text-2xl text-[#F5F2EB] mt-1">
+                  Triple-Glazed Panoramic Curtain Walls
+                </p>
+              </div>
             </div>
           </div>
         </div>
       </section>
 
-      {/* 4. Signature Arc */}
-      <section className="py-24 md:py-32 bg-[#0A0A0A] border-y border-white/10">
-        <div className="max-w-4xl mx-auto px-6 text-center">
-          <p className="font-tech text-xs uppercase tracking-[0.3em] text-[#9EBC3A] mb-4">{signatureSubtitle}</p>
-          <h2 className="font-display uppercase text-3xl md:text-4xl text-white mb-2">{signatureTitle}</h2>
-          <p className="font-body font-light text-[#9C978C] max-w-xl mx-auto mb-12">
-            {signatureDescription}
-          </p>
-          <SunArc title={heroTitle} />
-        </div>
-      </section>
-
-      {/* 5. Highlights */}
-      <section className="py-24 md:py-32 bg-[#F5F0E6] text-[#0A0A0A]">
-        <div className="max-w-7xl mx-auto px-6 lg:px-12">
-          <div className="flex items-end justify-between mb-16 gap-6">
-            <h2 className="font-display uppercase text-4xl md:text-6xl leading-none whitespace-pre-line">{highlightsTitle}</h2>
-            <span className="font-tech text-xs uppercase tracking-[0.25em] text-[#8A8578] hidden md:block">{highlightsSubtitle}</span>
+      {/* 4. EXPANDED FEATURE: AMENITIES & INFRASTRUCTURE */}
+      <section className="py-24 bg-[#15342B] border-y border-[#1C4438]">
+        <div className="max-w-7xl mx-auto px-6">
+          <div className="text-center max-w-2xl mx-auto mb-16">
+            <span className="font-tech text-xs tracking-[0.3em] uppercase text-[#9EBC3A] block mb-2">
+              World-Class Facilities
+            </span>
+            <h2 className="font-serif-luxury text-4xl md:text-5xl text-[#F5F2EB]">
+              Corporate Infrastructure & Services
+            </h2>
           </div>
 
-          <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {highlightsData.map((f, i) => (
-              <motion.div
-                key={f.title}
-                initial={{ opacity: 0, y: 30 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                viewport={{ once: true }}
-                transition={{ duration: 0.5, delay: (i % 3) * 0.1 }}
-                whileHover={{ y: -6 }}
-                className={`p-8 border border-black/10 transition-colors duration-300 ${i === 1 ? "bg-[#006253] text-[#F5F0E6]" : "bg-transparent hover:bg-white"}`}
+          <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-6">
+            {luxuryAmenities.map((amenity, idx) => (
+              <div
+                key={idx}
+                className="p-8 rounded-2xl bg-[#0E231C] border border-[#1C4438] hover:border-[#9EBC3A]/50 transition-all duration-300 group hover:-translate-y-1"
               >
-                <h3 className="font-display uppercase text-2xl mb-3">{f.title}</h3>
-                <p className={`font-body font-light leading-relaxed text-sm ${i === 1 ? "text-white/80" : "text-[#4A4844]"}`}>{f.desc}</p>
-              </motion.div>
+                <div className="w-12 h-12 rounded-xl bg-[#15342B] border border-[#1C4438] flex items-center justify-center text-2xl mb-6 group-hover:scale-110 transition-transform">
+                  {amenity.icon}
+                </div>
+                <h3 className="font-serif-luxury text-2xl text-[#F5F2EB] mb-2 group-hover:text-[#9EBC3A] transition-colors">
+                  {amenity.title}
+                </h3>
+                <p className="text-sm text-[#B2C0B9] font-light leading-relaxed">
+                  {amenity.desc}
+                </p>
+              </div>
             ))}
           </div>
         </div>
       </section>
 
-      {/* 6. Architecture Showcase */}
-      <section className="relative bg-[#0A0A0A]">
-        <div className="flex flex-col lg:flex-row min-h-[75vh]">
-          <div className="lg:w-3/5 relative h-[50vh] lg:h-auto overflow-hidden group">
-            <img src={architectureImg1} alt="Architecture Detail" className="w-full h-full object-cover transition-transform duration-[1400ms] group-hover:scale-105" />
-          </div>
-          <div className="lg:w-2/5 p-12 lg:p-16 flex flex-col justify-center bg-[#006253] text-[#F5F0E6]">
-            <h2 className="font-display uppercase text-3xl lg:text-4xl leading-tight mb-6 whitespace-pre-line">{architectureTitle}</h2>
-            <p className="font-body leading-relaxed text-[#F5F0E6]/80">{architectureDescription}</p>
-          </div>
+      {/* 5. FLOOR PLANS / BLUEPRINTS */}
+      <section id="floorplans" className="py-28 max-w-7xl mx-auto px-6">
+        <div className="text-center max-w-2xl mx-auto mb-16">
+          <span className="font-tech text-xs tracking-[0.3em] uppercase text-[#9EBC3A] block mb-2">
+            Space Allocation
+          </span>
+          <h2 className="font-serif-luxury text-4xl md:text-5xl text-[#F5F2EB]">
+            Bespoke Commercial Floorplates
+          </h2>
         </div>
 
-        <div className="flex flex-col-reverse lg:flex-row min-h-[75vh]">
-          <div className="lg:w-2/5 p-12 lg:p-16 flex flex-col justify-center border-t lg:border-t-0 border-white/10">
-            <h2 className="font-display uppercase text-3xl lg:text-4xl leading-tight mb-6 text-white whitespace-pre-line">{workspaceTitle}</h2>
-            <p className="font-body text-[#B8B3A6] font-light leading-relaxed">{workspaceDescription}</p>
+        <div className="grid lg:grid-cols-12 gap-12 items-center">
+          <div className="lg:col-span-5 space-y-4">
+            {floorPlans.map((plan, idx) => (
+              <div
+                key={plan.level}
+                onClick={() => setActiveFloor(idx)}
+                className={`p-6 rounded-xl cursor-pointer border transition-all duration-300 ${
+                  activeFloor === idx
+                    ? "bg-[#1C4438] border-[#9EBC3A] shadow-[0_0_25px_rgba(158,188,58,0.15)]"
+                    : "bg-[#15342B] border-[#1C4438] hover:border-[#9EBC3A]/50"
+                }`}
+              >
+                <div className="flex justify-between items-center mb-2">
+                  <span className="font-tech text-xs uppercase tracking-widest text-[#9EBC3A]">
+                    {plan.level}
+                  </span>
+                  <span className="font-tech text-xs text-[#B2C0B9]">
+                    {plan.area}
+                  </span>
+                </div>
+                <h3 className="font-serif-luxury text-2xl text-[#F5F2EB] mb-2">
+                  {plan.title}
+                </h3>
+                <p className="text-xs text-[#B2C0B9]">
+                  {plan.layout} • {plan.ceiling}
+                </p>
+              </div>
+            ))}
           </div>
-          <div className="lg:w-3/5 relative h-[50vh] lg:h-auto overflow-hidden group">
-            <img src={architectureImg2} alt="Workspace Layout" className="w-full h-full object-cover transition-transform duration-[1400ms] group-hover:scale-105" />
+
+          <div className="lg:col-span-7">
+            <div className="relative rounded-2xl overflow-hidden border border-[#1C4438] bg-[#15342B] p-8 text-center">
+              <img
+                src="https://images.unsplash.com/photo-1503387762-592deb58ef4e?q=80&w=1931&auto=format&fit=crop"
+                alt="Blueprint Plan"
+                className="w-full h-[380px] object-cover rounded-lg filter invert opacity-75"
+              />
+              <div className="mt-6 flex justify-between items-center text-left border-t border-[#1C4438] pt-4">
+                <div>
+                  <p className="font-tech text-xs uppercase text-[#9EBC3A]">
+                    Active Schematic
+                  </p>
+                  <p className="font-serif-luxury text-xl text-[#F5F2EB]">
+                    {floorPlans[activeFloor].title}
+                  </p>
+                </div>
+                <a
+                  href="#inquire"
+                  className="font-tech text-xs uppercase tracking-widest text-[#9EBC3A] hover:underline"
+                >
+                  Request CAD Files ↗
+                </a>
+              </div>
+            </div>
           </div>
         </div>
       </section>
 
-      {/* 7. Gallery */}
-      <section id="gallery" className="py-24 md:py-32 bg-[#F5F0E6] text-[#0A0A0A]">
-        <div className="max-w-7xl mx-auto px-6 lg:px-12">
-          <h2 className="font-display uppercase text-4xl md:text-6xl leading-none mb-16 whitespace-pre-line">{galleryTitle}</h2>
+      {/* 6. DUAL ARCHITECTURAL SHOWCASE */}
+      <section className="grid lg:grid-cols-2 border-y border-[#1C4438]">
+        <div className="relative h-[540px] overflow-hidden group">
+          <img
+            src={architectureImg1}
+            alt="Facade Detail"
+            className="w-full h-full object-cover transition duration-1000 group-hover:scale-105"
+          />
+          <div className="absolute inset-0 bg-gradient-to-t from-[#0E231C]/95 via-[#0E231C]/30 to-transparent p-12 flex flex-col justify-end">
+            <span className="font-tech text-xs uppercase tracking-[0.3em] text-[#9EBC3A]">
+              Material Selection
+            </span>
+            <h3 className="font-serif-luxury text-3xl md:text-4xl text-[#F5F2EB] mt-1">
+              Anodized Framing & Travertine Accents
+            </h3>
+            <p className="text-sm text-[#B2C0B9] mt-2 max-w-md font-light">
+              Sustainable materials engineered to withstand ambient weathering while reflecting changing daylight hues.
+            </p>
+          </div>
+        </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 auto-rows-[300px]">
-            {galleryImagesData.map((img, i) => (
-              <motion.div
-                key={i}
-                whileHover={{ rotate: i % 2 === 0 ? -1 : 1, scale: 1.02 }}
-                className={`relative overflow-hidden group cursor-pointer shadow-lg ${i === 0 ? "md:col-span-2 lg:row-span-2 lg:h-[616px]" : ""}`}
-                onClick={() => setSelectedImage(img.src)}
+        <div className="relative h-[540px] overflow-hidden group border-t lg:border-t-0 lg:border-l border-[#1C4438]">
+          <img
+            src={architectureImg2}
+            alt="Interior Executive"
+            className="w-full h-full object-cover transition duration-1000 group-hover:scale-105"
+          />
+          <div className="absolute inset-0 bg-gradient-to-t from-[#0E231C]/95 via-[#0E231C]/30 to-transparent p-12 flex flex-col justify-end">
+            <span className="font-tech text-xs uppercase tracking-[0.3em] text-[#9EBC3A]">
+              Spatial Experience
+            </span>
+            <h3 className="font-serif-luxury text-3xl md:text-4xl text-[#F5F2EB] mt-1">
+              Column-Free Executive Headquarters
+            </h3>
+            <p className="text-sm text-[#B2C0B9] mt-2 max-w-md font-light">
+              Engineered for seamless spatial modularity, optimal acoustics, and personalized climate zoning.
+            </p>
+          </div>
+        </div>
+      </section>
+
+      {/* 7. TECHNICAL SPECIFICATIONS MATRIX */}
+      <section className="py-28 max-w-7xl mx-auto px-6">
+        <div className="text-center max-w-2xl mx-auto mb-16">
+          <span className="font-tech text-xs tracking-[0.3em] uppercase text-[#9EBC3A] block mb-2">
+            Technical Dossier
+          </span>
+          <h2 className="font-serif-luxury text-4xl md:text-5xl text-[#F5F2EB]">
+            Engineering Specifications
+          </h2>
+        </div>
+
+        <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-4">
+          {specs.map((spec) => (
+            <div
+              key={spec.label}
+              className="bg-[#15342B] p-8 rounded-xl border border-[#1C4438] hover:border-[#9EBC3A]/50 transition-colors"
+            >
+              <span className="w-1.5 h-1.5 rounded-full bg-[#9EBC3A] block mb-4" />
+              <p className="font-tech text-xs uppercase tracking-widest text-[#B2C0B9] mb-2">
+                {spec.label}
+              </p>
+              <p className="font-serif-luxury text-2xl text-[#F5F2EB]">
+                {spec.value}
+              </p>
+            </div>
+          ))}
+        </div>
+      </section>
+
+      {/* 8. CURATED GALLERY */}
+      <section className="py-24 bg-[#15342B] border-t border-[#1C4438]">
+        <div className="max-w-7xl mx-auto px-6">
+          <div className="flex justify-between items-end mb-12">
+            <div>
+              <span className="font-tech text-xs uppercase tracking-[0.3em] text-[#9EBC3A] block mb-2">
+                Visual Showcase
+              </span>
+              <h2 className="font-serif-luxury text-4xl md:text-5xl text-[#F5F2EB]">
+                Project Gallery
+              </h2>
+            </div>
+            <span className="font-tech text-xs text-[#B2C0B9] uppercase tracking-widest hidden md:block">
+              Click to Expand
+            </span>
+          </div>
+
+          <div className="grid md:grid-cols-3 gap-6">
+            {galleryImages.map((img, idx) => (
+              <div
+                key={idx}
+                onClick={() => setSelectedImage(img)}
+                className={`relative rounded-xl overflow-hidden border border-[#1C4438] cursor-pointer group ${
+                  idx === 0
+                    ? "md:col-span-2 md:row-span-2 h-[500px]"
+                    : "h-[238px]"
+                }`}
               >
-                <img src={img.src} alt={img.title} className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110" />
-                <div className="absolute inset-0 bg-[#0A0A0A]/10 group-hover:bg-[#0A0A0A]/60 transition-colors duration-300" />
-                <div className="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-300">
-                  <span className="font-display uppercase text-[#9EBC3A] text-2xl">View</span>
+                <img
+                  src={img.src}
+                  alt={img.title}
+                  className="w-full h-full object-cover transition duration-700 group-hover:scale-105"
+                />
+                <div className="absolute inset-0 bg-[#0E231C]/40 group-hover:bg-transparent transition-colors" />
+                <div className="absolute bottom-4 left-4">
+                  <p className="font-tech text-xs uppercase tracking-widest text-[#F5F2EB] drop-shadow-md">
+                    {img.title}
+                  </p>
                 </div>
-                <div className="absolute bottom-6 left-6 opacity-0 group-hover:opacity-100 transition-opacity duration-300">
-                  <h4 className="font-tech text-[#F5F0E6] text-sm uppercase tracking-[0.2em]">{img.title}</h4>
-                </div>
-              </motion.div>
+              </div>
             ))}
           </div>
         </div>
@@ -347,109 +610,52 @@ const CommercialProject = () => {
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
-            className="fixed inset-0 z-50 bg-[#0A0A0A]/95 flex items-center justify-center p-4 md:p-10"
             onClick={() => setSelectedImage(null)}
+            className="fixed inset-0 z-50 bg-[#0E231C]/95 backdrop-blur-md flex items-center justify-center p-6"
           >
-            <button className="absolute top-6 right-6 text-[#F5F0E6] hover:text-[#9EBC3A] p-2">
-              <svg xmlns="http://www.w3.org/2000/svg" className="h-8 w-8" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-              </svg>
+            <button className="absolute top-8 right-8 text-[#F5F2EB] font-tech text-sm tracking-widest uppercase hover:text-[#9EBC3A]">
+              Close [ESC]
             </button>
-            <img src={selectedImage} alt="Fullscreen View" className="max-w-full max-h-full object-contain" />
+            <img
+              src={selectedImage.src}
+              alt="Enlarged view"
+              className="max-w-full max-h-[85vh] object-contain rounded-lg border border-[#1C4438]"
+            />
           </motion.div>
         )}
       </AnimatePresence>
 
-      {/* 8. Video */}
-      <section className="py-24 md:py-32 bg-[#0A0A0A] relative overflow-hidden">
-        <div className="max-w-5xl mx-auto px-6 lg:px-12 relative z-10 text-center">
-          <h2 className="font-display uppercase text-4xl md:text-6xl text-white mb-6 whitespace-pre-line">{videoTitle}</h2>
-          <p className="font-body text-[#9C978C] mb-12 max-w-2xl mx-auto font-light">{videoDescription}</p>
-
-          <div className="relative aspect-video bg-black overflow-hidden group cursor-pointer shadow-2xl">
-            <img src={videoThumbnail} alt="Video Thumbnail" className="w-full h-full object-cover opacity-50 group-hover:opacity-30 transition-opacity duration-500" />
-            <div className="absolute inset-0 flex items-center justify-center">
-              {videoUrl ? (
-                <a href={videoUrl} target="_blank" rel="noopener noreferrer" className="w-24 h-24 rounded-full bg-[#006253] flex items-center justify-center group-hover:scale-110 transition-transform duration-300">
-                  <svg xmlns="http://www.w3.org/2000/svg" className="h-9 w-9 text-[#F5F0E6] ml-1" fill="currentColor" viewBox="0 0 24 24">
-                    <path d="M8 5v14l11-7z" />
-                  </svg>
-                </a>
-              ) : (
-                <div className="w-24 h-24 rounded-full bg-[#006253] flex items-center justify-center group-hover:scale-110 transition-transform duration-300">
-                  <svg xmlns="http://www.w3.org/2000/svg" className="h-9 w-9 text-[#F5F0E6] ml-1" fill="currentColor" viewBox="0 0 24 24">
-                    <path d="M8 5v14l11-7z" />
-                  </svg>
-                </div>
-              )}
-            </div>
-          </div>
-        </div>
-      </section>
-
-      {/* 9. Specifications */}
-      <section className="py-24 md:py-32 bg-[#F5F0E6] text-[#0A0A0A]">
-        <div className="max-w-6xl mx-auto px-6 lg:px-12">
-          <h2 className="font-display uppercase text-4xl md:text-6xl leading-none mb-16">{specsTitle}</h2>
-          <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-px bg-[#0A0A0A]/10">
-            {specsData.map((spec) => (
-              <div key={spec.label} className="bg-[#F5F0E6] p-8">
-                <p className="font-tech text-xs uppercase tracking-[0.2em] text-[#8A8578] mb-3">{spec.label}</p>
-                <p className="font-display text-2xl">{spec.value}</p>
-              </div>
-            ))}
-          </div>
-        </div>
-      </section>
-
-      {/* 10. Location */}
-      <section className="py-24 md:py-32 bg-[#0A0A0A]">
-        <div className="max-w-7xl mx-auto px-6 lg:px-12">
-          <div className="grid lg:grid-cols-2 gap-16 items-center">
-            <div>
-              <h2 className="font-display uppercase text-4xl md:text-5xl leading-none mb-8 text-white whitespace-pre-line">{locationTitle}</h2>
-              <p className="font-body text-[#9C978C] leading-relaxed mb-10 font-light text-lg">{locationDescription}</p>
-              <ul className="space-y-4">
-                {locationBenefits.map((item) => (
-                  <li key={item} className="flex items-center text-white font-body">
-                    <span className="w-2 h-2 bg-[#9EBC3A] mr-4 flex-shrink-0" />
-                    <span className="font-light">{item}</span>
-                  </li>
-                ))}
-              </ul>
-            </div>
-            <div className="h-[420px] bg-[#151515] relative overflow-hidden border border-white/10">
-              {mapImg ? (
-                <img src={mapImg} alt="Location Map" className="w-full h-full object-cover" />
-              ) : (
-                <div className="w-full h-full flex items-center justify-center">
-                  <span className="font-display uppercase text-white/10 text-6xl">Map</span>
-                </div>
-              )}
-            </div>
-          </div>
-        </div>
-      </section>
-
-      {/* 11. Final CTA */}
-      <section className="relative bg-[#006253] text-[#F5F0E6] py-28 md:py-40 text-center overflow-hidden">
-        <div className="relative z-10 max-w-4xl mx-auto px-6">
-          <h2 className="font-display uppercase text-5xl md:text-7xl leading-[0.9] mb-8 text-white whitespace-pre-line">
-            {ctaTitle}
+      {/* 9. INQUIRY / PRIVATE APPOINTMENT CTA */}
+      <section
+        id="inquire"
+        className="py-32 relative bg-gradient-to-b from-[#15342B] to-[#0E231C] border-t border-[#1C4438] text-center"
+      >
+        <div className="max-w-4xl mx-auto px-6 relative z-10">
+          <span className="font-tech text-xs uppercase tracking-[0.35em] text-[#9EBC3A] block mb-4">
+            Confidential Allocation
+          </span>
+          <h2 className="font-serif-luxury text-5xl md:text-7xl text-[#F5F2EB] mb-6">
+            Schedule a Private Presentation
           </h2>
-          <p className="font-body text-lg font-light mb-12 max-w-xl mx-auto text-[#F5F0E6]/90">
-            {ctaDescription}
+          <p className="text-[#B2C0B9] font-light text-base md:text-lg max-w-xl mx-auto mb-10 leading-relaxed">
+            Direct discussions for full floorplate acquisition, naming rights, and customized architectural provisions.
           </p>
+
           <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
-            <Link to="/contact" className="font-tech w-full sm:w-auto px-10 py-4 bg-[#F5F0E6] text-[#006253] hover:bg-white hover:text-[#0A0A0A] text-xs font-bold uppercase tracking-[0.2em] transition-colors shadow-lg">
-              Contact Us
+            <Link
+              to="/contact"
+              className="font-tech w-full sm:w-auto px-10 py-4 bg-[#9EBC3A] text-[#0E231C] font-semibold text-xs uppercase tracking-[0.25em] rounded-full hover:bg-[#C5A869] transition duration-300 shadow-[0_0_30px_rgba(158,188,58,0.25)]"
+            >
+              Contact Sales Advisory
             </Link>
-            <button className="font-tech w-full sm:w-auto px-10 py-4 border-2 border-[#F5F0E6] hover:bg-[#F5F0E6] hover:text-[#006253] text-xs font-bold uppercase tracking-[0.2em] transition-colors">
-              Request Details
-            </button>
+            <a
+              href="tel:+8801894801923"
+              className="font-tech w-full sm:w-auto px-10 py-4 border border-[#9EBC3A]/40 text-[#F5F2EB] font-medium text-xs uppercase tracking-[0.25em] rounded-full hover:border-[#9EBC3A] hover:text-[#9EBC3A] transition duration-300"
+            >
+              Direct Line: +880 1894-801-923
+            </a>
           </div>
         </div>
-        <Marquee text={heroMarqueeText} dark />
       </section>
     </div>
   );
