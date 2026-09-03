@@ -268,15 +268,14 @@ export default function AboutUs() {
             <div className="space-y-5">
               <div>
                 <span className="inline-block rounded bg-[#0f7771]/10 px-3 py-1 font-brand-body text-[11px] font-bold uppercase tracking-wider text-[#0f7771]">
-                  SOLUTION
+                  {data.overviewEyebrow}
                 </span>
               </div>
               <h2 className="font-brand-body text-3xl font-bold tracking-tight text-slate-900 sm:text-4xl lg:text-[2.6rem] leading-tight">
-                Delivering Certainty
+                {data.overviewTitle}
               </h2>
               <p className="font-brand-body text-sm sm:text-base leading-relaxed text-slate-600 font-light">
-                {data.overviewText ||
-                  "North South Group empowers customers and communities to overcome critical housing and infrastructure challenges with planned reliability and trust."}
+                {data.overviewText}
               </p>
 
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-6 pt-6 mt-4 border-t border-slate-100">
@@ -285,10 +284,10 @@ export default function AboutUs() {
                     <HiOutlineClock size={19} />
                   </div>
                   <h4 className="font-brand-body text-sm font-bold text-slate-900">
-                    Faster Decision
+                    {data.strengths?.[0]?.title || "Planned Development"}
                   </h4>
                   <p className="font-brand-body mt-1 text-xs leading-relaxed text-slate-500 font-light">
-                    Real-time insights to act quickly and respond to changing conditions.
+                    {data.strengths?.[0]?.text || "Residential and industrial communities shaped around long-term value, access, and daily convenience."}
                   </p>
                 </div>
                 <div>
@@ -296,10 +295,10 @@ export default function AboutUs() {
                     <HiOutlineChartBar size={19} />
                   </div>
                   <h4 className="font-brand-body text-sm font-bold text-slate-900">
-                    Sustainable Growth
+                    {data.strengths?.[1]?.title || "Sustainable Living"}
                   </h4>
                   <p className="font-brand-body mt-1 text-xs leading-relaxed text-slate-500 font-light">
-                    Supporting long-term growth while maintaining resilience, profitability.
+                    {data.strengths?.[1]?.text || "Green spaces, civic facilities, and organized layouts guide our approach to healthier township growth."}
                   </p>
                 </div>
               </div>
@@ -310,7 +309,7 @@ export default function AboutUs() {
               <div className="relative h-[360px] sm:h-[420px] lg:h-[450px] w-full overflow-hidden rounded-3xl bg-slate-100 shadow-2xl">
                 <img
                   src={overviewGallery[0] || hero2}
-                  alt="Delivering Certainty"
+                  alt={data.overviewTitle}
                   className="h-full w-full object-cover object-center"
                 />
                 <div className="pointer-events-none absolute inset-0 bg-slate-900/10" />
@@ -319,10 +318,10 @@ export default function AboutUs() {
                 <div className="absolute right-6 top-6 sm:right-8 sm:top-8 flex min-w-[160px] items-start justify-between gap-4 rounded-2xl border border-slate-100/90 bg-white/95 p-4 sm:p-5 shadow-2xl backdrop-blur-md">
                   <div>
                     <p className="font-brand-body text-2xl sm:text-3xl font-black leading-none text-slate-900">
-                      10x
+                      {data.stats?.[1]?.value || "7+"}
                     </p>
                     <p className="font-brand-body mt-1 text-xs font-medium text-slate-500">
-                      Faster decisions
+                      {data.stats?.[1]?.label || "Sister Concerns"}
                     </p>
                   </div>
                   <span className="mt-1 h-2.5 w-2.5 shrink-0 rounded-full bg-[#0f7771]" />
@@ -332,10 +331,10 @@ export default function AboutUs() {
                 <div className="absolute bottom-6 right-6 sm:bottom-8 sm:right-8 flex min-w-[175px] items-start justify-between gap-4 rounded-2xl border border-slate-100/90 bg-white/95 p-4 sm:p-5 shadow-2xl backdrop-blur-md">
                   <div>
                     <p className="font-brand-body text-2xl sm:text-3xl font-black leading-none text-slate-900">
-                      95%
+                      {data.stats?.[3]?.value || "600+"}
                     </p>
                     <p className="font-brand-body mt-1 text-xs font-medium text-slate-500">
-                      Sustainable growth
+                      {data.stats?.[3]?.label || "Acres Planned"}
                     </p>
                   </div>
                   <span className="mt-1 h-2.5 w-2.5 shrink-0 rounded-sm bg-amber-400" />
@@ -354,28 +353,33 @@ export default function AboutUs() {
               <div className="relative h-[360px] sm:h-[420px] lg:h-[450px] w-full overflow-hidden rounded-3xl bg-slate-100 shadow-2xl">
                 <img
                   src={overviewGallery[1] || overviewGallery[0] || hero1}
-                  alt="Unparalleled Experience"
+                  alt={data.overviewHighlightTitle}
                   className="h-full w-full object-cover object-center"
                 />
                 <div className="pointer-events-none absolute inset-0 bg-slate-900/10" />
 
                 {/* Floating Quote Card at bottom */}
-                <div className="absolute bottom-5 left-5 right-5 sm:max-w-sm rounded-2xl border border-slate-100/90 bg-white/95 p-5 sm:p-6 shadow-2xl backdrop-blur-md">
-                  <p className="font-brand-body text-xs sm:text-sm font-medium leading-relaxed text-slate-700">
-                    "North South brings results, better efficiency, and consistent performance we can rely on."
+                <div className="absolute bottom-5 left-5 right-5 sm:max-w-md rounded-2xl border border-slate-100/90 bg-white/95 p-5 sm:p-6 shadow-2xl backdrop-blur-md">
+                  <p className="font-brand-body text-xs sm:text-sm font-medium leading-relaxed text-slate-700 italic">
+                    "{data.overviewHighlightTitle || data.heroSubtitle}"
                   </p>
-                  <div className="mt-4 flex items-center gap-3 border-t border-slate-100 pt-3">
-                    <div className="flex h-7 w-7 shrink-0 items-center justify-center rounded-lg bg-[#0f7771] text-xs font-bold text-white shadow-sm">
-                      NS
+                  <div className="mt-4 flex items-center justify-between border-t border-slate-100 pt-3">
+                    <div className="flex items-center gap-2.5">
+                      <div className="flex h-7 w-7 shrink-0 items-center justify-center rounded-lg bg-[#0f7771] text-xs font-bold text-white shadow-sm">
+                        NS
+                      </div>
+                      <div>
+                        <p className="font-brand-body text-xs font-bold uppercase tracking-wider text-slate-900">
+                          {data.overviewHighlightEyebrow || "North South Group"}
+                        </p>
+                        <p className="font-brand-body text-[10px] text-slate-400">
+                          Corporate Development
+                        </p>
+                      </div>
                     </div>
-                    <div>
-                      <p className="font-brand-body text-xs font-bold uppercase tracking-wider text-slate-900">
-                        North South Group
-                      </p>
-                      <p className="font-brand-body text-[10px] text-slate-400">
-                        Corporate Development
-                      </p>
-                    </div>
+                    <span className="font-brand-body text-[10px] font-bold uppercase px-2.5 py-1 rounded bg-[#0f7771]/10 text-[#0f7771]">
+                      {data.overviewBadge || "Since 2019"}
+                    </span>
                   </div>
                 </div>
               </div>
@@ -385,28 +389,33 @@ export default function AboutUs() {
             <div className="space-y-5 order-1 lg:order-2">
               <div>
                 <span className="inline-block rounded bg-[#0f7771]/10 px-3 py-1 font-brand-body text-[11px] font-bold uppercase tracking-wider text-[#0f7771]">
-                  SOLUTION
+                  {data.overviewHighlightEyebrow || "North South Group"}
                 </span>
               </div>
               <h2 className="font-brand-body text-3xl font-bold tracking-tight text-slate-900 sm:text-4xl lg:text-[2.6rem] leading-tight">
-                Unparalleled Experience
+                {data.overviewHighlightTitle || "Planned Projects Shaped Around Trust & Long-term Value"}
               </h2>
               <p className="font-brand-body text-sm sm:text-base leading-relaxed text-slate-600 font-light">
-                {data.overviewParagraphs?.[0] ||
-                  "We bring years of experience delivering strong results, faster value, and measurable quality across residential, industrial, and township development at scale consistently."}
+                {data.overviewParagraphs?.[0]}
               </p>
 
-              <div className="space-y-5 pt-4">
+              {data.overviewParagraphs?.[1] && (
+                <p className="font-brand-body text-sm sm:text-base leading-relaxed text-slate-600 font-light">
+                  {data.overviewParagraphs[1]}
+                </p>
+              )}
+
+              <div className="space-y-5 pt-3">
                 <div className="flex items-start gap-3.5">
                   <div className="mt-0.5 flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-[#0f7771]/10 text-[#0f7771]">
                     <HiOutlineBuildingOffice2 size={19} />
                   </div>
                   <div>
                     <h4 className="font-brand-body text-sm sm:text-base font-bold text-slate-900">
-                      Deep Industry Expertise
+                      {data.strengths?.[2]?.title || "Reliable Governance"}
                     </h4>
                     <p className="font-brand-body mt-1 text-xs sm:text-sm leading-relaxed text-slate-500 font-light">
-                      Built on real planned township and development experience across diverse industries.
+                      {data.strengths?.[2]?.text || "Disciplined project planning and professional leadership keep delivery aligned with client confidence."}
                     </p>
                   </div>
                 </div>
@@ -417,13 +426,25 @@ export default function AboutUs() {
                   </div>
                   <div>
                     <h4 className="font-brand-body text-sm sm:text-base font-bold text-slate-900">
-                      Consistent Performance Outcomes
+                      {data.strengths?.[3]?.title || "Client Commitment"}
                     </h4>
                     <p className="font-brand-body mt-1 text-xs sm:text-sm leading-relaxed text-slate-500 font-light">
-                      Delivering stable results with clear impact on efficiency, client trust, and long-term community value.
+                      {data.strengths?.[3]?.text || "We focus on trust, transparent communication, and real estate solutions that fit buyer needs."}
                     </p>
                   </div>
                 </div>
+              </div>
+
+              {/* Signature Group Ventures Chips */}
+              <div className="flex flex-wrap gap-2 pt-2">
+                {signatureVentures.map((venture) => (
+                  <span
+                    key={venture}
+                    className="font-brand-body border border-[#0f7771]/30 bg-[#0f7771]/5 px-3 py-1 text-xs font-semibold text-[#0f7771] rounded-full"
+                  >
+                    {venture}
+                  </span>
+                ))}
               </div>
             </div>
           </div>
