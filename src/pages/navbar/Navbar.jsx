@@ -54,7 +54,7 @@ const projectItems = [
   },
   {
     label: "Condominium Project",
-    to: "/purbachalNirapadValley",
+    to: "/nirapadVallecondominiumproject",
   },
   {
     label: "Hotel Project",
