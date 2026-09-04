@@ -270,6 +270,7 @@ function App({ scaling }) {
                   element={<UpdateHomeSlider />}
                 />
                 <Route path="createReview" element={<CreateReview />} />
+                <Route path="viewGreenCity" element={<ViewGreenCity />} />
                 <Route path="viewSquareCity" element={<ViewSquareCity />} />
                 <Route
                   path="viewIndustrialCity"
