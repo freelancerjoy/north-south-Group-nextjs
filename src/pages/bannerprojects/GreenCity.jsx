@@ -145,6 +145,7 @@ const GreenCity = () => {
       config={dynamicConfig}
       logoSrc={greenCityLogo}
       videoSrc={data?.greenCityVideo || ""}
+      locationVideoSrc={data?.locationVideo || "/videos/projectVideo.mp4"}
       brochureImageSrc={data?.brochureImage?.url || greenCityBrochure}
       brochurePdfHref={brochurePdfHref}
       bookingPdfHref={bookingPdfHref}
@@ -156,7 +157,7 @@ const GreenCity = () => {
       plotIntroText={data?.plotIntroText || ""}
       locationText={
         data?.locationBenefitsText ||
-        "Purbachal North South Green City is located on the eastern side of the River Shitalakhya and remains closely connected to Bhulta-Gausia, the Dhaka-Sylhet Highway, and the growing Purbachal corridor."
+        "Purbachal Northsouth Green City is Located on the eastern side of River Shitalakhya, opposite to Army Housing Jolshiri Abason Project-2, at Bhulta Gausia area. It is Closest to reach from Hazrat Shahjalal International Airport, Dhaka through Purbachal 300 Feet Link Road following Kuril Flyover and Kanchan Bridge. Another Key approach point is from Natun Bazar, Madani Avenue starting from the opposite side of the American Embassy and passing through Gazi Bridge and connecting Dhaka-Sylhet Highway. It is also on the Northern side of Dhaka-Sylhet High Way. This Project is also connected throw Aftab Nagar, Rampura, Banasree road."
       }
       rulesText={
         data?.rulesRegulationText ||
