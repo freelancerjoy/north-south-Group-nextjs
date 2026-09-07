@@ -121,18 +121,18 @@ const IndustrialCity = () => {
 
   const overviewParagraphs = [
     data?.overviewParagraph1 ||
-      "North South Group is a market leader in the real estate building and land development sector, gaining strong confidence in housing and industrial development across Bangladesh.",
+      "নর্থ সাউথ গ্রুপ দেশের অন্যতম শীর্ষস্থানীয় রিয়েল এস্টেট ও শিল্প অবকাঠামো উন্নয়নকারী প্রতিষ্ঠান, যা বাংলাদেশের আবাসন ও শিল্পায়নে ব্যাপক আস্থা অর্জন করেছে।",
     data?.overviewParagraph2 ||
-      '"North South Industrial City" is another milestone project spanning 600 acres along the Dhaka-Sylhet Highway, designed specifically to meet the growing demand for industrial land and infrastructure in the region.',
+      "ঢাকা-সিলেট মহাসড়কের পাশে ৬০০ একর জুড়ে বিস্তৃত 'নর্থ সাউথ ইন্ডাস্ট্রিয়াল সিটি' এ অঞ্চলের শিল্প ও বাণিজ্যের ক্রমবর্ধমান চাহিদা মেটাতে পরিকল্পিত একটি আধুনিক শিল্পাঞ্চল।",
   ].filter(Boolean);
 
   const specificationsParagraphs = [
     data?.specificationsParagraph1 ||
-      "Eco-friendly layout planning based on RAJUK rules and expert urban planning guidelines, ensuring an organized and future-ready industrial zone.",
+      "রাজউকের নিয়ম ও দক্ষ নগর পরিকল্পনার ভিত্তিতে পরিবেশবান্ধব ও সুশৃঙ্খল একটি ভবিষ্যৎ উপযোগী শিল্পাঞ্চল।",
     data?.specificationsParagraph2 ||
-      "Space allocated for civic infrastructure, parks, playgrounds, and a long lake edge provides a more balanced environment for workers and nearby residents.",
+      "নাগরিক সুযোগ-সুবিধা, সবুজ পার্ক, খেলার মাঠ এবং লেকের মনোরম পরিবেশ কর্মকর্তা ও কর্মচারীদের জন্য একটি স্বাস্থ্যকর কাজের পরিবেশ তৈরি করে।",
     data?.specificationsParagraph3 ||
-      "Dedicated zones for education, healthcare, shopping, community centers, and mosques support the daily needs of the industrial community.",
+      "শিক্ষা প্রতিষ্ঠান, স্বাস্থ্যসেবা, শপিং কমপ্লেক্স, কমিউনিটি সেন্টার এবং মসজিদ শিল্পাঞ্চলের দৈনন্দিন চাহিদা মেটাতে বিশেষভাবে নির্ধারিত।",
   ].filter(Boolean);
 
   const galleryImages = data?.galleryImages?.length
@@ -151,7 +151,7 @@ const IndustrialCity = () => {
 
   return (
     <ProjectShowcaseTemplate
-      projectName="North South Industrial City"
+      projectName="নর্থ সাউথ ইন্ডাস্ট্রিয়াল সিটি"
       config={dynamicConfig}
       logoSrc={industrialCityLogo}
       videoSrc={data?.industrialCityVideo || ""}
@@ -166,11 +166,11 @@ const IndustrialCity = () => {
       plotIntroText={data?.plotIntroText || ""}
       locationText={
         data?.locationBenefitsText ||
-        "Purbachal Industrial City is located on the eastern side of River Shitalakhya, opposite the Army Housing Jolshiri Abason Project-2. The project remains easily accessible via Purbachal Link Road, Kuril Flyover, and Kanchan Bridge."
+        "পূর্বাচল ইন্ডাস্ট্রিয়াল সিটি শীতলক্ষ্যা নদীর পূর্ব তীরে, আর্মি হাউজিং জলসিঁড়ি আবাসন প্রকল্প-২ এর বিপরীতে অবস্থিত। পূর্বাচল লিংক রোড, কুড়িল ফ্লাইওভার এবং কাঞ্চন ব্রিজের মাধ্যমে খুব সহজেই এই প্রকল্পে যাতায়াত করা যায়।"
       }
       rulesText={
         data?.rulesRegulationText ||
-        "RAJUK exercises development control as per the East Bengal Building Construction Act, 1952 and its guidelines. All industrial plots and constructions within North South Industrial City follow RAJUK-approved layout plans and development regulations."
+        "রাজউক ১৯৫২ সালের ইমারত নির্মাণ আইন ও প্রাসঙ্গিক নির্দেশিকা অনুসারে উন্নয়ন নিয়ন্ত্রণ করে থাকে, যা প্রকল্পটির সুশৃঙ্খল ও পরিকল্পিত শিল্পায়ন নিশ্চিত করে।"
       }
       modalPreviewSrc={industrialModalImg}
     />

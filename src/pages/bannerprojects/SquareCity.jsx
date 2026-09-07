@@ -112,18 +112,18 @@ const SquareCity = () => {
 
   const overviewParagraphs = [
     data?.overviewParagraph1 ||
-      "North South Group is a market leader in real estate, offering residential projects tailored to buyer needs with a commitment to quality and timely delivery.",
+      "নর্থ সাউথ গ্রুপ রিয়েল এস্টেট খাতের একটি বিশ্বস্ত প্রতিষ্ঠান, যা গুণগত মান ও সময়মতো হস্তান্তরের নিশ্চয়তা দিয়ে গ্রাহকদের জন্য নান্দনিক আবাসন প্রকল্প উপহার দিয়ে আসছে।",
     data?.overviewParagraph2 ||
-      '"North South Square City" is a milestone project spanning 600 acres along the Dhaka-Sylhet Highway, developed in full compliance with RAJUK guidelines and modern urban planning standards.',
+      "ঢাকা-সিলেট মহাসড়কের পাশে ৬০০ একর জুড়ে বিস্তৃত 'নর্থ সাউথ স্কয়ার সিটি' রাজউকের নীতিমালা এবং আধুনিক নগর পরিকল্পনার সাথে সামঞ্জস্য রেখে তৈরি একটি যুগান্তকারী প্রকল্প।",
   ].filter(Boolean);
 
   const specificationsParagraphs = [
     data?.specificationsParagraph1 ||
-      "Eco-friendly layout prepared with RAJUK compliance and urban planning guidelines, ensuring a sustainable and livable environment for residents.",
+      "রাজউকের নিয়ম ও পরিবেশবান্ধব নগর পরিকল্পনার সমন্বয়ে তৈরি, যা বাসিন্দাদের জন্য একটি সুস্থ ও নিরাপদ আবাসন নিশ্চিত করে।",
     data?.specificationsParagraph2 ||
-      "Space for civic infrastructure, parks, playgrounds, community centers, and a scenic lake edge supports a more complete township life.",
+      "নাগরিক সুযোগ-সুবিধা, সবুজ পার্ক, খেলার মাঠ, কমিউনিটি সেন্টার এবং মনোরম লেক ভিউ একটি সমৃদ্ধ টাউনশিপ জীবনের পূর্ণতা দেয়।",
     data?.specificationsParagraph3 ||
-      "Dedicated zones for education, healthcare, shopping complexes, community centers, and mosques meet everyday needs within the project.",
+      "শিক্ষা প্রতিষ্ঠান, আধুনিক স্বাস্থ্যসেবা, শপিং কমপ্লেক্স, কমিউনিটি সেন্টার এবং মসজিদ প্রকল্পের ভেতরেই দৈনন্দিন চাহিদা পূরণ করে।",
   ].filter(Boolean);
 
   const galleryImages = data?.galleryImages?.length
@@ -142,7 +142,7 @@ const SquareCity = () => {
 
   return (
     <ProjectShowcaseTemplate
-      projectName="North South Square City"
+      projectName="নর্থ সাউথ স্কয়ার সিটি"
       config={dynamicConfig}
       logoSrc={squareCityLogo}
       videoSrc={data?.squareCityVideo || ""}
@@ -157,11 +157,11 @@ const SquareCity = () => {
       plotIntroText={data?.plotIntroText || ""}
       locationText={
         data?.locationBenefitsText ||
-        "Purbachal Square City is easily accessible from all major routes in Dhaka. The project is located near the Purbachal Link Road and stays well connected via Kuril Flyover and Kanchan Bridge for convenient commuting."
+        "পূর্বাচল স্কয়ার সিটি ঢাকার সকল প্রধান রুট থেকে সহজে যাতায়াতযোগ্য। প্রকল্পটি পূর্বাচল লিংক রোডের সন্নিকটে অবস্থিত এবং কুড়িল ফ্লাইওভার ও কাঞ্চন ব্রিজের মাধ্যমে চমৎকার যোগাযোগ ব্যবস্থার সাথে যুক্ত।"
       }
       rulesText={
         data?.rulesRegulationText ||
-        "RAJUK exercises development control as per the East Bengal Building Construction Act, 1952 and its guidelines. All plots and constructions within North South Square City follow RAJUK-approved layout plans and disciplined development rules."
+        "রাজউক ১৯৫২ সালের ইমারত নির্মাণ আইন ও প্রাসঙ্গিক নির্দেশিকা অনুসারে উন্নয়ন নিয়ন্ত্রণ করে থাকে, যা প্রকল্পটির সুশৃঙ্খল ও পরিকল্পিত নগরায়ন নিশ্চিত করে।"
       }
       modalPreviewSrc={squareCityModalImg}
     />

@@ -565,7 +565,7 @@ function ProjectShowcaseTemplate({
 
     try {
       await addBooking(form);
-      toast.success("Booking request submitted successfully!");
+      toast.success("আপনার বুকিং রিকোয়েস্ট সফলভাবে জমা হয়েছে!");
       setForm({
         name: "",
         block: "",
@@ -578,7 +578,7 @@ function ProjectShowcaseTemplate({
       });
     } catch (error) {
       console.error(error);
-      toast.error("Failed to submit booking request.");
+      toast.error("বুকিং রিকোয়েস্ট জমা দিতে সমস্যা হয়েছে।");
     }
   };
 
@@ -631,18 +631,18 @@ function ProjectShowcaseTemplate({
             </p>
           </div>
 
-          {/* ── PROJECT OVERVIEW (With Modern Video Showcase) ── */}
+          {/* ── প্রকল্প পরিচিতি (With Modern Video Showcase) ── */}
           <div className="mt-16 grid items-center gap-12 lg:gap-16 lg:grid-cols-[1fr_1fr]">
             <div data-aos="fade-up" className="max-w-xl">
               <div className="inline-flex items-center gap-2 rounded-full bg-[#0f7771]/10 px-3.5 py-1 text-xs font-bold uppercase tracking-wider text-[#0f7771]">
                 <span className="h-2 w-2 rounded-full bg-[#0f7771]" />
-                PROJECT OVERVIEW
+                প্রকল্প পরিচিতি
               </div>
               <h2
                 className={`mt-4 text-3xl font-bold tracking-tight sm:text-4xl lg:text-5xl leading-tight ${headingClass}`}
                 style={displayFont}
               >
-                Project Overview
+                প্রকল্প পরিচিতি
               </h2>
               <div className="mt-5 space-y-4">
                 {overviewParagraphs.map((paragraph, index) => (
@@ -671,7 +671,7 @@ function ProjectShowcaseTemplate({
                   <p
                     className={`text-[11px] font-semibold uppercase tracking-wider ${softTextClass}`}
                   >
-                    Acres Township
+                    একর টাউনশিপ
                   </p>
                 </div>
                 <div>
@@ -681,7 +681,7 @@ function ProjectShowcaseTemplate({
                   <p
                     className={`text-[11px] font-semibold uppercase tracking-wider ${softTextClass}`}
                   >
-                    Est. Inception
+                    প্রতিষ্ঠিত
                   </p>
                 </div>
                 <div>
@@ -691,7 +691,7 @@ function ProjectShowcaseTemplate({
                   <p
                     className={`text-[11px] font-semibold uppercase tracking-wider ${softTextClass}`}
                   >
-                    Aligned Layout
+                    অনুমোদিত লেআউট
                   </p>
                 </div>
               </div>
@@ -720,7 +720,7 @@ function ProjectShowcaseTemplate({
               </div>
             </div>
 
-            {/* Right: Modern Project Overview Video Player Card */}
+            {/* Right: Modern প্রকল্প পরিচিতি Video Player Card */}
             <div className="relative mx-auto w-full max-w-[480px] lg:max-w-[500px]">
               <div className="pointer-events-none absolute -inset-3 rounded-3xl bg-gradient-to-tr from-[#0f7771]/25 via-[#f3b128]/15 to-transparent blur-2xl opacity-70" />
               <div className="relative overflow-hidden rounded-3xl border-4 border-white bg-white shadow-[0_25px_60px_-15px_rgba(15,119,113,0.35)] ring-1 ring-slate-900/10">
@@ -831,7 +831,7 @@ function ProjectShowcaseTemplate({
                   <div className="pointer-events-none absolute top-3 left-3 z-10 flex items-center gap-2 rounded-full border border-white/30 bg-black/60 px-3 py-1 backdrop-blur-md text-white shadow-md">
                     <span className="h-2 w-2 rounded-full bg-emerald-400 animate-pulse" />
                     <span className="text-[10px] sm:text-[11px] font-bold uppercase tracking-wider">
-                      Location Video Tour
+                      লোকেশন ভিডিও ট্যুর
                     </span>
                   </div>
                 </div>
@@ -850,7 +850,7 @@ function ProjectShowcaseTemplate({
                     <FaPlane size={13} />
                   </div>
                   <h4 className="text-xs font-bold text-slate-900">
-                    Airport & 300ft Road
+                    বিমানবন্দর ও ৩০০ ফিট সড়ক
                   </h4>
                 </div>
                 <p className="text-[11px] text-slate-600 leading-snug font-normal">
@@ -865,7 +865,7 @@ function ProjectShowcaseTemplate({
                     <FaRoad size={13} />
                   </div>
                   <h4 className="text-xs font-bold text-slate-900">
-                    Madani Ave / US Embassy
+                    মাদানী এভিনিউ / আমেরিকান দূতাবাস
                   </h4>
                 </div>
                 <p className="text-[11px] text-slate-600 leading-snug font-normal">
@@ -880,7 +880,7 @@ function ProjectShowcaseTemplate({
                     <FaShieldAlt size={13} />
                   </div>
                   <h4 className="text-xs font-bold text-slate-900">
-                    Opp. Jolshiri Abason-2
+                    জলসিঁড়ি আবাসন-২ এর বিপরীতে
                   </h4>
                 </div>
                 <p className="text-[11px] text-slate-600 leading-snug font-normal">
@@ -895,11 +895,11 @@ function ProjectShowcaseTemplate({
                     <FaWater size={13} />
                   </div>
                   <h4 className="text-xs font-bold text-slate-900">
-                    Rampura & Banasree
+                    রামপুরা ও বনশ্রী
                   </h4>
                 </div>
                 <p className="text-[11px] text-slate-600 leading-snug font-normal">
-                  Seamlessly connected through Aftab Nagar, Rampura & Banasree
+                  Seamlessly connected through Aftab Nagar, রামপুরা ও বনশ্রী
                   access road.
                 </p>
               </div>
@@ -929,15 +929,15 @@ function ProjectShowcaseTemplate({
             <div className="mt-4 flex flex-wrap gap-2">
               <span className="inline-flex items-center gap-1.5 rounded-full border border-emerald-200 bg-emerald-50/80 px-2.5 py-0.5 text-[11px] font-semibold text-[#0f7771]">
                 <span className="h-1.5 w-1.5 rounded-full bg-[#0f7771]" />
-                River Shitalakhya Frontage
+                শীতলক্ষ্যা নদী সংলগ্ন
               </span>
               <span className="inline-flex items-center gap-1.5 rounded-full border border-emerald-200 bg-emerald-50/80 px-2.5 py-0.5 text-[11px] font-semibold text-[#0f7771]">
                 <span className="h-1.5 w-1.5 rounded-full bg-[#0f7771]" />
-                Purbachal 300ft Expressway Link
+                পূর্বাচল ৩০০ ফুট এক্সপ্রেসওয়ে সংযোগ
               </span>
               <span className="inline-flex items-center gap-1.5 rounded-full border border-emerald-200 bg-emerald-50/80 px-2.5 py-0.5 text-[11px] font-semibold text-[#0f7771]">
                 <span className="h-1.5 w-1.5 rounded-full bg-[#0f7771]" />
-                Opposite Army Housing-2
+                আর্মি হাউজিং-২ এর বিপরীতে
               </span>
             </div>
 
@@ -954,7 +954,7 @@ function ProjectShowcaseTemplate({
                 style={accentFont}
               >
                 <FaMapMarkerAlt size={12} />
-                <span>Get Directions on Google Maps</span>
+                <span>গুগল ম্যাপে দিকনির্দেশনা দেখুন</span>
                 <FaExternalLinkAlt size={9} className="ml-1 opacity-80" />
               </a>
 
@@ -965,7 +965,7 @@ function ProjectShowcaseTemplate({
                 style={accentFont}
               >
                 <FaRegImage size={12} />
-                <span>View Map Plan</span>
+                <span>ম্যাপ প্ল্যান দেখুন</span>
               </button>
             </div>
           </div>
@@ -1022,26 +1022,26 @@ function ProjectShowcaseTemplate({
             <div className="flex flex-col gap-8">
               {[
                 {
-                  title: "RAJUK Compliance",
+                  title: "রাজউক অনুমোদন ও নীতিমালা",
                   desc:
                     specificationsParagraphs[0] ||
                     "Developed strictly according to East Bengal Building Construction Act 1952 and RAJUK guidelines for organized urbanization.",
                   icon: FaShieldAlt,
                 },
                 {
-                  title: "Scenic Lake & Greenery",
+                  title: "মনোরম লেক ও সবুজায়ন",
                   desc:
                     specificationsParagraphs[1] ||
                     "Expansive lakefront perimeter, sprawling recreational parks, playgrounds, and tree-lined walkways create a serene natural ecosystem.",
                   icon: FaWater,
                 },
                 {
-                  title: "Internal Road Network",
-                  desc: "Spacious 40' to 100' wide asphalt avenues, dedicated walkways, underground utility corridors, and modern stormwater drainage systems.",
+                  title: "অভ্যন্তরীণ সড়ক নেটওয়ার্ক",
+                  desc: "৪০ থেকে ১০০ ফুট প্রশস্ত পিচঢালা রাস্তা, ফুটপাথ, ভূগর্ভস্থ ইউটিলিটি সংযোগ এবং আধুনিক ড্রেনেজ ব্যবস্থা।",
                   icon: FaRoad,
                 },
                 {
-                  title: "Civic & Social Amenities",
+                  title: "নাগরিক ও সামাজিক সুবিধা",
                   desc:
                     specificationsParagraphs[2] ||
                     "Designated zones for educational institutions, healthcare clinics, central mosques, community centers, and commercial retail hubs.",
@@ -1113,7 +1113,7 @@ function ProjectShowcaseTemplate({
                       className={`h-2 w-2 rounded-full animate-pulse ${isLightPage ? "bg-emerald-400" : "bg-[#f3b128]"}`}
                     />
                     <span className="text-[10px] sm:text-xs font-bold uppercase tracking-wider text-white">
-                      Project Showcase
+                      প্রকল্প পরিচিতি
                     </span>
                   </div>
 
@@ -1123,7 +1123,7 @@ function ProjectShowcaseTemplate({
                       <p
                         className={`text-[10px] font-bold uppercase tracking-widest ${isLightPage ? "text-emerald-400" : "text-[#f3b128]"}`}
                       >
-                        Sustainable Design
+                        টেকসই ডিজাইন
                       </p>
                       <h4 className="mt-1 text-sm sm:text-base font-bold text-white">
                         {projectName}
@@ -1135,7 +1135,7 @@ function ProjectShowcaseTemplate({
                         type="button"
                         onClick={openBrochureModal}
                         className={`flex h-12 w-12 items-center justify-center rounded-2xl shadow-lg transition-transform hover:scale-105 ${isLightPage ? "bg-[#0f7771] text-white" : "bg-[#f3b128] text-black"}`}
-                        title="Download Brochure"
+                        title="ব্রোশিওর ডাউনলোড করুন"
                       >
                         <MdDownload size={22} />
                       </button>
@@ -1190,7 +1190,7 @@ function ProjectShowcaseTemplate({
               style={bodyFont}
             >
               {plotIntroText ||
-                "The master plan keeps residential, commercial, and support zones in balance so the project can grow in a more organized way."}
+                "আমাদের মাস্টার প্ল্যান অনুযায়ী আবাসিক, বাণিজ্যিক এবং অন্যান্য জোনগুলো এমনভাবে সাজানো হয়েছে যা একটি সুশৃঙ্খল ও আধুনিক জীবনযাপনের নিশ্চয়তা দেয়।"}
             </p>
             <div className="mt-8 flex flex-wrap items-center justify-center gap-3">
               {config.plotTabs?.map((tab) => (
@@ -1323,11 +1323,7 @@ function ProjectShowcaseTemplate({
                 className={`mt-6 text-sm leading-relaxed sm:text-base font-medium ${softTextClass}`}
                 style={bodyFont}
               >
-                Our core vision is driven by sustainability, community
-                well-being, and structured urbanization. Every aspect of the
-                project is engineered to provide a balanced, high-quality
-                residential lifestyle that respects nature while embracing
-                modern living standards.
+                আমাদের মূল লক্ষ্য হলো স্থায়িত্ব, সামাজিক কল্যাণ এবং সুপরিকল্পিত নগরায়ন। প্রকল্পের প্রতিটি দিক এমনভাবে সাজানো হয়েছে যা প্রকৃতির ভারসাম্য রক্ষা করে আধুনিক ও উন্নত জীবনযাত্রার নিশ্চয়তা দেয়।
               </p>
 
               <div className="mt-10 flex items-center gap-4">
@@ -1337,7 +1333,7 @@ function ProjectShowcaseTemplate({
                 <span
                   className={`text-xs font-bold uppercase tracking-widest ${isLightPage ? "text-[#0f7771]" : "text-[#f3b128]"}`}
                 >
-                  Vision & Mission
+                  ভিশন ও মিশন
                 </span>
               </div>
             </div>
@@ -1423,13 +1419,13 @@ function ProjectShowcaseTemplate({
             className="mx-auto max-w-3xl text-center mb-16"
           >
             <SectionEyebrow centered tone={eyebrowTone}>
-              PROJECT GALLERY
+              প্রজেক্ট গ্যালারি
             </SectionEyebrow>
             <h2
               className={`mt-4 text-3xl font-bold sm:text-4xl lg:text-5xl ${headingClass}`}
               style={displayFont}
             >
-              Visual Tour of {projectName}
+              ভিজ্যুয়াল ট্যুর - {projectName}
             </h2>
           </div>
 
@@ -1566,7 +1562,7 @@ function ProjectShowcaseTemplate({
                 className={outlineActionClass}
                 style={accentFont}
               >
-                Get Direction <FaArrowRight />
+                দিকনির্দেশনা পান <FaArrowRight />
               </a>
             </div>
           </div>
@@ -1576,7 +1572,7 @@ function ProjectShowcaseTemplate({
       <FeatureCardSection
         eyebrow={config.securityEyebrow}
         title={config.securityTitle}
-        subtitle="Secure, organized systems designed around modern township living."
+        subtitle="আধুনিক টাউনশিপের জন্য পরিকল্পিত ও সুরক্ষিত পরিবেশ।"
         items={securityItems}
         columnsClass="md:grid-cols-3"
       />
@@ -1584,7 +1580,7 @@ function ProjectShowcaseTemplate({
       <FeatureCardSection
         eyebrow={config.amenitiesEyebrow}
         title={config.amenitiesTitle}
-        subtitle="Experience world-class facilities designed for modern living."
+        subtitle="আধুনিক জীবনযাত্রার জন্য বিশ্বমানের নাগরিক সুযোগ-সুবিধা।"
         items={amenities}
       />
 
@@ -1730,7 +1726,7 @@ function ProjectShowcaseTemplate({
                 className={`mt-6 text-center text-sm leading-7 ${softTextClass}`}
                 style={bodyFont}
               >
-                Download the project brochure for complete details.
+                বিস্তারিত তথ্যের জন্য প্রকল্পের ব্রোশিওরটি ডাউনলোড করুন।
               </p>
 
               <div className="mt-5 flex justify-center">
@@ -1742,7 +1738,7 @@ function ProjectShowcaseTemplate({
                     style={accentFont}
                   >
                     <MdDownload className="text-base" />
-                    Download Brochure PDF
+                    ব্রোশিওর PDF ডাউনলোড করুন
                   </button>
                 )}
               </div>
@@ -1759,7 +1755,7 @@ function ProjectShowcaseTemplate({
                 className={`text-4xl font-semibold sm:text-5xl ${headingClass}`}
                 style={displayFont}
               >
-                Plot Booking
+                প্লট বুকিং
               </h3>
               <p
                 className={`mt-4 text-sm leading-8 sm:text-base ${softTextClass}`}
@@ -1781,14 +1777,14 @@ function ProjectShowcaseTemplate({
                       className={fieldLabelClass}
                       style={bodyFont}
                     >
-                      Name*
+                      নাম*
                     </label>
                     <input
                       id={`${formIdPrefix}-name`}
                       name="name"
                       value={form.name}
                       onChange={onFormChange}
-                      placeholder="Full name"
+                      placeholder="সম্পূর্ণ নাম"
                       className={inputClass}
                       required
                     />
@@ -1799,7 +1795,7 @@ function ProjectShowcaseTemplate({
                       className={fieldLabelClass}
                       style={bodyFont}
                     >
-                      Block*
+                      ব্লক*
                     </label>
                     <select
                       id={`${formIdPrefix}-block`}
@@ -1810,7 +1806,7 @@ function ProjectShowcaseTemplate({
                       required
                     >
                       <option value="" className="bg-slate-900">
-                        Select block
+                        ব্লক নির্বাচন করুন
                       </option>
                       <option value="A" className="bg-slate-900">
                         A
@@ -1839,14 +1835,14 @@ function ProjectShowcaseTemplate({
                       className={fieldLabelClass}
                       style={bodyFont}
                     >
-                      Address*
+                      ঠিকানা*
                     </label>
                     <input
                       id={`${formIdPrefix}-address`}
                       name="address"
                       value={form.address}
                       onChange={onFormChange}
-                      placeholder="Current address"
+                      placeholder="বর্তমান ঠিকানা"
                       className={inputClass}
                       required
                     />
@@ -1864,7 +1860,7 @@ function ProjectShowcaseTemplate({
                       name="road"
                       value={form.road}
                       onChange={onFormChange}
-                      placeholder="Road / area"
+                      placeholder="রাস্তা / এলাকা"
                       className={inputClass}
                     />
                   </div>
@@ -1881,14 +1877,14 @@ function ProjectShowcaseTemplate({
                       className={fieldLabelClass}
                       style={bodyFont}
                     >
-                      Phone*
+                      ফোন নম্বর*
                     </label>
                     <input
                       id={`${formIdPrefix}-phone`}
                       name="phone"
                       value={form.phone}
                       onChange={onFormChange}
-                      placeholder="Phone number"
+                      placeholder="আপনার ফোন নম্বর"
                       className={inputClass}
                       required
                     />
@@ -1899,14 +1895,14 @@ function ProjectShowcaseTemplate({
                       className={fieldLabelClass}
                       style={bodyFont}
                     >
-                      Plot No
+                      প্লট নং
                     </label>
                     <input
                       id={`${formIdPrefix}-plot`}
                       name="plotNo"
                       value={form.plotNo}
                       onChange={onFormChange}
-                      placeholder="Preferred plot no"
+                      placeholder="পছন্দের প্লট নং"
                       className={inputClass}
                     />
                   </div>
@@ -1923,7 +1919,7 @@ function ProjectShowcaseTemplate({
                       className={fieldLabelClass}
                       style={bodyFont}
                     >
-                      Email*
+                      ইমেইল*
                     </label>
                     <input
                       id={`${formIdPrefix}-email`}
@@ -1931,7 +1927,7 @@ function ProjectShowcaseTemplate({
                       name="email"
                       value={form.email}
                       onChange={onFormChange}
-                      placeholder="Email address"
+                      placeholder="আপনার ইমেইল"
                       className={inputClass}
                       required
                     />
@@ -1942,7 +1938,7 @@ function ProjectShowcaseTemplate({
                       className={fieldLabelClass}
                       style={bodyFont}
                     >
-                      Size (Katha)*
+                      আয়তন (কাঠা)*
                     </label>
                     <input
                       id={`${formIdPrefix}-size`}
@@ -1950,7 +1946,7 @@ function ProjectShowcaseTemplate({
                       name="size"
                       value={form.size}
                       onChange={onFormChange}
-                      placeholder="Required size"
+                      placeholder="প্রয়োজনীয় সাইজ"
                       className={inputClass}
                       required
                     />
@@ -1967,7 +1963,7 @@ function ProjectShowcaseTemplate({
                   }`}
                   style={accentFont}
                 >
-                  {isLoading ? "Submitting..." : "Submit Booking"}
+                  {isLoading ? "জমা দেওয়া হচ্ছে..." : "বুকিং জমা দিন"}
                 </button>
               </form>
             </div>

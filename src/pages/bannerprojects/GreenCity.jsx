@@ -111,18 +111,18 @@ const GreenCity = () => {
 
   const overviewParagraphs = [
     data?.overviewParagraph1 ||
-      "North South Group is a market leader in real estate, offering residential projects tailored to buyer needs and long-term value creation.",
+      "নর্থ সাউথ গ্রুপ রিয়েল এস্টেট খাতের একটি শীর্ষস্থানীয় প্রতিষ্ঠান, যা ক্রেতাদের চাহিদা এবং দীর্ঘমেয়াদী মূল্যায়নের ভিত্তিতে আধুনিক আবাসিক প্রকল্প উপহার দিয়ে আসছে।",
     data?.overviewParagraph2 ||
-      '"North South Green City" started in 2021, spanning 600 acres in Bhulta-Gausia along the Dhaka-Sylhet Highway with a forward-looking residential vision.',
+      "২০২১ সালে যাত্রা শুরু করা 'নর্থ সাউথ গ্রিন সিটি' ঢাকা-সিলেট মহাসড়কের ভুলতা-গাউছিয়া সংলগ্ন ৬০০ একর জায়গা জুড়ে পরিকল্পিত একটি আধুনিক ও পরিবেশবান্ধব আবাসন প্রকল্প।",
   ].filter(Boolean);
 
   const specificationsParagraphs = [
     data?.specificationsParagraph1 ||
-      "Eco-friendly layout with RAJUK compliance and planned urbanization designed for future-ready living.",
+      "রাজউকের নিয়ম ও আধুনিক নগর পরিকল্পনা অনুসরণ করে ভবিষ্যতের উপযোগী একটি টেকসই ও স্বাস্থ্যকর আবাসন ব্যবস্থা।",
     data?.specificationsParagraph2 ||
-      "Civic infrastructure, parks, playgrounds, and a long lake edge create a healthier residential environment.",
+      "প্রশস্ত অভ্যন্তরীণ সড়ক, সবুজ পার্ক, খেলার মাঠ এবং লেকের মনোরম পরিবেশ তৈরি করেছে একটি চমৎকার আবাসিক পরিবেশ।",
     data?.specificationsParagraph3 ||
-      "Zones for education, healthcare, shopping, community centers, and mosques support everyday convenience inside the township.",
+      "শিক্ষা প্রতিষ্ঠান, স্বাস্থ্যসেবা, শপিং কমপ্লেক্স, কমিউনিটি সেন্টার এবং মসজিদ প্রকল্পের ভেতরেই দৈনন্দিন সব সুবিধা নিশ্চিত করে।",
   ].filter(Boolean);
 
   const galleryImages = data?.galleryImages?.length
@@ -141,7 +141,7 @@ const GreenCity = () => {
 
   return (
     <ProjectShowcaseTemplate
-      projectName="North South Green City"
+      projectName="নর্থ সাউথ গ্রিন সিটি"
       config={dynamicConfig}
       logoSrc={greenCityLogo}
       videoSrc={data?.greenCityVideo || ""}
@@ -157,11 +157,11 @@ const GreenCity = () => {
       plotIntroText={data?.plotIntroText || ""}
       locationText={
         data?.locationBenefitsText ||
-        "Purbachal Northsouth Green City is Located on the eastern side of River Shitalakhya, opposite to Army Housing Jolshiri Abason Project-2, at Bhulta Gausia area. It is Closest to reach from Hazrat Shahjalal International Airport, Dhaka through Purbachal 300 Feet Link Road following Kuril Flyover and Kanchan Bridge. Another Key approach point is from Natun Bazar, Madani Avenue starting from the opposite side of the American Embassy and passing through Gazi Bridge and connecting Dhaka-Sylhet Highway. It is also on the Northern side of Dhaka-Sylhet High Way. This Project is also connected throw Aftab Nagar, Rampura, Banasree road."
+        "পূর্বাচল নর্থ সাউথ গ্রিন সিটি ভুলতা-গাউছিয়া এলাকায়, শীতলক্ষ্যা নদীর পূর্ব তীরে, আর্মি হাউজিং জলসিঁড়ি আবাসন প্রকল্প-২ এর ঠিক বিপরীতে অবস্থিত। হযরত শাহজালাল আন্তর্জাতিক বিমানবন্দর থেকে কুড়িল ফ্লাইওভার, কাঞ্চন ব্রিজ এবং পূর্বাচল ৩০০ ফুট লিংক রোড দিয়ে খুব দ্রুত ও সহজে এই প্রকল্পে পৌঁছানো যায়। আরেকটি গুরুত্বপূর্ণ যাতায়াত পথ হলো নতুন বাজার, মাদানী এভিনিউ (আমেরিকান দূতাবাসের বিপরীত দিক থেকে শুরু হয়ে গাজী ব্রিজ পার হয়ে ঢাকা-সিলেট হাইওয়ের সাথে সংযুক্ত)। এটি ঢাকা-সিলেট হাইওয়ের উত্তর পাশে অবস্থিত। এছাড়াও প্রকল্পটি আফতাবনগর, রামপুরা ও বনশ্রী রোড দিয়েও চমৎকারভাবে সংযুক্ত।"
       }
       rulesText={
         data?.rulesRegulationText ||
-        "RAJUK exercises development control as per the East Bengal Building Construction Act, 1952 and relevant guidelines, keeping the township aligned with organized planning standards."
+        "রাজউক ১৯৫২ সালের ইমারত নির্মাণ আইন ও প্রাসঙ্গিক নির্দেশিকা অনুসারে উন্নয়ন নিয়ন্ত্রণ করে থাকে, যা প্রকল্পটির সুশৃঙ্খল ও পরিকল্পিত নগরায়ন নিশ্চিত করে।"
       }
       modalPreviewSrc={greenCityBrochure}
     />
