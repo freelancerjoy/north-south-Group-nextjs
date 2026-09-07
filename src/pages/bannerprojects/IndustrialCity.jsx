@@ -155,6 +155,7 @@ const IndustrialCity = () => {
       config={dynamicConfig}
       logoSrc={industrialCityLogo}
       videoSrc={data?.industrialCityVideo || ""}
+      locationVideoSrc={data?.industrialCityVideo || "/videos/projectVideo.mp4"}
       brochureImageSrc={data?.brochureImage?.url || squareCityBrochure}
       brochurePdfHref={brochurePdfHref}
       bookingPdfHref={bookingPdfHref}

@@ -145,7 +145,7 @@ const GreenCity = () => {
       config={dynamicConfig}
       logoSrc={greenCityLogo}
       videoSrc={data?.greenCityVideo || ""}
-      locationVideoSrc={data?.locationVideo || "/videos/projectVideo.mp4"}
+      locationVideoSrc={data?.greenCityVideo || "/videos/projectVideo.mp4"}
       brochureImageSrc={data?.brochureImage?.url || greenCityBrochure}
       brochurePdfHref={brochurePdfHref}
       bookingPdfHref={bookingPdfHref}

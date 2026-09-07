@@ -146,6 +146,7 @@ const SquareCity = () => {
       config={dynamicConfig}
       logoSrc={squareCityLogo}
       videoSrc={data?.squareCityVideo || ""}
+      locationVideoSrc={data?.squareCityVideo || "/videos/projectVideo.mp4"}
       brochureImageSrc={data?.brochureImage?.url || squareCityBrochure}
       brochurePdfHref={brochurePdfHref}
       bookingPdfHref={bookingPdfHref}

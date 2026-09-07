@@ -540,6 +540,8 @@ function ProjectShowcaseTemplate({
     ? "mb-2 block text-sm font-medium text-gray-700"
     : "mb-2 block text-sm font-medium text-white/80";
   const effectiveBrochurePdfHref = brochurePdfHref || bookingPdfHref;
+  const effectiveLocationVideo =
+    locationVideoSrc || videoSrc || "/videos/projectVideo.mp4";
   const brochureButtonClass = `${primaryActionClass} animate-bounce shadow-[0_20px_50px_-25px_rgba(22,101,52,0.8)]`;
 
   const onPlayVideo = () => {
@@ -737,11 +739,19 @@ function ProjectShowcaseTemplate({
                       />
                     ) : (
                       <video
+                        ref={(el) => {
+                          if (el) {
+                            el.muted = true;
+                            el.defaultMuted = true;
+                            el.play().catch(() => {});
+                          }
+                        }}
                         src={videoSrc}
                         autoPlay
                         muted
                         loop
                         playsInline
+                        preload="auto"
                         className="absolute inset-0 h-full w-full object-cover"
                       />
                     )
@@ -795,10 +805,10 @@ function ProjectShowcaseTemplate({
               <div className="pointer-events-none absolute -inset-2 rounded-2xl bg-gradient-to-tr from-[#0f7771]/20 via-[#f3b128]/15 to-transparent blur-xl opacity-60" />
               <div className="relative overflow-hidden rounded-2xl border-2 border-emerald-200/90 bg-black shadow-lg ring-1 ring-slate-900/10">
                 <div className="relative aspect-video w-full overflow-hidden bg-black flex items-center justify-center">
-                  {locationVideoSrc || "/videos/projectVideo.mp4" ? (
-                    getYouTubeEmbedUrl(locationVideoSrc || "") ? (
+                  {effectiveLocationVideo ? (
+                    getYouTubeEmbedUrl(effectiveLocationVideo) ? (
                       <iframe
-                        src={`${getYouTubeEmbedUrl(locationVideoSrc)}?autoplay=1&mute=1&loop=1&controls=0`}
+                        src={`${getYouTubeEmbedUrl(effectiveLocationVideo)}?autoplay=1&mute=1&loop=1&controls=0`}
                         title={`${projectName} location tour`}
                         className="absolute inset-0 h-full w-full pointer-events-none"
                         frameBorder="0"
@@ -807,12 +817,29 @@ function ProjectShowcaseTemplate({
                       />
                     ) : (
                       <video
-                        src={locationVideoSrc || "/videos/projectVideo.mp4"}
+                        ref={(el) => {
+                          if (el) {
+                            el.muted = true;
+                            el.defaultMuted = true;
+                            el.play().catch(() => {});
+                          }
+                        }}
+                        src={effectiveLocationVideo}
                         autoPlay
                         muted
                         loop
                         playsInline
+                        preload="auto"
                         className="absolute inset-0 h-full w-full object-cover"
+                        onError={(e) => {
+                          if (
+                            e.target.src &&
+                            !e.target.src.includes("/videos/projectVideo.mp4")
+                          ) {
+                            e.target.src = "/videos/projectVideo.mp4";
+                            e.target.play().catch(() => {});
+                          }
+                        }}
                       />
                     )
                   ) : (
