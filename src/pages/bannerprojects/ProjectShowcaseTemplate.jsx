@@ -420,6 +420,9 @@ function ProjectShowcaseTemplate({
   plotIntroText = "",
   modalPreviewSrc,
   sectionImages = {},
+  activeSection = "",
+  onSelectSection,
+  isLivePreview = false,
 }) {
   const [activeModal, setActiveModal] = useState(null);
   const [isBrochureModalOpen, setIsBrochureModalOpen] = useState(false);
@@ -443,13 +446,15 @@ function ProjectShowcaseTemplate({
 
   useEffect(() => {
     loadPartners();
-    AOS.init({
-      duration: 800,
-      once: true,
-      offset: 50,
-      easing: "ease-out-cubic",
-    });
-  }, [loadPartners]);
+    if (!isLivePreview) {
+      AOS.init({
+        duration: 800,
+        once: true,
+        offset: 50,
+        easing: "ease-out-cubic",
+      });
+    }
+  }, [loadPartners, isLivePreview]);
 
   const imagePool = [
     ...galleryImages.filter(Boolean),
@@ -591,8 +596,13 @@ function ProjectShowcaseTemplate({
       }`}
     >
       <section
+        id="preview-section-hero"
         data-aos="fade-up"
-        className={`relative isolate overflow-hidden ${
+        className={`relative isolate overflow-hidden scroll-mt-6 transition-all duration-500 ${
+          activeSection === "hero"
+            ? "ring-4 ring-emerald-500/80 shadow-[0_0_50px_rgba(16,185,129,0.35)]"
+            : ""
+        } ${
           isLightPage ? "bg-white" : "bg-[#0c0c0d]"
         }`}
       >
@@ -634,7 +644,14 @@ function ProjectShowcaseTemplate({
           </div>
 
           {/* ── প্রকল্প পরিচিতি (With Modern Video Showcase) ── */}
-          <div className="mt-16 grid items-center gap-12 lg:gap-16 lg:grid-cols-[1fr_1fr]">
+          <div
+            id="preview-section-overview"
+            className={`mt-16 grid items-center gap-12 lg:gap-16 lg:grid-cols-[1fr_1fr] scroll-mt-10 transition-all duration-500 rounded-3xl ${
+              activeSection === "overview"
+                ? "ring-4 ring-emerald-500/80 bg-emerald-50/20 p-4 shadow-[0_0_50px_rgba(16,185,129,0.35)]"
+                : ""
+            }`}
+          >
             <div data-aos="fade-up" className="max-w-xl">
               <div className="inline-flex items-center gap-2 rounded-full bg-[#0f7771]/10 px-3.5 py-1 text-xs font-bold uppercase tracking-wider text-[#0f7771]">
                 <span className="h-2 w-2 rounded-full bg-[#0f7771]" />
@@ -775,8 +792,13 @@ function ProjectShowcaseTemplate({
 
       {/* ── LOCATION & CONNECTIVITY SECTION (Media & Route Cards on Left, Strategic Details on Right) ── */}
       <section
+        id="preview-section-location"
         data-aos="fade-up"
-        className={`relative isolate overflow-hidden ${
+        className={`relative isolate overflow-hidden scroll-mt-6 transition-all duration-500 ${
+          activeSection === "location"
+            ? "ring-4 ring-emerald-500/80 shadow-[0_0_50px_rgba(16,185,129,0.35)]"
+            : ""
+        } ${
           isLightPage
             ? "bg-gradient-to-b from-[#f8fcf9] via-white to-[#f4faf6] border-y border-emerald-100/70"
             : "bg-[#0b0b0c]"
@@ -1001,8 +1023,13 @@ function ProjectShowcaseTemplate({
 
       {/* ── FEATURES SECTION (Elegant 2-Column: Left Text, Right Slider) ── */}
       <section
+        id="preview-section-features"
         data-aos="fade-up"
-        className={`relative isolate overflow-hidden ${
+        className={`relative isolate overflow-hidden scroll-mt-6 transition-all duration-500 ${
+          activeSection === "features"
+            ? "ring-4 ring-emerald-500/80 shadow-[0_0_50px_rgba(16,185,129,0.35)]"
+            : ""
+        } ${
           isLightPage ? "bg-[#f8fdf9]" : "bg-[#0b0b0c]"
         }`}
       >
@@ -1176,8 +1203,13 @@ function ProjectShowcaseTemplate({
       </section>
 
       <section
+        id="preview-section-plots"
         data-aos="fade-up"
-        className={`relative isolate overflow-hidden ${
+        className={`relative isolate overflow-hidden scroll-mt-6 transition-all duration-500 ${
+          activeSection === "plots"
+            ? "ring-4 ring-emerald-500/80 shadow-[0_0_50px_rgba(16,185,129,0.35)]"
+            : ""
+        } ${
           isLightPage ? "bg-white" : ""
         }`}
       >
@@ -1308,8 +1340,13 @@ function ProjectShowcaseTemplate({
 
       {/* ── GOALS SECTION (Premium Visual Grid) ── */}
       <section
+        id="preview-section-goals"
         data-aos="fade-up"
-        className={`relative isolate ${
+        className={`relative isolate scroll-mt-6 transition-all duration-500 ${
+          activeSection === "goals"
+            ? "ring-4 ring-emerald-500/80 shadow-[0_0_50px_rgba(16,185,129,0.35)]"
+            : ""
+        } ${
           isLightPage ? "bg-[#f6faf5]" : "bg-[#0b0b0c]"
         }`}
       >
@@ -1428,8 +1465,13 @@ function ProjectShowcaseTemplate({
       </section>
 
       <section
+        id="preview-section-gallery"
         data-aos="fade-up"
-        className={`relative isolate overflow-hidden ${
+        className={`relative isolate overflow-hidden scroll-mt-6 transition-all duration-500 ${
+          activeSection === "gallery"
+            ? "ring-4 ring-emerald-500/80 shadow-[0_0_50px_rgba(16,185,129,0.35)]"
+            : ""
+        } ${
           isLightPage ? "bg-[#f8fdf9]" : "bg-[#080809]"
         }`}
       >
@@ -1504,8 +1546,13 @@ function ProjectShowcaseTemplate({
       </section>
 
       <section
+        id="preview-section-map"
         data-aos="fade-up"
-        className={`relative isolate overflow-hidden ${
+        className={`relative isolate overflow-hidden scroll-mt-6 transition-all duration-500 ${
+          activeSection === "map"
+            ? "ring-4 ring-emerald-500/80 shadow-[0_0_50px_rgba(16,185,129,0.35)]"
+            : ""
+        } ${
           isLightPage ? "bg-white" : "bg-[#080809]"
         }`}
       >
@@ -1673,8 +1720,13 @@ function ProjectShowcaseTemplate({
       </section>
 
       <section
+        id="preview-section-booking"
         data-aos="fade-up"
-        className={`relative isolate overflow-hidden ${
+        className={`relative isolate overflow-hidden scroll-mt-6 transition-all duration-500 ${
+          activeSection === "booking"
+            ? "ring-4 ring-emerald-500/80 shadow-[0_0_50px_rgba(16,185,129,0.35)]"
+            : ""
+        } ${
           isLightPage ? "bg-[#f6faf5]" : "bg-[#080809]"
         }`}
       >

@@ -9,8 +9,9 @@ import {
   MdDelete,
   MdVideocamOff,
 } from "react-icons/md";
-import { FaLeaf } from "react-icons/fa";
+import { FaLeaf, FaYoutube } from "react-icons/fa";
 import { AdminCollectionPage, getAdminGridStyles } from "../adminUi";
+import { getYouTubeEmbedUrl } from "../../../components/VideoUtility";
 
 const mediaGridStyles = {
   ...getAdminGridStyles(),
@@ -63,31 +64,46 @@ const ViewGreenCity = () => {
       headerName: "Video Preview",
       minWidth: 280,
       flex: 1,
-      renderCell: (p) => (
-        <div className="flex w-full items-center gap-4">
-          <div className="flex h-16 w-28 flex-shrink-0 items-center justify-center overflow-hidden rounded-2xl border border-slate-200 bg-slate-100">
-            {p.value ? (
-              <video
-                src={p.value}
-                className="h-full w-full object-cover"
-                muted
-                playsInline
-                preload="metadata"
-              />
-            ) : (
-              <div className="flex h-full w-full items-center justify-center bg-slate-100 text-slate-400">
-                <MdVideocamOff size={24} />
-              </div>
-            )}
+      renderCell: (p) => {
+        const ytEmbed = getYouTubeEmbedUrl(p.value);
+        return (
+          <div className="flex w-full items-center gap-4">
+            <div className="flex h-16 w-28 flex-shrink-0 items-center justify-center overflow-hidden rounded-2xl border border-slate-200 bg-slate-100">
+              {p.value ? (
+                ytEmbed ? (
+                  <iframe
+                    src={ytEmbed}
+                    title="YouTube preview"
+                    className="h-full w-full pointer-events-none"
+                    frameBorder="0"
+                  />
+                ) : (
+                  <video
+                    src={p.value}
+                    className="h-full w-full object-cover"
+                    muted
+                    playsInline
+                    preload="metadata"
+                  />
+                )
+              ) : (
+                <div className="flex h-full w-full items-center justify-center bg-slate-100 text-slate-400">
+                  <MdVideocamOff size={24} />
+                </div>
+              )}
+            </div>
+            <div className="min-w-0">
+              <p className="truncate text-sm font-bold text-slate-900 flex items-center gap-1.5">
+                {ytEmbed && <FaYoutube className="text-red-600 shrink-0" />}
+                Green City Hero Video
+              </p>
+              <p className="mt-1 truncate text-xs text-slate-500">
+                {p.value ? (ytEmbed ? "YouTube video link linked" : "Cloudinary video file uploaded") : "No video uploaded yet"}
+              </p>
+            </div>
           </div>
-          <div className="min-w-0">
-            <p className="truncate text-sm font-bold text-slate-900">Green City Hero Video</p>
-            <p className="mt-1 truncate text-xs text-slate-500">
-              {p.value ? "Video uploaded and ready to manage" : "No video uploaded yet"}
-            </p>
-          </div>
-        </div>
-      ),
+        );
+      },
     },
     {
       field: "actions",

@@ -9,8 +9,9 @@ import {
   MdDelete,
   MdVideocamOff,
 } from "react-icons/md";
-import { FaCity } from "react-icons/fa";
+import { FaCity, FaYoutube } from "react-icons/fa";
 import { AdminCollectionPage, getAdminGridStyles } from "../adminUi";
+import { getYouTubeEmbedUrl } from "../../../components/VideoUtility";
 
 const mediaGridStyles = {
   ...getAdminGridStyles(),
@@ -63,31 +64,50 @@ const ViewSquareCity = () => {
       headerName: "Video Preview",
       minWidth: 280,
       flex: 1,
-      renderCell: (p) => (
-        <div className="flex w-full items-center gap-4">
-          <div className="flex h-16 w-28 flex-shrink-0 items-center justify-center overflow-hidden rounded-2xl border border-slate-200 bg-slate-100">
-            {p.value ? (
-              <video
-                src={p.value}
-                className="h-full w-full object-cover"
-                muted
-                playsInline
-                preload="metadata"
-              />
-            ) : (
-              <div className="flex h-full w-full items-center justify-center bg-slate-100 text-slate-400">
-                <MdVideocamOff size={24} />
+      renderCell: (p) => {
+        const embedUrl = p.value ? getYouTubeEmbedUrl(p.value) : null;
+        return (
+          <div className="flex w-full items-center gap-4">
+            <div className="flex h-16 w-28 flex-shrink-0 items-center justify-center overflow-hidden rounded-2xl border border-slate-200 bg-slate-100">
+              {p.value ? (
+                embedUrl ? (
+                  <iframe
+                    src={embedUrl}
+                    title="YouTube Preview"
+                    className="h-full w-full pointer-events-none"
+                    frameBorder="0"
+                  />
+                ) : (
+                  <video
+                    src={p.value}
+                    className="h-full w-full object-cover"
+                    muted
+                    playsInline
+                    preload="metadata"
+                  />
+                )
+              ) : (
+                <div className="flex h-full w-full items-center justify-center bg-slate-100 text-slate-400">
+                  <MdVideocamOff size={24} />
+                </div>
+              )}
+            </div>
+            <div className="min-w-0">
+              <div className="flex items-center gap-2">
+                <p className="truncate text-sm font-bold text-slate-900">Square City Video</p>
+                {embedUrl && (
+                  <span className="inline-flex items-center gap-1 rounded-md bg-rose-100 px-1.5 py-0.5 text-[10px] font-bold text-rose-600">
+                    <FaYoutube size={11} /> YouTube
+                  </span>
+                )}
               </div>
-            )}
+              <p className="mt-1 truncate text-xs text-slate-500">
+                {p.value ? (embedUrl ? "YouTube link active" : "Video uploaded and ready to manage") : "No video uploaded yet"}
+              </p>
+            </div>
           </div>
-          <div className="min-w-0">
-            <p className="truncate text-sm font-bold text-slate-900">Square City Hero Video</p>
-            <p className="mt-1 truncate text-xs text-slate-500">
-              {p.value ? "Video uploaded and ready to manage" : "No video uploaded yet"}
-            </p>
-          </div>
-        </div>
-      ),
+        );
+      },
     },
     {
       field: "actions",

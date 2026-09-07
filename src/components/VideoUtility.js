@@ -1,14 +1,36 @@
 export const getYouTubeEmbedUrl = (url) => {
-  if (!url) return null;
+  if (!url || typeof url !== "string") return null;
 
-  if (url.includes("youtu.be")) {
-    const id = url.split("youtu.be/")[1].split("?")[0];
-    return `https://www.youtube.com/embed/${id}`;
-  }
+  try {
+    const trimmed = url.trim();
+    if (trimmed.includes("youtu.be/")) {
+      const id = trimmed.split("youtu.be/")[1]?.split("?")[0]?.split("&")[0];
+      return id ? `https://www.youtube.com/embed/${id}` : null;
+    }
 
-  if (url.includes("youtube.com")) {
-    const id = new URL(url).searchParams.get("v");
-    return `https://www.youtube.com/embed/${id}`;
+    if (trimmed.includes("youtube.com/embed/")) {
+      const id = trimmed.split("youtube.com/embed/")[1]?.split("?")[0]?.split("&")[0];
+      return id ? `https://www.youtube.com/embed/${id}` : null;
+    }
+
+    if (trimmed.includes("youtube.com/shorts/")) {
+      const id = trimmed.split("youtube.com/shorts/")[1]?.split("?")[0]?.split("&")[0];
+      return id ? `https://www.youtube.com/embed/${id}` : null;
+    }
+
+    if (trimmed.includes("youtube.com/watch")) {
+      const urlObj = new URL(trimmed.startsWith("http") ? trimmed : `https://${trimmed}`);
+      const id = urlObj.searchParams.get("v");
+      return id ? `https://www.youtube.com/embed/${id}` : null;
+    }
+
+    const regExp = /^.*(youtu.be\/|v\/|u\/\w\/|embed\/|watch\?v=|&v=)([^#&?]*).*/;
+    const match = trimmed.match(regExp);
+    if (match && match[2]?.length === 11) {
+      return `https://www.youtube.com/embed/${match[2]}`;
+    }
+  } catch {
+    return null;
   }
 
   return null;

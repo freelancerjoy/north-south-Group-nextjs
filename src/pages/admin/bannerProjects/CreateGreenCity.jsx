@@ -6,6 +6,7 @@ import { MdArrowBack, MdCloudUpload, MdDelete, MdOutlinePermMedia } from "react-
 import { FaSpinner } from "react-icons/fa";
 import { ProjectSubmitOverlay } from "../projects/projectFormUi";
 import { appendOptimizedFile, appendOptimizedFiles } from "../../../utils/cloudinaryUpload";
+import { getYouTubeEmbedUrl } from "../../../components/VideoUtility";
 
 const inp = "w-full rounded-2xl border border-slate-200 bg-white px-4 py-3 text-sm text-slate-800 shadow-sm transition-all placeholder:text-slate-400 focus:border-emerald-400 focus:outline-none focus:ring-4 focus:ring-emerald-100";
 const lbl = "mb-2 block text-sm font-semibold text-slate-700";
@@ -18,6 +19,7 @@ const CreateGreenCity = () => {
   const { addGreenCity, loadGreenCity, isLoading } = useGreenCityStore();
 
   const [video, setVideo] = useState(null);
+  const [videoUrl, setVideoUrl] = useState("");
   const [videoPreview, setVideoPreview] = useState(null);
   const [brochureImage, setBrochureImage] = useState(null);
   const [brochurePreview, setBrochurePreview] = useState(null);
@@ -112,7 +114,11 @@ const CreateGreenCity = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     const formData = new FormData();
-    if (video) formData.append("greenCityVideo", video);
+    if (video) {
+      formData.append("greenCityVideo", video);
+    } else if (videoUrl) {
+      formData.append("greenCityVideo", videoUrl.trim());
+    }
     await appendOptimizedFile(formData, "brochureImage", brochureImage);
     await appendOptimizedFiles(formData, "galleryImages", galleryFiles);
     Object.entries(form).forEach(([k, v]) => formData.append(k, v));
@@ -203,25 +209,88 @@ const CreateGreenCity = () => {
             </p>
           </div>
 
-          <div className="grid grid-cols-1 gap-5 lg:grid-cols-[1.1fr,0.9fr]">
-            <label className="flex min-h-56 w-full cursor-pointer flex-col items-center justify-center rounded-[24px] border border-dashed border-emerald-300 bg-[radial-gradient(circle_at_top,_rgba(16,185,129,0.14),transparent_55%),linear-gradient(135deg,#f8fffb_0%,#effaf4_100%)] p-6 text-center transition-all hover:border-emerald-500 hover:bg-white">
-              <MdCloudUpload className="mb-3 text-slate-400" size={30} />
-              <span className="text-base font-semibold text-slate-700">{video ? video.name : "Click to upload hero video"}</span>
-              <span className="mt-1 text-xs text-slate-400">MP4, WebM accepted</span>
-              <input type="file" accept="video/*" className="hidden" onChange={handleVideoChange} />
-            </label>
+          <div className="space-y-4">
+            <div>
+              <label className={lbl}>Video Source (YouTube Link or Video File)</label>
+              <div className="flex flex-col sm:flex-row gap-2">
+                <input
+                  type="text"
+                  placeholder="Paste YouTube video link (e.g. https://www.youtube.com/watch?v=... or https://youtu.be/...)"
+                  value={videoUrl}
+                  onChange={(e) => {
+                    const url = e.target.value;
+                    setVideoUrl(url);
+                    if (!video) {
+                      setVideoPreview(url || null);
+                    }
+                  }}
+                  className={inp}
+                />
+                {(videoPreview || video || videoUrl) && (
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setVideo(null);
+                      setVideoUrl("");
+                      safeRevoke(videoPreview);
+                      setVideoPreview(null);
+                    }}
+                    className="inline-flex items-center justify-center gap-1.5 rounded-2xl border border-rose-200 bg-rose-50 px-4 py-3 text-xs font-bold text-rose-600 hover:bg-rose-100 transition shrink-0"
+                    title="Remove Video"
+                  >
+                    <MdDelete size={16} />
+                    Remove
+                  </button>
+                )}
+              </div>
+              <p className="mt-1 text-xs leading-5 text-slate-500">
+                You can paste any YouTube URL (watch, shorts, youtu.be, or embed), or upload an MP4/WebM video file below.
+              </p>
+            </div>
 
-            <div className="overflow-hidden rounded-[24px] border border-slate-200 bg-slate-950 shadow-sm">
-              {videoPreview ? (
-                <video src={videoPreview} controls className="h-full min-h-56 w-full object-cover" />
-              ) : (
-                <div className="flex min-h-56 flex-col items-center justify-center px-6 text-center">
-                  <p className="text-sm font-semibold text-white">Video preview will appear here</p>
-                  <p className="mt-2 text-xs leading-6 text-slate-400">
-                    Choose a file from the left side and review it instantly before creating the page.
-                  </p>
-                </div>
-              )}
+            <div className="grid grid-cols-1 gap-5 lg:grid-cols-[1.1fr,0.9fr]">
+              <label className="flex min-h-56 w-full cursor-pointer flex-col items-center justify-center rounded-[24px] border border-dashed border-emerald-300 bg-[radial-gradient(circle_at_top,_rgba(16,185,129,0.14),transparent_55%),linear-gradient(135deg,#f8fffb_0%,#effaf4_100%)] p-6 text-center transition-all hover:border-emerald-500 hover:bg-white">
+                <MdCloudUpload className="mb-3 text-slate-400" size={30} />
+                <span className="text-base font-semibold text-slate-700">{video ? video.name : "Or upload video file"}</span>
+                <span className="mt-1 text-xs text-slate-400">MP4, WebM accepted (Uploaded to Cloudinary)</span>
+                <input
+                  type="file"
+                  accept="video/*"
+                  className="hidden"
+                  onChange={(e) => {
+                    const file = e.target.files?.[0];
+                    if (!file) return;
+                    safeRevoke(videoPreview);
+                    setVideo(file);
+                    setVideoUrl("");
+                    setVideoPreview(URL.createObjectURL(file));
+                  }}
+                />
+              </label>
+
+              <div className="overflow-hidden rounded-[24px] border border-slate-200 bg-slate-950 shadow-sm flex items-center justify-center">
+                {videoPreview ? (
+                  getYouTubeEmbedUrl(videoPreview) ? (
+                    <iframe
+                      src={getYouTubeEmbedUrl(videoPreview)}
+                      title="YouTube Video Preview"
+                      className="h-full min-h-56 w-full"
+                      frameBorder="0"
+                      allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                      allowFullScreen
+                    />
+                  ) : (
+                    <video src={videoPreview} controls className="h-full min-h-56 w-full object-cover" />
+                  )
+                ) : (
+                  <div className="flex min-h-56 flex-col items-center justify-center px-6 text-center">
+                    <p className="text-sm font-semibold text-white">No video uploaded</p>
+                    <p className="mt-2 text-xs leading-6 text-slate-400">
+                      Paste a YouTube link or choose a video file to preview here.
+                    </p>
+                  </div>
+                )}
+              </div>
             </div>
           </div>
         </div>
