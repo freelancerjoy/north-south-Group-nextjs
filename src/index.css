@@ -2,6 +2,45 @@
 @import url('https://fonts.googleapis.com/css2?family=Montserrat:ital,wght@0,100..900;1,100..900&family=Playwrite+US+Trad+Guides&display=swap');
 @import url('https://fonts.googleapis.com/css2?family=Cinzel:wght@400;500;600;700&family=Cormorant+Garamond:wght@400;500;600;700&family=Manrope:wght@400;500;600;700&display=swap');
 
+/* ── Prothom Alo's Shurjo Bengali Font ── */
+@font-face {
+  font-family: "Shurjo";
+  font-display: swap;
+  font-style: normal;
+  font-weight: 400;
+  src: url('/fonts/ShurjoWeb_400.woff2') format('woff2'),
+       url('https://assets.prothomalo.com/prothomalo/assets/ShurjoWeb_400_v5_1.woff2') format('woff2');
+}
+
+@font-face {
+  font-family: "Shurjo";
+  font-display: swap;
+  font-style: normal;
+  font-weight: 700;
+  src: url('/fonts/ShurjoWeb_700.woff2') format('woff2'),
+       url('https://assets.prothomalo.com/prothomalo/assets/ShurjoWeb_700_v5_1.woff2') format('woff2');
+}
+
+.font-shurjo,
+.font-shurjo button,
+.font-shurjo input,
+.font-shurjo textarea,
+.font-shurjo select,
+.font-shurjo optgroup,
+.font-shurjo h1,
+.font-shurjo h2,
+.font-shurjo h3,
+.font-shurjo h4,
+.font-shurjo h5,
+.font-shurjo h6,
+.font-shurjo p,
+.font-shurjo span,
+.font-shurjo a,
+.font-shurjo label,
+.font-shurjo li {
+  font-family: "Shurjo", "Siyam Rupali", "SolaimanLipi", Roboto, sans-serif !important;
+}
+
 
 @import "tailwindcss";
 @plugin "flowbite-react/plugin/tailwindcss";

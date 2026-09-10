@@ -5,6 +5,22 @@ export default function Document() {
   return (
     <Html lang="en">
       <Head>
+        {/* Preload Prothom Alo's Shurjo Bengali WebFont */}
+        <link
+          rel="preload"
+          href="/fonts/ShurjoWeb_400.woff2"
+          as="font"
+          type="font/woff2"
+          crossOrigin="anonymous"
+        />
+        <link
+          rel="preload"
+          href="/fonts/ShurjoWeb_700.woff2"
+          as="font"
+          type="font/woff2"
+          crossOrigin="anonymous"
+        />
+
         {/* Facebook Pixel Code */}
         <script
           dangerouslySetInnerHTML={{

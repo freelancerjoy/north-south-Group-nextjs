@@ -29,13 +29,15 @@ import { usePartnerStore } from "../../store/partners/partnersStore";
 import { usePlotBookingStore } from "../../store/plotbooking/plotBookingStore";
 import { sharedAmenities, sharedSecurityItems } from "./projectShowcaseData";
 
-const displayFont = { fontFamily: '"Montserrat", sans-serif' };
+const shurjoFontFamily = '"Shurjo", "Siyam Rupali", "SolaimanLipi", Roboto, sans-serif';
+
+const displayFont = { fontFamily: shurjoFontFamily };
 const accentFont = {
-  fontFamily: '"Montserrat", sans-serif',
-  letterSpacing: "0.16em",
+  fontFamily: shurjoFontFamily,
+  letterSpacing: "0.08em",
   fontWeight: 700,
 };
-const bodyFont = { fontFamily: '"Montserrat", sans-serif' };
+const bodyFont = { fontFamily: shurjoFontFamily };
 
 const hexagonClip =
   "polygon(25% 6.7%, 75% 6.7%, 100% 50%, 75% 93.3%, 25% 93.3%, 0% 50%)";
@@ -591,9 +593,10 @@ function ProjectShowcaseTemplate({
 
   return (
     <div
-      className={`min-h-screen ${
+      className={`min-h-screen font-shurjo ${
         isLightPage ? "bg-white text-gray-950" : "bg-[#050505] text-white"
       }`}
+      style={{ fontFamily: shurjoFontFamily }}
     >
       <section
         id="preview-section-hero"
@@ -1535,7 +1538,7 @@ function ProjectShowcaseTemplate({
 
                 {/* Bottom Text Info on Hover */}
                 <div className="absolute bottom-0 left-0 w-full p-5 translate-y-4 opacity-0 transition-all duration-500 group-hover:translate-y-0 group-hover:opacity-100">
-                  <h3 className="font-serif text-lg text-white leading-snug drop-shadow-md">
+                  <h3 className="text-lg font-bold text-white leading-snug drop-shadow-md">
                     {projectName} View {index + 1}
                   </h3>
                 </div>
