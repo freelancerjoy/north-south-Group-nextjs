@@ -366,7 +366,7 @@ function FeatureCardSection({
           <div className="mt-5 h-0.5 w-16 bg-linear-to-r from-transparent via-green-500 to-transparent" />
           {subtitle && (
             <p
-              className="mt-4 max-w-xl text-center text-sm leading-relaxed text-gray-500"
+              className="mt-4 max-w-3xl text-center text-lg sm:text-xl lg:text-2xl leading-relaxed sm:leading-9 text-slate-800"
               style={bodyFont}
             >
               {subtitle}
@@ -390,7 +390,7 @@ function FeatureCardSection({
                   <Icon />
                 </div>
                 <p
-                  className="relative text-center text-sm font-semibold leading-snug text-gray-700 transition-colors duration-300 group-hover:text-green-800"
+                  className="relative text-center text-base sm:text-lg lg:text-xl font-bold leading-relaxed text-slate-900 transition-colors duration-300 group-hover:text-green-800"
                   style={bodyFont}
                 >
                   {item.title}
@@ -534,8 +534,8 @@ function ProjectShowcaseTemplate({
   const eyebrowTone = config.eyebrowTone || "gold";
   const plotCardVariant = config.plotCardVariant || "default";
   const headingClass = isLightPage ? "text-gray-950" : "text-white";
-  const bodyTextClass = isLightPage ? "text-gray-600" : "text-white/[0.78]";
-  const softTextClass = isLightPage ? "text-gray-500" : "text-white/[0.74]";
+  const bodyTextClass = isLightPage ? "text-slate-800 font-normal" : "text-white/[0.94] font-normal";
+  const softTextClass = isLightPage ? "text-slate-700 font-normal" : "text-white/[0.88] font-normal";
   const outlineActionClass = isLightPage
     ? lightOutlineButtonClass
     : outlineButtonClass;
@@ -544,8 +544,8 @@ function ProjectShowcaseTemplate({
     : primaryButtonClass;
   const inputClass = isLightPage ? lightFormFieldClass : formFieldClass;
   const fieldLabelClass = isLightPage
-    ? "mb-2 block text-sm font-medium text-gray-700"
-    : "mb-2 block text-sm font-medium text-white/80";
+    ? "mb-2 block text-base font-semibold text-gray-800"
+    : "mb-2 block text-base font-semibold text-white/90";
   const effectiveBrochurePdfHref = brochurePdfHref || bookingPdfHref;
   const effectiveLocationVideo =
     locationVideoSrc || videoSrc || "/videos/projectVideo.mp4";
@@ -639,7 +639,7 @@ function ProjectShowcaseTemplate({
               {config.heroTitle}
             </h1>
             <p
-              className={`mx-auto mt-5 max-w-3xl text-sm leading-7 sm:text-base ${softTextClass}`}
+              className={`mx-auto mt-6 max-w-4xl text-lg sm:text-xl lg:text-2xl leading-relaxed sm:leading-9 ${softTextClass}`}
               style={bodyFont}
             >
               {heroSummary}
@@ -666,11 +666,11 @@ function ProjectShowcaseTemplate({
               >
                 প্রকল্প পরিচিতি
               </h2>
-              <div className="mt-5 space-y-4">
+              <div className="mt-6 space-y-4">
                 {overviewParagraphs.map((paragraph, index) => (
                   <p
                     key={`${paragraph}-${index}`}
-                    className={`text-sm leading-relaxed sm:text-base ${bodyTextClass} font-light`}
+                    className={`text-lg sm:text-xl lg:text-[21px] leading-relaxed sm:leading-9 ${bodyTextClass}`}
                     style={bodyFont}
                   >
                     {paragraph}
@@ -691,7 +691,7 @@ function ProjectShowcaseTemplate({
                     600+
                   </p>
                   <p
-                    className={`text-[11px] font-semibold uppercase tracking-wider ${softTextClass}`}
+                    className={`text-xs sm:text-sm font-semibold uppercase tracking-wider ${softTextClass}`}
                   >
                     একর টাউনশিপ
                   </p>
@@ -701,7 +701,7 @@ function ProjectShowcaseTemplate({
                     2021
                   </p>
                   <p
-                    className={`text-[11px] font-semibold uppercase tracking-wider ${softTextClass}`}
+                    className={`text-xs sm:text-sm font-semibold uppercase tracking-wider ${softTextClass}`}
                   >
                     প্রতিষ্ঠিত
                   </p>
@@ -711,7 +711,7 @@ function ProjectShowcaseTemplate({
                     RAJUK
                   </p>
                   <p
-                    className={`text-[11px] font-semibold uppercase tracking-wider ${softTextClass}`}
+                    className={`text-xs sm:text-sm font-semibold uppercase tracking-wider ${softTextClass}`}
                   >
                     অনুমোদিত লেআউট
                   </p>
@@ -722,21 +722,21 @@ function ProjectShowcaseTemplate({
                 <button
                   type="button"
                   onClick={() => setActiveModal("plan")}
-                  className="inline-flex items-center gap-2.5 rounded-full border-2 border-[#0f7771] px-6 py-3 text-xs font-bold uppercase tracking-[0.2em] text-[#0f7771] transition-all duration-300 hover:bg-[#0f7771] hover:text-white hover:shadow-lg"
+                  className="inline-flex items-center gap-2.5 rounded-full border-2 border-[#0f7771] px-6 py-3 text-xs sm:text-sm font-bold uppercase tracking-[0.15em] text-[#0f7771] transition-all duration-300 hover:bg-[#0f7771] hover:text-white hover:shadow-lg"
                   style={accentFont}
                 >
                   <FaRegImage size={14} />
-                  Master Plan
+                  মাস্টার প্ল্যান
                 </button>
                 {effectiveBrochurePdfHref && (
                   <button
                     type="button"
                     onClick={openBrochureModal}
-                    className="inline-flex items-center gap-2.5 rounded-full bg-gradient-to-r from-[#0f7771] to-[#149990] px-7 py-3 text-xs font-bold uppercase tracking-[0.2em] text-white shadow-[0_10px_25px_-5px_rgba(15,119,113,0.4)] transition-all duration-300 hover:scale-105 hover:from-[#0a5e5a] hover:to-[#0f7771]"
+                    className="inline-flex items-center gap-2.5 rounded-full bg-gradient-to-r from-[#0f7771] to-[#149990] px-7 py-3 text-xs sm:text-sm font-bold uppercase tracking-[0.15em] text-white shadow-[0_10px_25px_-5px_rgba(15,119,113,0.4)] transition-all duration-300 hover:scale-105 hover:from-[#0a5e5a] hover:to-[#0f7771]"
                     style={accentFont}
                   >
                     <MdDownload className="text-base" />
-                    Download Brochure
+                    ব্রোশিওর ডাউনলোড
                   </button>
                 )}
               </div>
@@ -896,63 +896,59 @@ function ProjectShowcaseTemplate({
               data-aos-delay="100"
               className="grid sm:grid-cols-2 gap-3"
             >
-              <div className="rounded-xl border border-emerald-100 bg-white p-3.5 shadow-sm transition-all duration-300 hover:border-[#0f7771]/50 hover:shadow-md hover:-translate-y-0.5">
-                <div className="flex items-center gap-2 mb-1.5">
-                  <div className="w-7 h-7 rounded-lg bg-[#0f7771]/10 text-[#0f7771] flex items-center justify-center shrink-0">
-                    <FaPlane size={13} />
+              <div className="rounded-2xl border border-emerald-100 bg-white p-4 sm:p-5 shadow-sm transition-all duration-300 hover:border-[#0f7771]/50 hover:shadow-md hover:-translate-y-0.5">
+                <div className="flex items-center gap-2.5 mb-2">
+                  <div className="w-9 h-9 rounded-xl bg-[#0f7771]/10 text-[#0f7771] flex items-center justify-center shrink-0">
+                    <FaPlane size={16} />
                   </div>
-                  <h4 className="text-xs font-bold text-slate-900">
+                  <h4 className="text-base sm:text-lg font-bold text-slate-900" style={displayFont}>
                     বিমানবন্দর ও ৩০০ ফিট সড়ক
                   </h4>
                 </div>
-                <p className="text-[11px] text-slate-600 leading-snug font-normal">
-                  Closest reach from Shahjalal Int'l Airport via Kuril Flyover &
-                  Kanchan Bridge.
+                <p className="text-sm sm:text-base text-slate-800 leading-relaxed font-normal" style={bodyFont}>
+                  হযরত শাহজালাল আন্তর্জাতিক বিমানবন্দর থেকে কুড়িল ফ্লাইওভার ও কাঞ্চন ব্রিজ হয়ে দ্রুততম সময়ে পৌঁছানো যায়।
                 </p>
               </div>
 
-              <div className="rounded-xl border border-emerald-100 bg-white p-3.5 shadow-sm transition-all duration-300 hover:border-[#0f7771]/50 hover:shadow-md hover:-translate-y-0.5">
-                <div className="flex items-center gap-2 mb-1.5">
-                  <div className="w-7 h-7 rounded-lg bg-[#0f7771]/10 text-[#0f7771] flex items-center justify-center shrink-0">
-                    <FaRoad size={13} />
+              <div className="rounded-2xl border border-emerald-100 bg-white p-4 sm:p-5 shadow-sm transition-all duration-300 hover:border-[#0f7771]/50 hover:shadow-md hover:-translate-y-0.5">
+                <div className="flex items-center gap-2.5 mb-2">
+                  <div className="w-9 h-9 rounded-xl bg-[#0f7771]/10 text-[#0f7771] flex items-center justify-center shrink-0">
+                    <FaRoad size={16} />
                   </div>
-                  <h4 className="text-xs font-bold text-slate-900">
+                  <h4 className="text-base sm:text-lg font-bold text-slate-900" style={displayFont}>
                     মাদানী এভিনিউ / আমেরিকান দূতাবাস
                   </h4>
                 </div>
-                <p className="text-[11px] text-slate-600 leading-snug font-normal">
-                  From Natun Bazar opposite US Embassy, passing Gazi Bridge to
-                  Dhaka-Sylhet Hwy.
+                <p className="text-sm sm:text-base text-slate-800 leading-relaxed font-normal" style={bodyFont}>
+                  নতুন বাজার আমেরিকান দূতাবাসের বিপরীত থেকে মাদানী এভিনিউ, গাজী ব্রিজ হয়ে সরাসরি ঢাকা-সিলেট হাইওয়ের সাথে সংযুক্ত।
                 </p>
               </div>
 
-              <div className="rounded-xl border border-emerald-100 bg-white p-3.5 shadow-sm transition-all duration-300 hover:border-[#0f7771]/50 hover:shadow-md hover:-translate-y-0.5">
-                <div className="flex items-center gap-2 mb-1.5">
-                  <div className="w-7 h-7 rounded-lg bg-[#0f7771]/10 text-[#0f7771] flex items-center justify-center shrink-0">
-                    <FaShieldAlt size={13} />
+              <div className="rounded-2xl border border-emerald-100 bg-white p-4 sm:p-5 shadow-sm transition-all duration-300 hover:border-[#0f7771]/50 hover:shadow-md hover:-translate-y-0.5">
+                <div className="flex items-center gap-2.5 mb-2">
+                  <div className="w-9 h-9 rounded-xl bg-[#0f7771]/10 text-[#0f7771] flex items-center justify-center shrink-0">
+                    <FaShieldAlt size={16} />
                   </div>
-                  <h4 className="text-xs font-bold text-slate-900">
+                  <h4 className="text-base sm:text-lg font-bold text-slate-900" style={displayFont}>
                     জলসিঁড়ি আবাসন-২ এর বিপরীতে
                   </h4>
                 </div>
-                <p className="text-[11px] text-slate-600 leading-snug font-normal">
-                  Eastern side of Shitalakhya River, opposite Army Housing
-                  Jolshiri Abason-2.
+                <p className="text-sm sm:text-base text-slate-800 leading-relaxed font-normal" style={bodyFont}>
+                  শীতলক্ষ্যা নদীর পূর্ব তীরে, সেনা আবাসন জলসিঁড়ি প্রকল্প-২ এর ঠিক বিপরীতে মনোরম প্রাকৃতিক পরিবেশে অবস্থিত।
                 </p>
               </div>
 
-              <div className="rounded-xl border border-emerald-100 bg-white p-3.5 shadow-sm transition-all duration-300 hover:border-[#0f7771]/50 hover:shadow-md hover:-translate-y-0.5">
-                <div className="flex items-center gap-2 mb-1.5">
-                  <div className="w-7 h-7 rounded-lg bg-[#0f7771]/10 text-[#0f7771] flex items-center justify-center shrink-0">
-                    <FaWater size={13} />
+              <div className="rounded-2xl border border-emerald-100 bg-white p-4 sm:p-5 shadow-sm transition-all duration-300 hover:border-[#0f7771]/50 hover:shadow-md hover:-translate-y-0.5">
+                <div className="flex items-center gap-2.5 mb-2">
+                  <div className="w-9 h-9 rounded-xl bg-[#0f7771]/10 text-[#0f7771] flex items-center justify-center shrink-0">
+                    <FaWater size={16} />
                   </div>
-                  <h4 className="text-xs font-bold text-slate-900">
-                    রামপুরা ও বনশ্রী
+                  <h4 className="text-base sm:text-lg font-bold text-slate-900" style={displayFont}>
+                    রামপুরা ও বনশ্রী সংযোগ
                   </h4>
                 </div>
-                <p className="text-[11px] text-slate-600 leading-snug font-normal">
-                  Seamlessly connected through Aftab Nagar, রামপুরা ও বনশ্রী
-                  access road.
+                <p className="text-sm sm:text-base text-slate-800 leading-relaxed font-normal" style={bodyFont}>
+                  আফতাবনগর, রামপুরা ও বনশ্রী এপ্রোচ রোড দিয়ে ঢাকা শহরের যেকোনো প্রান্ত থেকে সহজ ও সাবলীল যাতায়াত।
                 </p>
               </div>
             </div>
@@ -971,23 +967,23 @@ function ProjectShowcaseTemplate({
             </h2>
 
             <p
-              className={`mt-3 text-xs sm:text-[13.5px] leading-relaxed text-slate-600 font-normal`}
+              className={`mt-5 text-lg sm:text-xl lg:text-[21px] leading-relaxed sm:leading-9 text-slate-800 font-normal`}
               style={bodyFont}
             >
               {locationText}
             </p>
 
             {/* Strategic Advantage Highlight Badges */}
-            <div className="mt-4 flex flex-wrap gap-2">
-              <span className="inline-flex items-center gap-1.5 rounded-full border border-emerald-200 bg-emerald-50/80 px-2.5 py-0.5 text-[11px] font-semibold text-[#0f7771]">
+            <div className="mt-5 flex flex-wrap gap-2.5">
+              <span className="inline-flex items-center gap-1.5 rounded-full border border-emerald-200 bg-emerald-50/90 px-3.5 py-1 text-xs sm:text-sm font-semibold text-[#0f7771]">
                 <span className="h-1.5 w-1.5 rounded-full bg-[#0f7771]" />
                 শীতলক্ষ্যা নদী সংলগ্ন
               </span>
-              <span className="inline-flex items-center gap-1.5 rounded-full border border-emerald-200 bg-emerald-50/80 px-2.5 py-0.5 text-[11px] font-semibold text-[#0f7771]">
+              <span className="inline-flex items-center gap-1.5 rounded-full border border-emerald-200 bg-emerald-50/90 px-3.5 py-1 text-xs sm:text-sm font-semibold text-[#0f7771]">
                 <span className="h-1.5 w-1.5 rounded-full bg-[#0f7771]" />
                 পূর্বাচল ৩০০ ফুট এক্সপ্রেসওয়ে সংযোগ
               </span>
-              <span className="inline-flex items-center gap-1.5 rounded-full border border-emerald-200 bg-emerald-50/80 px-2.5 py-0.5 text-[11px] font-semibold text-[#0f7771]">
+              <span className="inline-flex items-center gap-1.5 rounded-full border border-emerald-200 bg-emerald-50/90 px-3.5 py-1 text-xs sm:text-sm font-semibold text-[#0f7771]">
                 <span className="h-1.5 w-1.5 rounded-full bg-[#0f7771]" />
                 আর্মি হাউজিং-২ এর বিপরীতে
               </span>
@@ -1052,21 +1048,19 @@ function ProjectShowcaseTemplate({
             className="mx-auto max-w-3xl text-center mb-14"
           >
             <SectionEyebrow centered tone={eyebrowTone}>
-              {config.featuresEyebrow || "WHY GREEN CITY STANDS OUT"}
+              {config.featuresEyebrow || "বিনিয়োগের সেরা সুযোগ"}
             </SectionEyebrow>
             <h2
               className={`mt-4 text-3xl font-bold tracking-tight sm:text-4xl lg:text-5xl ${headingClass}`}
               style={displayFont}
             >
-              {config.featuresTitle || "Features of North South Green City"}
+              {config.featuresTitle || `${projectName}-এর বৈশিষ্ট্যসমূহ`}
             </h2>
             <p
-              className={`mx-auto mt-4 max-w-2xl text-sm sm:text-base leading-relaxed ${softTextClass} font-light`}
+              className={`mx-auto mt-6 max-w-4xl text-lg sm:text-xl lg:text-2xl leading-relaxed sm:leading-9 ${softTextClass}`}
               style={bodyFont}
             >
-              Engineered for sustainable living, combining RAJUK compliance,
-              lush green landscapes, and modern civic infrastructure in a
-              self-sufficient township.
+              রাজউকের নিয়মনীতি ও পরিবেশবান্ধব নগর পরিকল্পনার সমন্বয়ে তৈরি এক অনন্য, সবুজ ও আধুনিক নাগরিক সুযোগ-সুবিধা সম্বলিত স্বয়ংসম্পূর্ণ টাউনশিপ।
             </p>
           </div>
 
@@ -1082,18 +1076,18 @@ function ProjectShowcaseTemplate({
                   title: "রাজউক অনুমোদন ও নীতিমালা",
                   desc:
                     specificationsParagraphs[0] ||
-                    "Developed strictly according to East Bengal Building Construction Act 1952 and RAJUK guidelines for organized urbanization.",
+                    "ইস্ট বেঙ্গল বিল্ডিং কনস্ট্রাকশন অ্যাক্ট ১৯৫২ এবং রাজউকের বিধিবিধান মেনে পরিকল্পিত ও সুশৃঙ্খল নগরায়ন।",
                   icon: FaShieldAlt,
                 },
                 {
                   title: "মনোরম লেক ও সবুজায়ন",
                   desc:
                     specificationsParagraphs[1] ||
-                    "Expansive lakefront perimeter, sprawling recreational parks, playgrounds, and tree-lined walkways create a serene natural ecosystem.",
+                    "প্রাকৃতিক লেকভিউ, সুবিশাল উন্মুক্ত পার্ক, খেলার মাঠ এবং বৃক্ষশোভিত ওয়াকওয়ে সমৃদ্ধ মনোরম পরিবেশ।",
                   icon: FaWater,
                 },
                 {
-                  title: "অভ্যন্তরীণ সড়ক নেটওয়ার্ক",
+                  title: "অভ্যন্তরীণ সড়ক নেটওয়ার্ক",
                   desc: "৪০ থেকে ১০০ ফুট প্রশস্ত পিচঢালা রাস্তা, ফুটপাথ, ভূগর্ভস্থ ইউটিলিটি সংযোগ এবং আধুনিক ড্রেনেজ ব্যবস্থা।",
                   icon: FaRoad,
                 },
@@ -1101,7 +1095,7 @@ function ProjectShowcaseTemplate({
                   title: "নাগরিক ও সামাজিক সুবিধা",
                   desc:
                     specificationsParagraphs[2] ||
-                    "Designated zones for educational institutions, healthcare clinics, central mosques, community centers, and commercial retail hubs.",
+                    "প্রকল্পের ভেতরেই আন্তর্জাতিক মানের শিক্ষা প্রতিষ্ঠান, স্বাস্থ্যসেবা কেন্দ্র, কেন্দ্রীয় মসজিদ, কমিউনিটি সেন্টার ও বাণিজ্যিক শপিং মল।",
                   icon: FaBuilding,
                 },
               ].map((feature, idx) => {
@@ -1122,7 +1116,7 @@ function ProjectShowcaseTemplate({
                     </div>
                     <div>
                       <h4
-                        className={`text-lg sm:text-xl font-bold transition-colors ${
+                        className={`text-xl sm:text-2xl font-bold transition-colors ${
                           isLightPage
                             ? "text-slate-900 group-hover:text-[#0f7771]"
                             : "text-white group-hover:text-[#f3b128]"
@@ -1132,8 +1126,8 @@ function ProjectShowcaseTemplate({
                         {feature.title}
                       </h4>
                       <p
-                        className={`mt-2 text-sm leading-relaxed font-normal ${
-                          isLightPage ? "text-slate-600" : "text-slate-300/80"
+                        className={`mt-2.5 text-base sm:text-lg lg:text-[19px] leading-relaxed font-normal ${
+                          isLightPage ? "text-slate-800" : "text-slate-200"
                         }`}
                         style={bodyFont}
                       >
@@ -1248,7 +1242,7 @@ function ProjectShowcaseTemplate({
               {config.plotsTitle}
             </h2>
             <p
-              className={`mx-auto mt-4 max-w-3xl text-sm leading-7 sm:text-base ${softTextClass}`}
+              className={`mx-auto mt-6 max-w-4xl text-lg sm:text-xl lg:text-2xl leading-relaxed sm:leading-9 ${softTextClass}`}
               style={bodyFont}
             >
               {plotIntroText ||
@@ -1260,7 +1254,7 @@ function ProjectShowcaseTemplate({
                   key={tab.key}
                   type="button"
                   onClick={() => setPlotTab(tab.key)}
-                  className={`rounded-full border px-6 py-3 text-sm transition ${
+                  className={`rounded-full border px-7 py-3 text-sm sm:text-base font-semibold transition ${
                     plotTab === tab.key
                       ? isLightPage
                         ? "border-green-600 bg-green-600 text-white"
@@ -1326,8 +1320,8 @@ function ProjectShowcaseTemplate({
                     <p
                       className={
                         isFeatureVariant
-                          ? "relative text-sm leading-7 text-gray-500"
-                          : "mt-4 text-sm leading-7 text-white/[0.78]"
+                          ? "relative text-base sm:text-lg leading-relaxed text-slate-800"
+                          : "mt-4 text-base sm:text-lg leading-relaxed text-white/90"
                       }
                       style={bodyFont}
                     >
@@ -1378,16 +1372,16 @@ function ProjectShowcaseTemplate({
             {/* Header Content */}
             <div className="max-w-xl lg:sticky lg:top-36 lg:pb-12">
               <SectionEyebrow tone={eyebrowTone}>
-                {config.goalsEyebrow || "A DESTINATION WORTH LIVING"}
+                {config.goalsEyebrow || "স্বপ্নের নিরাপদ ঠিকানা"}
               </SectionEyebrow>
               <h2
                 className={`mt-5 text-4xl font-semibold leading-tight sm:text-5xl lg:text-6xl ${headingClass}`}
                 style={displayFont}
               >
-                {config.goalsTitle || "Goals of North South Green City"}
+                {config.goalsTitle || `${projectName}-এর মূল লক্ষ্য ও ভিশন`}
               </h2>
               <p
-                className={`mt-6 text-sm leading-relaxed sm:text-base font-medium ${softTextClass}`}
+                className={`mt-6 text-lg sm:text-xl lg:text-2xl leading-relaxed sm:leading-9 ${softTextClass}`}
                 style={bodyFont}
               >
                 আমাদের মূল লক্ষ্য হলো স্থায়িত্ব, সামাজিক কল্যাণ এবং সুপরিকল্পিত নগরায়ন। প্রকল্পের প্রতিটি দিক এমনভাবে সাজানো হয়েছে যা প্রকৃতির ভারসাম্য রক্ষা করে আধুনিক ও উন্নত জীবনযাত্রার নিশ্চয়তা দেয়।
@@ -1454,7 +1448,7 @@ function ProjectShowcaseTemplate({
                         >
                           <IoCheckmarkCircle size={18} />
                         </div>
-                        <p className="text-sm sm:text-base font-semibold leading-relaxed text-white drop-shadow-md">
+                        <p className="text-base sm:text-lg lg:text-xl font-bold leading-relaxed text-white drop-shadow-md">
                           {goal}
                         </p>
                       </div>
@@ -1597,7 +1591,7 @@ function ProjectShowcaseTemplate({
               {config.mapTitle}
             </h2>
             <p
-              className={`mt-5 text-sm leading-8 sm:text-base ${softTextClass}`}
+              className={`mt-5 text-lg sm:text-xl lg:text-[21px] leading-relaxed sm:leading-9 ${softTextClass}`}
               style={bodyFont}
             >
               {locationText}
@@ -1620,7 +1614,7 @@ function ProjectShowcaseTemplate({
                         {item.title}
                       </p>
                       <p
-                        className={`mt-1 text-sm ${softTextClass}`}
+                        className={`mt-1.5 text-base sm:text-lg lg:text-xl leading-relaxed ${softTextClass}`}
                         style={bodyFont}
                       >
                         {item.detail}
@@ -1774,7 +1768,7 @@ function ProjectShowcaseTemplate({
                 {config.bookingTitle}
               </h2>
               <p
-                className={`mt-4 text-sm leading-8 sm:text-base ${softTextClass}`}
+                className={`mt-4 text-lg sm:text-xl lg:text-[21px] leading-relaxed sm:leading-9 ${softTextClass}`}
                 style={bodyFont}
               >
                 {config.bookingSubtitle}
@@ -1805,7 +1799,7 @@ function ProjectShowcaseTemplate({
               </div>
 
               <p
-                className={`mt-6 text-center text-sm leading-7 ${softTextClass}`}
+                className={`mt-6 text-center text-lg sm:text-xl leading-relaxed ${softTextClass}`}
                 style={bodyFont}
               >
                 বিস্তারিত তথ্যের জন্য প্রকল্পের ব্রোশিওরটি ডাউনলোড করুন।
@@ -1840,11 +1834,10 @@ function ProjectShowcaseTemplate({
                 প্লট বুকিং
               </h3>
               <p
-                className={`mt-4 text-sm leading-8 sm:text-base ${softTextClass}`}
+                className={`mt-4 text-lg sm:text-xl lg:text-[21px] leading-relaxed sm:leading-9 ${softTextClass}`}
                 style={bodyFont}
               >
-                Send us your preferred block, contact details, and plot size so
-                our team can follow up with the next steps quickly.
+                আপনার কাঙ্ক্ষিত প্লটের সাইজ, ব্লক ও প্রয়োজনীয় তথ্য দিয়ে বুকিং ফর্মটি পূরণ করুন, আমাদের প্রতিনিধি অতি দ্রুত আপনার সাথে যোগাযোগ করবেন।
               </p>
 
               <form onSubmit={handleBookingSubmit} className="mt-8 space-y-5">
@@ -1935,7 +1928,7 @@ function ProjectShowcaseTemplate({
                       className={fieldLabelClass}
                       style={bodyFont}
                     >
-                      Road
+                      রোড / রাস্তা
                     </label>
                     <input
                       id={`${formIdPrefix}-road`}

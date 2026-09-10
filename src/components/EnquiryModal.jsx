@@ -40,7 +40,7 @@ export default function EnquiryModal({ isOpen, onClose, projectTitle, brochureUr
   };
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 px-4">
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 px-4 font-shurjo">
       <div className="relative w-full max-w-md overflow-hidden rounded-2xl bg-white shadow-2xl">
         <div className="h-1.5 w-full bg-gradient-to-r from-green-400 to-green-600" />
 
@@ -57,22 +57,21 @@ export default function EnquiryModal({ isOpen, onClose, projectTitle, brochureUr
           {!submitted ? (
             <>
               <div className="mb-6">
-                <h3 className="text-2xl font-bold text-gray-800">
-                  Download Brochure
+                <h3 className="text-2xl font-bold text-slate-900">
+                  ব্রোশিওর ডাউনলোড
                 </h3>
-                <p className="mt-1 text-sm text-gray-500">
-                  Please share your details to download the{" "}
-                  <span className="font-semibold text-green-600">
+                <p className="mt-2 text-base text-slate-700 leading-relaxed">
+                  <span className="font-semibold text-green-700">
                     {projectTitle}
                   </span>{" "}
-                  brochure.
+                  প্রকল্পের ব্রোশিওর ডাউনলোড করতে আপনার তথ্য প্রদান করুন।
                 </p>
               </div>
 
               <form onSubmit={handleSubmit} className="space-y-4">
                 <div>
-                  <label className="mb-1 block text-sm font-medium text-gray-700">
-                    Full Name <span className="text-red-500">*</span>
+                  <label className="mb-1.5 block text-base font-semibold text-slate-800">
+                    আপনার নাম <span className="text-red-500">*</span>
                   </label>
                   <input
                     name="name"
@@ -80,14 +79,14 @@ export default function EnquiryModal({ isOpen, onClose, projectTitle, brochureUr
                     required
                     value={form.name}
                     onChange={handleChange}
-                    placeholder="Your full name"
-                    className="w-full rounded-xl border border-gray-200 px-4 py-2.5 text-sm transition focus:border-transparent focus:outline-none focus:ring-2 focus:ring-green-400"
+                    placeholder="সম্পূর্ণ নাম লিখুন"
+                    className="w-full rounded-xl border border-gray-200 px-4 py-3 text-base text-slate-900 transition focus:border-transparent focus:outline-none focus:ring-2 focus:ring-green-400"
                   />
                 </div>
 
                 <div>
-                  <label className="mb-1 block text-sm font-medium text-gray-700">
-                    Phone Number <span className="text-red-500">*</span>
+                  <label className="mb-1.5 block text-base font-semibold text-slate-800">
+                    ফোন নম্বর <span className="text-red-500">*</span>
                   </label>
                   <input
                     name="phone"
@@ -96,13 +95,13 @@ export default function EnquiryModal({ isOpen, onClose, projectTitle, brochureUr
                     value={form.phone}
                     onChange={handleChange}
                     placeholder="+880 1XXXXXXXXX"
-                    className="w-full rounded-xl border border-gray-200 px-4 py-2.5 text-sm transition focus:border-transparent focus:outline-none focus:ring-2 focus:ring-green-400"
+                    className="w-full rounded-xl border border-gray-200 px-4 py-3 text-base text-slate-900 transition focus:border-transparent focus:outline-none focus:ring-2 focus:ring-green-400"
                   />
                 </div>
 
                 <div>
-                  <label className="mb-1 block text-sm font-medium text-gray-700">
-                    Address <span className="text-red-500">*</span>
+                  <label className="mb-1.5 block text-base font-semibold text-slate-800">
+                    ঠিকানা <span className="text-red-500">*</span>
                   </label>
                   <textarea
                     name="address"
@@ -110,22 +109,22 @@ export default function EnquiryModal({ isOpen, onClose, projectTitle, brochureUr
                     rows={3}
                     value={form.address}
                     onChange={handleChange}
-                    placeholder="Your address"
-                    className="w-full resize-none rounded-xl border border-gray-200 px-4 py-2.5 text-sm transition focus:border-transparent focus:outline-none focus:ring-2 focus:ring-green-400"
+                    placeholder="আপনার বর্তমান ঠিকানা লিখুন"
+                    className="w-full resize-none rounded-xl border border-gray-200 px-4 py-3 text-base text-slate-900 transition focus:border-transparent focus:outline-none focus:ring-2 focus:ring-green-400"
                   />
                 </div>
 
                 <button
                   type="submit"
                   disabled={loading}
-                  className="mt-2 flex w-full items-center justify-center gap-2 rounded-xl bg-green-600 py-3 font-semibold text-white shadow-md transition-all duration-300 hover:bg-green-700 hover:shadow-lg disabled:bg-green-400"
+                  className="mt-3 flex w-full items-center justify-center gap-2 rounded-xl bg-green-600 py-3.5 text-base font-bold text-white shadow-md transition-all duration-300 hover:bg-green-700 hover:shadow-lg disabled:bg-green-400"
                 >
                   {loading ? (
                     <span className="h-5 w-5 animate-spin rounded-full border-2 border-white border-t-transparent" />
                   ) : (
                     <>
                       <MdDownload className="text-xl" />
-                      Download Brochure
+                      ব্রোশিওর ডাউনলোড করুন
                     </>
                   )}
                 </button>
@@ -136,14 +135,14 @@ export default function EnquiryModal({ isOpen, onClose, projectTitle, brochureUr
               <div className="flex h-16 w-16 items-center justify-center rounded-full bg-green-100 text-4xl text-green-500">
                 &#10003;
               </div>
-              <h3 className="text-xl font-bold text-gray-800">
-                Download Started!
+              <h3 className="text-2xl font-bold text-slate-900">
+                ডাউনলোড শুরু হয়েছে!
               </h3>
-              <p className="text-sm text-gray-500">
-                Thank you{" "}
-                <span className="font-semibold text-gray-700">{form.name}</span>!
+              <p className="text-base text-slate-700 leading-relaxed">
+                ধন্যবাদ{" "}
+                <span className="font-semibold text-slate-900">{form.name}</span>!
                 <br />
-                Your brochure is downloading now.
+                আপনার ব্রোশিওরটি ডাউনলোড হচ্ছে।
               </p>
             </div>
           )}

@@ -39,6 +39,11 @@
 .font-shurjo label,
 .font-shurjo li {
   font-family: "Shurjo", "Siyam Rupali", "SolaimanLipi", Roboto, sans-serif !important;
+  letter-spacing: 0 !important;
+}
+
+.font-shurjo p {
+  line-height: 1.8;
 }
 
 
