@@ -11,6 +11,7 @@ import greenCityMap from "../../assets/images/greenCityMap.png";
 import { useGreenCityStore } from "../../store/greenCity/greenCityStore";
 import { API_BASE_URL } from "../../config/env";
 import ProjectShowcaseTemplate from "./ProjectShowcaseTemplate";
+import GreenCityVideoGallery from "./GreenCityVideoGallery";
 import {
   greenCityShowcaseConfig,
   industrialCityIconRegistry,
@@ -152,6 +153,7 @@ const GreenCity = () => {
       mapImageSrc={data?.mapImage?.url || greenCityMap}
       sectionImages={data?.sectionImages}
       galleryImages={galleryImages}
+      videoGallery={<GreenCityVideoGallery />}
       overviewParagraphs={overviewParagraphs}
       specificationsParagraphs={specificationsParagraphs}
       plotIntroText={data?.plotIntroText || ""}

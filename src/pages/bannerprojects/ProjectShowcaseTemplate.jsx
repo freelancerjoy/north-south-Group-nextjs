@@ -415,6 +415,7 @@ function ProjectShowcaseTemplate({
   bookingPdfHref,
   mapImageSrc,
   galleryImages = [],
+  videoGallery = null,
   overviewParagraphs = [],
   specificationsParagraphs = [],
   locationText = "",
@@ -1541,6 +1542,8 @@ function ProjectShowcaseTemplate({
           </div>
         </div>
       </section>
+
+      {videoGallery}
 
       <section
         id="preview-section-map"
