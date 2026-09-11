@@ -144,7 +144,7 @@ const GreenCity = () => {
       projectName="নর্থ সাউথ গ্রিন সিটি"
       config={dynamicConfig}
       logoSrc={greenCityLogo}
-      videoSrc={data?.greenCityVideo || ""}
+      videoSrc="https://res.cloudinary.com/dhchj00vt/video/upload/v1777280352/squareCity/j1y6ogs76gifnyqn8l6a.mp4"
       locationVideoSrc={data?.greenCityVideo || "/videos/projectVideo.mp4"}
       brochureImageSrc={data?.brochureImage?.url || greenCityBrochure}
       brochurePdfHref={brochurePdfHref}
