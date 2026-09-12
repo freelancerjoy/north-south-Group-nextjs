@@ -517,16 +517,32 @@ const ProjectCityUpdateForm = ({
       setSubmissionStage(`Uploading ${projectName} changes`, `${mediaCount || 1} media item${mediaCount === 1 ? "" : "s"} and the content updates are being processed now.`, 1);
 
       const formData = new FormData();
+      const projectFolder = projectName.toLowerCase().includes("square")
+        ? "squareCity"
+        : projectName.toLowerCase().includes("industrial")
+        ? "industrialCity"
+        : "greenCity";
+
       if (video) {
-        formData.append(videoField, video);
+        setSubmissionStage(`Uploading ${projectName} overview video`, "Uploading video directly to Cloudinary to bypass server limits...", 1);
+        const videoAsset = await uploadSingleAsset(video, projectFolder);
+        if (videoAsset?.url) {
+          formData.append(videoField, videoAsset.url);
+        }
       } else if (videoUrl !== undefined) {
         formData.append(videoField, videoUrl.trim());
       }
+
       if (locationVideo) {
-        formData.append("locationTourVideo", locationVideo);
+        setSubmissionStage(`Uploading ${projectName} tour video`, "Uploading tour video directly to Cloudinary to bypass server limits...", 1);
+        const tourAsset = await uploadSingleAsset(locationVideo, `${projectFolder}/locationTour`);
+        if (tourAsset?.url) {
+          formData.append("locationTourVideo", tourAsset.url);
+        }
       } else if (locationVideoUrl !== undefined) {
         formData.append("locationTourVideo", locationVideoUrl.trim());
       }
+
       prepareVideoGalleryFormData(formData, videoGallery);
       await appendOptimizedFile(formData, "brochureImage", brochureImage);
       const pdfFolder = pdfFolderByVideoField[videoField] || "city/pdfs";
@@ -548,8 +564,28 @@ const ProjectCityUpdateForm = ({
       for (const [field, file] of Object.entries(sectionImageFiles)) {
         await appendOptimizedFile(formData, field, file);
       }
-      formData.append("existingGalleryImages", JSON.stringify(existingGalleryImages));
-      await appendOptimizedFiles(formData, "galleryImages", galleryFiles);
+
+      // Upload gallery images directly to Cloudinary so Vercel 4.5MB payload limit is never exceeded
+      let newUploadedGalleryAssets = [];
+      if (galleryFiles.length > 0) {
+        setSubmissionStage(
+          `Uploading ${projectName} gallery`,
+          `Uploading ${galleryFiles.length} gallery image(s) directly to Cloudinary...`,
+          1
+        );
+        const galleryFolder = `${projectFolder}/gallery`;
+        newUploadedGalleryAssets = await Promise.all(
+          galleryFiles.map((file) => uploadSingleAsset(file, galleryFolder))
+        );
+      }
+      const combinedGalleryImages = [
+        ...existingGalleryImages,
+        ...newUploadedGalleryAssets.filter(Boolean).map((asset) => ({
+          public_id: asset.public_id || "",
+          url: asset.url || "",
+        })),
+      ];
+      formData.append("existingGalleryImages", JSON.stringify(combinedGalleryImages));
       Object.entries(form).forEach(([key, value]) => formData.append(key, value));
       formData.append("goals", JSON.stringify(goals.filter(Boolean)));
       formData.append("locationHighlights", JSON.stringify(locationHighlights));
