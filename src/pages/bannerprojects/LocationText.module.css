@@ -1,0 +1,49 @@
+.section {
+  font-family: "Shurjo", "Siyam Rupali", "SolaimanLipi", sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+.section .narrative h2 {
+  color: #173e35;
+  font-size: clamp(27px, 2.5vw, 36px);
+  font-weight: 700;
+  line-height: 1.45;
+  letter-spacing: normal;
+  text-wrap: balance;
+}
+.section h4 {
+  color: #23483f;
+  font-size: 18px;
+  font-weight: 700;
+  line-height: 1.55;
+  text-wrap: pretty;
+}
+.section p {
+  color: #45564f;
+  font-size: 16px;
+  font-weight: 400;
+  line-height: 1.85;
+}
+.paragraphs {
+  display: grid;
+  gap: 16px;
+  padding: 0;
+  margin: 24px 0 0;
+}
+.section .paragraphs p {
+  margin: 0;
+  color: #3e5149;
+  font-size: clamp(18px, 1.35vw, 20px);
+  font-weight: 400;
+  line-height: 1.9;
+  letter-spacing: normal;
+  text-align: start;
+  word-break: normal;
+  overflow-wrap: break-word;
+  text-wrap: pretty;
+}
+@media (max-width: 639px) {
+  .paragraphs { margin-top: 20px; gap: 12px; }
+  .section .paragraphs p { font-size: 18px; line-height: 1.85; }
+  .section h4 { font-size: 17px; }
+}

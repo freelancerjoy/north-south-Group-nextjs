@@ -1,4 +1,6 @@
 import { useEffect, useState } from "react";
+import GalleryLightbox from "./GalleryLightbox";
+import locationTextStyles from "./LocationText.module.css";
 import AOS from "aos";
 import "aos/dist/aos.css";
 import { toast } from "react-toastify";
@@ -429,7 +431,7 @@ function ProjectShowcaseTemplate({
 }) {
   const [activeModal, setActiveModal] = useState(null);
   const [isBrochureModalOpen, setIsBrochureModalOpen] = useState(false);
-  const [activeGalleryImage, setActiveGalleryImage] = useState("");
+  const [activeGalleryIndex, setActiveGalleryIndex] = useState(0);
   const [plotTab, setPlotTab] = useState(
     config.plotTabs?.[0]?.key || "residential",
   );
@@ -469,6 +471,10 @@ function ProjectShowcaseTemplate({
 
   const heroSummary =
     buildSummary(overviewParagraphs) || cleanText(locationText);
+  const locationPoints = locationText
+    .split(/(?<=[।!?])\s*|(?<=\.)\s+|\r?\n+/u)
+    .map((point) => point.trim())
+    .filter(Boolean);
   const featureItems = buildFeatureItems(
     specificationsParagraphs,
     locationText,
@@ -560,8 +566,8 @@ function ProjectShowcaseTemplate({
     setIsBrochureModalOpen(true);
   };
 
-  const openGalleryPreview = (image) => {
-    setActiveGalleryImage(image);
+  const openGalleryPreview = (index) => {
+    setActiveGalleryIndex(index);
     setActiveModal("gallery");
   };
 
@@ -798,7 +804,7 @@ function ProjectShowcaseTemplate({
       <section
         id="preview-section-location"
         data-aos="fade-up"
-        className={`relative isolate overflow-hidden scroll-mt-6 transition-all duration-500 ${
+        className={`${config.locationTextLayout === "paragraphs" ? locationTextStyles.section : ""} relative isolate overflow-hidden scroll-mt-6 transition-all duration-500 ${
           activeSection === "location"
             ? "ring-4 ring-emerald-500/80 shadow-[0_0_50px_rgba(16,185,129,0.35)]"
             : ""
@@ -881,12 +887,7 @@ function ProjectShowcaseTemplate({
                   )}
 
                   {/* Top Floating Badge on Video */}
-                  <div className="pointer-events-none absolute top-3 left-3 z-10 flex items-center gap-2 rounded-full border border-white/30 bg-black/60 px-3 py-1 backdrop-blur-md text-white shadow-md">
-                    <span className="h-2 w-2 rounded-full bg-emerald-400 animate-pulse" />
-                    <span className="text-[10px] sm:text-[11px] font-bold uppercase tracking-wider">
-                      লোকেশন ভিডিও ট্যুর
-                    </span>
-                  </div>
+              
                 </div>
               </div>
             </div>
@@ -956,7 +957,7 @@ function ProjectShowcaseTemplate({
           </div>
 
           {/* Right Column: Strategic Location Narrative & Highlights */}
-          <div className="flex flex-col justify-center lg:pl-3">
+            <div className={`flex min-w-0 flex-col justify-center lg:pl-3 ${config.locationTextLayout === "paragraphs" ? locationTextStyles.narrative : "lg:-translate-y-10"}`}>
             <SectionEyebrow tone={eyebrowTone}>
               {config.locationEyebrow}
             </SectionEyebrow>
@@ -967,12 +968,18 @@ function ProjectShowcaseTemplate({
               {config.locationTitle}
             </h2>
 
-            <p
+            {config.locationTextLayout === "paragraphs" ? (
+              <div className={locationTextStyles.paragraphs}>
+                {locationPoints.map((point, index) => (
+                  <p key={`${index}-${point}`}>{point}</p>
+                ))}
+              </div>
+            ) : <p
               className={`mt-5 text-lg sm:text-xl lg:text-[21px] leading-relaxed sm:leading-9 text-slate-800 font-normal`}
               style={bodyFont}
             >
               {locationText}
-            </p>
+            </p>}
 
             {/* Strategic Advantage Highlight Badges */}
             <div className="mt-5 flex flex-wrap gap-2.5">
@@ -1506,7 +1513,7 @@ function ProjectShowcaseTemplate({
               <button
                 key={`${image}-${index}`}
                 type="button"
-                onClick={() => openGalleryPreview(image)}
+                onClick={() => openGalleryPreview(index)}
                 className={`group relative w-full aspect-[4/3] overflow-hidden rounded-2xl shadow-md transition-all duration-500 hover:-translate-y-1 hover:shadow-xl text-left ${
                   isLightPage
                     ? "ring-1 ring-black/5"
@@ -2056,7 +2063,15 @@ function ProjectShowcaseTemplate({
         brochureUrl={effectiveBrochurePdfHref}
       />
 
-      {activeModal && (
+      {activeModal === "gallery" && projectGalleryImages.length > 0 && (
+        <GalleryLightbox
+          images={projectGalleryImages}
+          initialIndex={activeGalleryIndex}
+          projectName={projectName}
+          onClose={() => setActiveModal(null)}
+        />
+      )}
+      {activeModal && activeModal !== "gallery" && (
         <div className="fixed inset-0 z-[100] flex items-center justify-center bg-black/80 p-4">
           <div className="relative max-h-[92vh] w-full max-w-5xl overflow-hidden rounded-[2rem] bg-[#0b0b0d] shadow-[0_40px_120px_-40px_rgba(0,0,0,0.95)]">
             <button
@@ -2090,12 +2105,6 @@ function ProjectShowcaseTemplate({
                   />
                 </div>
               )
-            ) : activeModal === "gallery" && activeGalleryImage ? (
-              <img
-                src={activeGalleryImage}
-                alt={`${projectName} gallery preview`}
-                className="max-h-[92vh] w-full object-contain"
-              />
             ) : (
               <img
                 src={planPreview}

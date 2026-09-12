@@ -68,6 +68,7 @@ export const sharedAmenities = [
 ];
 
 export const greenCityShowcaseConfig = {
+  locationTextLayout: "paragraphs",
   surfaceTone: "light",
   eyebrowTone: "green",
   plotCardVariant: "feature",
