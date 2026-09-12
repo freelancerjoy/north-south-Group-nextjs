@@ -61,14 +61,14 @@ const ViewGreenCity = () => {
     },
     {
       field: "greenCityVideo",
-      headerName: "Video Preview",
-      minWidth: 280,
+      headerName: "02. প্রজেক্ট পরিচিতি Video",
+      minWidth: 260,
       flex: 1,
       renderCell: (p) => {
         const ytEmbed = getYouTubeEmbedUrl(p.value);
         return (
-          <div className="flex w-full items-center gap-4">
-            <div className="flex h-16 w-28 flex-shrink-0 items-center justify-center overflow-hidden rounded-2xl border border-slate-200 bg-slate-100">
+          <div className="flex w-full items-center gap-3">
+            <div className="flex h-14 w-24 flex-shrink-0 items-center justify-center overflow-hidden rounded-xl border border-slate-200 bg-slate-100">
               {p.value ? (
                 ytEmbed ? (
                   <iframe
@@ -88,18 +88,78 @@ const ViewGreenCity = () => {
                 )
               ) : (
                 <div className="flex h-full w-full items-center justify-center bg-slate-100 text-slate-400">
-                  <MdVideocamOff size={24} />
+                  <MdVideocamOff size={20} />
                 </div>
               )}
             </div>
             <div className="min-w-0">
-              <p className="truncate text-sm font-bold text-slate-900 flex items-center gap-1.5">
-                {ytEmbed && <FaYoutube className="text-red-600 shrink-0" />}
-                Green City Hero Video
+              <div className="flex items-center gap-1.5">
+                <p className="truncate text-xs font-bold text-slate-900">Overview Video</p>
+                {ytEmbed && (
+                  <span className="inline-flex items-center gap-1 rounded bg-rose-100 px-1 py-0.5 text-[9px] font-bold text-rose-600">
+                    <FaYoutube size={10} /> YouTube
+                  </span>
+                )}
+              </div>
+              <p className="mt-0.5 truncate text-[11px] text-slate-500">
+                {p.value ? (ytEmbed ? "YouTube video linked" : "Cloudinary MP4 uploaded") : "No video uploaded yet"}
               </p>
-              <p className="mt-1 truncate text-xs text-slate-500">
-                {p.value ? (ytEmbed ? "YouTube video link linked" : "Cloudinary video file uploaded") : "No video uploaded yet"}
+              <p className="mt-0.5 text-[11px] font-semibold text-emerald-700">
+                {p.row.videoGalleryCount} gallery video{p.row.videoGalleryCount === 1 ? "" : "s"}
               </p>
+            </div>
+          </div>
+        );
+      },
+    },
+    {
+      field: "locationTourVideo",
+      headerName: "03. Location & Video Tour",
+      minWidth: 260,
+      flex: 1,
+      renderCell: (p) => {
+        const ytEmbed = getYouTubeEmbedUrl(p.value);
+        return (
+          <div className="flex w-full items-center gap-3">
+            <div className="flex h-14 w-24 flex-shrink-0 items-center justify-center overflow-hidden rounded-xl border border-slate-200 bg-slate-100">
+              {p.value ? (
+                ytEmbed ? (
+                  <iframe
+                    src={ytEmbed}
+                    title="Tour YouTube preview"
+                    className="h-full w-full pointer-events-none"
+                    frameBorder="0"
+                  />
+                ) : (
+                  <video
+                    src={p.value}
+                    className="h-full w-full object-cover"
+                    muted
+                    playsInline
+                    preload="metadata"
+                  />
+                )
+              ) : (
+                <div className="flex h-full w-full items-center justify-center bg-slate-100 text-slate-400">
+                  <MdVideocamOff size={20} />
+                </div>
+              )}
+            </div>
+            <div className="min-w-0">
+              <div className="flex items-center gap-1.5">
+                <p className="truncate text-xs font-bold text-slate-900">Tour Video</p>
+                {ytEmbed && (
+                  <span className="inline-flex items-center gap-1 rounded bg-rose-100 px-1 py-0.5 text-[9px] font-bold text-rose-600">
+                    <FaYoutube size={10} /> YouTube
+                  </span>
+                )}
+              </div>
+              <p className="mt-0.5 truncate text-[11px] text-slate-500">
+                {p.value ? (ytEmbed ? "YouTube tour active" : "MP4 tour saved") : "Default tour video"}
+              </p>
+              <span className="mt-0.5 inline-block text-[10px] font-semibold text-emerald-700 bg-emerald-50 px-1.5 py-0.5 rounded border border-emerald-200">
+                Section 03 Tour
+              </span>
             </div>
           </div>
         );
@@ -133,7 +193,11 @@ const ViewGreenCity = () => {
   ];
 
   const rows = Array.isArray(greenCity) ? greenCity.map((item, i) => ({
-    id: item._id, no: i + 1, greenCityVideo: item.greenCityVideo,
+    id: item._id,
+    no: i + 1,
+    greenCityVideo: item.greenCityVideo,
+    locationTourVideo: item.locationTourVideo,
+    videoGalleryCount: item.videoGallery?.length || 0,
   })) : [];
 
   return (

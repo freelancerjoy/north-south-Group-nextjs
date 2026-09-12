@@ -12,6 +12,7 @@ import greenCityImg6 from "../../assets/images/greenCityImg6.jpg";
 import { useSquareCityStore } from "../../store/squareCity/squareCityStore";
 import { API_BASE_URL } from "../../config/env";
 import ProjectShowcaseTemplate from "./ProjectShowcaseTemplate";
+import GreenCityVideoGallery from "./GreenCityVideoGallery";
 import {
   industrialCityIconRegistry,
   squareCityShowcaseConfig,
@@ -146,13 +147,24 @@ const SquareCity = () => {
       config={dynamicConfig}
       logoSrc={squareCityLogo}
       videoSrc={data?.squareCityVideo || ""}
-      locationVideoSrc={data?.squareCityVideo || "/videos/projectVideo.mp4"}
+      locationVideoSrc={data?.locationTourVideo || "/videos/projectVideo.mp4"}
       brochureImageSrc={data?.brochureImage?.url || squareCityBrochure}
       brochurePdfHref={brochurePdfHref}
       bookingPdfHref={bookingPdfHref}
       mapImageSrc={data?.mapImage?.url || squareCityMap}
       sectionImages={data?.sectionImages}
       galleryImages={galleryImages}
+      videoGallery={
+        <GreenCityVideoGallery
+          videos={data?.videoGallery}
+          projectLabel="স্কয়ার সিটি"
+          eyebrow="Square City Films"
+          title="ভিডিওতে দেখুন স্কয়ার সিটি"
+          intro="এক নজরে আমাদের প্রকল্প। পছন্দের ভিডিও বেছে নিন, আরও কাছ থেকে দেখুন স্কয়ার সিটি।"
+          sectionId="square-city-videos"
+          defaultVideosEnabled={true}
+        />
+      }
       overviewParagraphs={overviewParagraphs}
       specificationsParagraphs={specificationsParagraphs}
       plotIntroText={data?.plotIntroText || ""}

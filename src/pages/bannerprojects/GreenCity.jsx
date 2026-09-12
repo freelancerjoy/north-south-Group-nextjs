@@ -145,15 +145,15 @@ const GreenCity = () => {
       projectName="নর্থ সাউথ গ্রিন সিটি"
       config={dynamicConfig}
       logoSrc={greenCityLogo}
-      videoSrc="https://res.cloudinary.com/dhchj00vt/video/upload/v1777280352/squareCity/j1y6ogs76gifnyqn8l6a.mp4"
-      locationVideoSrc={data?.greenCityVideo || "/videos/projectVideo.mp4"}
+      videoSrc={data?.greenCityVideo || "https://res.cloudinary.com/dhchj00vt/video/upload/v1777280352/squareCity/j1y6ogs76gifnyqn8l6a.mp4"}
+      locationVideoSrc={data?.locationTourVideo || "/videos/projectVideo.mp4"}
       brochureImageSrc={data?.brochureImage?.url || greenCityBrochure}
       brochurePdfHref={brochurePdfHref}
       bookingPdfHref={bookingPdfHref}
       mapImageSrc={data?.mapImage?.url || greenCityMap}
       sectionImages={data?.sectionImages}
       galleryImages={galleryImages}
-      videoGallery={<GreenCityVideoGallery />}
+      videoGallery={<GreenCityVideoGallery videos={data?.videoGallery} />}
       overviewParagraphs={overviewParagraphs}
       specificationsParagraphs={specificationsParagraphs}
       plotIntroText={data?.plotIntroText || ""}

@@ -7,6 +7,8 @@ import { FaSpinner } from "react-icons/fa";
 import { ProjectSubmitOverlay } from "../projects/projectFormUi";
 import { appendOptimizedFile, appendOptimizedFiles } from "../../../utils/cloudinaryUpload";
 import { getYouTubeEmbedUrl } from "../../../components/VideoUtility";
+import VideoGalleryManager, { prepareVideoGalleryFormData } from "./VideoGalleryManager";
+import { defaultGreenCityVideos } from "../../bannerprojects/GreenCityVideoGallery";
 
 const inp = "w-full rounded-2xl border border-slate-200 bg-white px-4 py-3 text-sm text-slate-800 shadow-sm transition-all placeholder:text-slate-400 focus:border-emerald-400 focus:outline-none focus:ring-4 focus:ring-emerald-100";
 const lbl = "mb-2 block text-sm font-semibold text-slate-700";
@@ -21,6 +23,7 @@ const CreateGreenCity = () => {
   const [video, setVideo] = useState(null);
   const [videoUrl, setVideoUrl] = useState("");
   const [videoPreview, setVideoPreview] = useState(null);
+  const [videoGallery, setVideoGallery] = useState(defaultGreenCityVideos);
   const [brochureImage, setBrochureImage] = useState(null);
   const [brochurePreview, setBrochurePreview] = useState(null);
   const [galleryFiles, setGalleryFiles] = useState([]);
@@ -75,14 +78,6 @@ const CreateGreenCity = () => {
     []
   );
 
-  const handleVideoChange = (e) => {
-    const file = e.target.files?.[0];
-    if (!file) return;
-    safeRevoke(videoPreview);
-    setVideo(file);
-    setVideoPreview(URL.createObjectURL(file));
-  };
-
   const handleBrochureChange = (e) => {
     const file = e.target.files[0];
     if (!file) return;
@@ -119,6 +114,7 @@ const CreateGreenCity = () => {
     } else if (videoUrl) {
       formData.append("greenCityVideo", videoUrl.trim());
     }
+    prepareVideoGalleryFormData(formData, videoGallery);
     await appendOptimizedFile(formData, "brochureImage", brochureImage);
     await appendOptimizedFiles(formData, "galleryImages", galleryFiles);
     Object.entries(form).forEach(([k, v]) => formData.append(k, v));
@@ -220,9 +216,8 @@ const CreateGreenCity = () => {
                   onChange={(e) => {
                     const url = e.target.value;
                     setVideoUrl(url);
-                    if (!video) {
-                      setVideoPreview(url || null);
-                    }
+                    if (video) setVideo(null);
+                    setVideoPreview(url || null);
                   }}
                   className={inp}
                 />
@@ -293,6 +288,16 @@ const CreateGreenCity = () => {
               </div>
             </div>
           </div>
+        </div>
+
+        <div className={sectionCard}>
+          <VideoGalleryManager
+            items={videoGallery}
+            setItems={setVideoGallery}
+            title="Green City Films"
+            note="Add the videos shown in the public Green City Films section. YouTube link and uploaded video file both work."
+            accent="emerald"
+          />
         </div>
 
         <div className={sectionCard}>

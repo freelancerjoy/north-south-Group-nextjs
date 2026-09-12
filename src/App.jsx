@@ -253,10 +253,7 @@ function App({ scaling }) {
                 />
                 <Route path="createGreenCity" element={<CreateGreenCity />} />
                 <Route path="createSquareCity" element={<CreateSquareCity />} />
-                <Route
-                  path="updateIndustrialCity/:id"
-                  element={<UpdateIndustrialCity />}
-                />
+                <Route path="createIndustrialCity" element={<CreateIndustrialCity />} />
                 <Route
                   path="viewHomeSlider"
                   element={<ViewHomeSlider />}

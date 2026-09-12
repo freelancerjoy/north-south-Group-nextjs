@@ -12,6 +12,7 @@ import greenCityImg6 from "../../assets/images/greenCityImg6.jpg";
 import { useIndustrialCityStore } from "../../store/industrialCity/industrialCityStore";
 import { API_BASE_URL } from "../../config/env";
 import ProjectShowcaseTemplate from "./ProjectShowcaseTemplate";
+import GreenCityVideoGallery from "./GreenCityVideoGallery";
 import {
   industrialCityIconRegistry,
   industrialCityShowcaseConfig,
@@ -155,13 +156,24 @@ const IndustrialCity = () => {
       config={dynamicConfig}
       logoSrc={industrialCityLogo}
       videoSrc={data?.industrialCityVideo || ""}
-      locationVideoSrc={data?.industrialCityVideo || "/videos/projectVideo.mp4"}
+      locationVideoSrc={data?.locationTourVideo || "/videos/projectVideo.mp4"}
       brochureImageSrc={data?.brochureImage?.url || squareCityBrochure}
       brochurePdfHref={brochurePdfHref}
       bookingPdfHref={bookingPdfHref}
       mapImageSrc={data?.mapImage?.url || industrialCityMap}
       sectionImages={data?.sectionImages}
       galleryImages={galleryImages}
+      videoGallery={
+        <GreenCityVideoGallery
+          videos={data?.videoGallery}
+          projectLabel="ইন্ডাস্ট্রিয়াল সিটি"
+          eyebrow="Industrial City Films"
+          title="ভিডিওতে দেখুন ইন্ডাস্ট্রিয়াল সিটি"
+          intro="এক নজরে আমাদের প্রকল্প। পছন্দের ভিডিও বেছে নিন, আরও কাছ থেকে দেখুন ইন্ডাস্ট্রিয়াল সিটি।"
+          sectionId="industrial-city-videos"
+          defaultVideosEnabled={true}
+        />
+      }
       overviewParagraphs={overviewParagraphs}
       specificationsParagraphs={specificationsParagraphs}
       plotIntroText={data?.plotIntroText || ""}

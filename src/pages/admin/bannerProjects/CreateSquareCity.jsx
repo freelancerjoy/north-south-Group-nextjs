@@ -6,6 +6,9 @@ import { MdArrowBack, MdCloudUpload, MdDelete, MdOutlinePermMedia } from "react-
 import { FaSpinner } from "react-icons/fa";
 import { ProjectSubmitOverlay } from "../projects/projectFormUi";
 import { appendOptimizedFile, appendOptimizedFiles } from "../../../utils/cloudinaryUpload";
+import { getYouTubeEmbedUrl } from "../../../components/VideoUtility";
+import VideoGalleryManager, { prepareVideoGalleryFormData } from "./VideoGalleryManager";
+import { defaultGreenCityVideos } from "../../bannerprojects/GreenCityVideoGallery";
 
 const inp = "w-full rounded-2xl border border-slate-200 bg-white px-4 py-3 text-sm text-slate-800 shadow-sm transition-all placeholder:text-slate-400 focus:border-amber-400 focus:outline-none focus:ring-4 focus:ring-amber-100";
 const lbl = "mb-2 block text-sm font-semibold text-slate-700";
@@ -18,7 +21,9 @@ const CreateSquareCity = () => {
   const { addSquareCity, loadSquareCity, isLoading } = useSquareCityStore();
 
   const [video, setVideo] = useState(null);
+  const [videoUrl, setVideoUrl] = useState("");
   const [videoPreview, setVideoPreview] = useState(null);
+  const [videoGallery, setVideoGallery] = useState(defaultGreenCityVideos);
   const [brochureImage, setBrochureImage] = useState(null);
   const [brochurePreview, setBrochurePreview] = useState(null);
   const [galleryFiles, setGalleryFiles] = useState([]);
@@ -112,7 +117,12 @@ const CreateSquareCity = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     const formData = new FormData();
-    if (video) formData.append("squareCityVideo", video);
+    if (video) {
+      formData.append("squareCityVideo", video);
+    } else if (videoUrl) {
+      formData.append("squareCityVideo", videoUrl.trim());
+    }
+    prepareVideoGalleryFormData(formData, videoGallery);
     await appendOptimizedFile(formData, "brochureImage", brochureImage);
     await appendOptimizedFiles(formData, "galleryImages", galleryFiles);
     Object.entries(form).forEach(([k, v]) => formData.append(k, v));
@@ -201,17 +211,38 @@ const CreateSquareCity = () => {
             </p>
           </div>
 
+          <div className="space-y-4">
+            <input
+              type="text"
+              placeholder="Paste YouTube video link, or upload an MP4/WebM below"
+              value={videoUrl}
+              onChange={(e) => {
+                setVideoUrl(e.target.value);
+                if (video) setVideo(null);
+                setVideoPreview(e.target.value || null);
+              }}
+              className={inp}
+            />
+          </div>
+
           <div className="grid grid-cols-1 gap-5 lg:grid-cols-[1.1fr,0.9fr]">
             <label className="flex min-h-56 w-full cursor-pointer flex-col items-center justify-center rounded-[24px] border border-dashed border-amber-300 bg-[radial-gradient(circle_at_top,_rgba(245,158,11,0.15),transparent_55%),linear-gradient(135deg,#fffaf0_0%,#fff1dd_100%)] p-6 text-center transition-all hover:border-amber-500 hover:bg-white">
               <MdCloudUpload className="mb-3 text-slate-400" size={30} />
               <span className="text-base font-semibold text-slate-700">{video ? video.name : "Click to upload hero video"}</span>
               <span className="mt-1 text-xs text-slate-400">MP4, WebM accepted</span>
-              <input type="file" accept="video/*" className="hidden" onChange={handleVideoChange} />
+                <input type="file" accept="video/*" className="hidden" onChange={(e) => {
+                  setVideoUrl("");
+                  handleVideoChange(e);
+                }} />
             </label>
 
             <div className="overflow-hidden rounded-[24px] border border-slate-200 bg-slate-950 shadow-sm">
               {videoPreview ? (
-                <video src={videoPreview} controls className="h-full min-h-56 w-full object-cover" />
+                getYouTubeEmbedUrl(videoPreview) ? (
+                  <iframe src={getYouTubeEmbedUrl(videoPreview)} title="Square City video preview" className="h-full min-h-56 w-full" frameBorder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowFullScreen />
+                ) : (
+                  <video src={videoPreview} controls className="h-full min-h-56 w-full object-cover" />
+                )
               ) : (
                 <div className="flex min-h-56 flex-col items-center justify-center px-6 text-center">
                   <p className="text-sm font-semibold text-white">Video preview will appear here</p>
@@ -222,6 +253,16 @@ const CreateSquareCity = () => {
               )}
             </div>
           </div>
+        </div>
+
+        <div className={sectionCard}>
+          <VideoGalleryManager
+            items={videoGallery}
+            setItems={setVideoGallery}
+            title="Square City Films"
+            note="Add the videos shown in the public Square City Films section. YouTube link and uploaded video file both work."
+            accent="amber"
+          />
         </div>
 
         <div className={sectionCard}>

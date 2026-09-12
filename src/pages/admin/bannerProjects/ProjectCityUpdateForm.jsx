@@ -38,6 +38,8 @@ import { industrialCityIconRegistry } from "../../bannerprojects/projectShowcase
 import { appendOptimizedFile, appendOptimizedFiles, uploadSingleAsset } from "../../../utils/cloudinaryUpload";
 import { getYouTubeEmbedUrl } from "../../../components/VideoUtility";
 import ProjectShowcaseTemplate from "../../bannerprojects/ProjectShowcaseTemplate";
+import GreenCityVideoGallery, { defaultGreenCityVideos } from "../../bannerprojects/GreenCityVideoGallery";
+import VideoGalleryManager, { prepareVideoGalleryFormData } from "./VideoGalleryManager";
 
 import greenCityLogo from "../../../assets/images/greenCity.png";
 import squareCityLogo from "../../../assets/images/squareCityLogo.png";
@@ -129,15 +131,16 @@ const sectionImageFields = [
 ];
 
 const accordionSections = [
-  { id: "hero", label: "Hero Top Banner", desc: "Headings & Hero Background", icon: MdLayers, step: "01" },
-  { id: "overview", label: "Project Overview", desc: "Introduction Copy & Brochure", icon: MdDescription, step: "02" },
+  { id: "hero", label: "হিরো টপ ব্যানার", desc: "শিরোনাম, বিবরণ ও ব্যাকগ্রাউন্ড", icon: MdLayers, step: "01" },
+  { id: "overview", label: "প্রজেক্ট পরিচিতি", desc: "বিস্তারিত লেখা ও ব্রোশিওর", icon: MdDescription, step: "02" },
   { id: "location", label: "Location & Video Tour", desc: "Video Player, Route Narrative & Benefits", icon: MdPlayCircleFilled, step: "03" },
   { id: "features", label: "Features & Rules", desc: "Key Selling Points & RAJUK Compliance", icon: MdListAlt, step: "04" },
   { id: "plots", label: "Available Plots", desc: "Category Tabs & Plot Cards", icon: MdGridView, step: "05" },
   { id: "goals", label: "Vision & Goals", desc: "Strategic Points & Objectives", icon: MdCheck, step: "06" },
   { id: "map", label: "Master Plan & Map", desc: "Map Graphic & Highlight Cards", icon: MdMap, step: "07" },
   { id: "gallery", label: "Project Gallery", desc: "Photo Showcase & Sliders", icon: MdImage, step: "08" },
-  { id: "booking", label: "Booking & Downloads", desc: "Bottom CTA & Booking PDF", icon: MdBookOnline, step: "09" },
+  { id: "media", label: "Video Gallery", desc: "Films & YouTube Links", icon: MdPlayCircleFilled, step: "09" },
+  { id: "booking", label: "Booking & Downloads", desc: "Bottom CTA & Booking PDF", icon: MdBookOnline, step: "10" },
 ];
 
 const textKeys = [
@@ -168,7 +171,7 @@ const buildInitialForm = (config) => ({
   featuresTitle: config.featuresTitle || "",
   plotsEyebrow: config.plotsEyebrow || "",
   plotsTitle: config.plotsTitle || "",
-  plotIntroText: "The master plan keeps residential, commercial, and support zones in balance so the project can grow in a more organized way.",
+  plotIntroText: "আমাদের মাস্টার প্ল্যান অনুযায়ী আবাসিক, বাণিজ্যিক এবং সাপোর্ট জোনগুলো এমনভাবে সাজানো হয়েছে, যাতে প্রকল্পটি পরিকল্পিতভাবে এগিয়ে যেতে পারে।",
   goalsEyebrow: config.goalsEyebrow || "",
   goalsTitle: config.goalsTitle || "",
   mapEyebrow: config.mapEyebrow || "",
@@ -235,6 +238,7 @@ const ProjectCityUpdateForm = ({
     goals: false,
     map: false,
     gallery: false,
+    media: false,
     booking: false,
   });
 
@@ -275,6 +279,7 @@ const ProjectCityUpdateForm = ({
       goals: true,
       map: true,
       gallery: true,
+      media: true,
       booking: true,
     });
   };
@@ -289,6 +294,7 @@ const ProjectCityUpdateForm = ({
       goals: false,
       map: false,
       gallery: false,
+      media: false,
       booking: false,
     });
   };
@@ -299,6 +305,10 @@ const ProjectCityUpdateForm = ({
   const [video, setVideo] = useState(null);
   const [videoUrl, setVideoUrl] = useState("");
   const [videoPreview, setVideoPreview] = useState(null);
+  const [locationVideo, setLocationVideo] = useState(null);
+  const [locationVideoUrl, setLocationVideoUrl] = useState("");
+  const [locationVideoPreview, setLocationVideoPreview] = useState(null);
+  const [videoGallery, setVideoGallery] = useState(defaultGreenCityVideos);
   const [brochureImage, setBrochureImage] = useState(null);
   const [brochurePreview, setBrochurePreview] = useState(null);
   const [brochurePdf, setBrochurePdf] = useState(null);
@@ -309,10 +319,11 @@ const ProjectCityUpdateForm = ({
   const [mapPreview, setMapPreview] = useState(null);
   const [sectionImageFiles, setSectionImageFiles] = useState({});
   const [sectionImagePreviews, setSectionImagePreviews] = useState({});
+  const [existingGalleryImages, setExistingGalleryImages] = useState([]);
   const [galleryFiles, setGalleryFiles] = useState([]);
   const [galleryPreviews, setGalleryPreviews] = useState([]);
   const galleryRef = useRef(null);
-  const previewRefs = useRef({ video: null, brochure: null, map: null, gallery: [], sectionImages: {} });
+  const previewRefs = useRef({ video: null, locationVideo: null, brochure: null, map: null, gallery: [], sectionImages: {} });
   const [submitState, setSubmitState] = useState({ active: false, title: "", detail: "", step: 0 });
   const [form, setForm] = useState(buildInitialForm(config));
   const [goals, setGoals] = useState(defaultGoals);
@@ -333,16 +344,17 @@ const ProjectCityUpdateForm = ({
   useEffect(() => {
     previewRefs.current = {
       video: videoPreview,
+      locationVideo: locationVideoPreview,
       brochure: brochurePreview,
       map: mapPreview,
       gallery: galleryPreviews,
       sectionImages: sectionImagePreviews,
     };
-  }, [videoPreview, brochurePreview, mapPreview, galleryPreviews, sectionImagePreviews]);
+  }, [videoPreview, locationVideoPreview, brochurePreview, mapPreview, galleryPreviews, sectionImagePreviews]);
 
   useEffect(
     () => () => {
-      revokeUrls([previewRefs.current.video, previewRefs.current.brochure, previewRefs.current.map]);
+      revokeUrls([previewRefs.current.video, previewRefs.current.locationVideo, previewRefs.current.brochure, previewRefs.current.map]);
       revokeUrls(previewRefs.current.gallery);
       revokeUrls(Object.values(previewRefs.current.sectionImages || {}));
     },
@@ -374,6 +386,24 @@ const ProjectCityUpdateForm = ({
 
     setVideoPreview(item[videoField] || null);
     setVideoUrl(item[videoField] || "");
+    setLocationVideoPreview(item.locationTourVideo || null);
+    setLocationVideoUrl(item.locationTourVideo || "");
+    const hasExistingVideos =
+      Array.isArray(item.videoGallery) &&
+      item.videoGallery.length > 0 &&
+      item.videoGallery.some((v) => v?.url || v?.preview || v?.public_id);
+
+    setVideoGallery(
+      hasExistingVideos
+        ? item.videoGallery.map((videoItem, index) => ({
+            label: videoItem.label || `ভিডিও ${String(index + 1).padStart(2, "0")}`,
+            url: videoItem.url || "",
+            preview: videoItem.url || "",
+            public_id: videoItem.public_id || "",
+            file: null,
+          }))
+        : defaultGreenCityVideos
+    );
     setBrochurePreview(item.brochureImage?.url || null);
     setBrochurePdfLabel(item.brochurePdf?.url ? "Current brochure PDF is saved" : "");
     setBookingPdfLabel(item.bookingPdf?.url ? "Current booking PDF is saved" : "");
@@ -387,8 +417,17 @@ const ProjectCityUpdateForm = ({
       setSectionImagePreviews(existing);
     }
     if (Array.isArray(item.galleryImages) && item.galleryImages.length) {
-      setGalleryPreviews(item.galleryImages.map((img) => img.url).filter(Boolean));
+      setExistingGalleryImages(
+        item.galleryImages
+          .map((img) => ({ public_id: img.public_id || "", url: img.url || "" }))
+          .filter((img) => img.url)
+      );
+    } else {
+      setExistingGalleryImages([]);
     }
+    revokeUrls(galleryPreviews);
+    setGalleryFiles([]);
+    setGalleryPreviews([]);
     if (Array.isArray(item.goals) && item.goals.length) setGoals(item.goals);
     if (Array.isArray(item.locationHighlights) && item.locationHighlights.length)
       setLocationHighlights(item.locationHighlights);
@@ -440,8 +479,9 @@ const ProjectCityUpdateForm = ({
 
   const handleGalleryChange = (e) => {
     const files = Array.from(e.target.files);
-    const combined = [...galleryFiles, ...files].slice(0, maxGalleryImages);
-    if (galleryFiles.length + files.length > maxGalleryImages) {
+    const remainingSlots = Math.max(maxGalleryImages - existingGalleryImages.length, 0);
+    const combined = [...galleryFiles, ...files].slice(0, remainingSlots);
+    if (galleryFiles.length + files.length > remainingSlots) {
       toast.info(`Maximum ${maxGalleryImages} gallery images can be uploaded at once.`);
     }
     revokeUrls(galleryPreviews);
@@ -454,6 +494,10 @@ const ProjectCityUpdateForm = ({
     safeRevoke(galleryPreviews[idx]);
     setGalleryFiles((files) => files.filter((_, i) => i !== idx));
     setGalleryPreviews((previews) => previews.filter((_, i) => i !== idx));
+  };
+
+  const removeExistingGalleryImage = (idx) => {
+    setExistingGalleryImages((images) => images.filter((_, i) => i !== idx));
   };
 
   const setSubmissionStage = (title, detail, step) => setSubmitState({ active: true, title, detail, step });
@@ -478,6 +522,12 @@ const ProjectCityUpdateForm = ({
       } else if (videoUrl !== undefined) {
         formData.append(videoField, videoUrl.trim());
       }
+      if (locationVideo) {
+        formData.append("locationTourVideo", locationVideo);
+      } else if (locationVideoUrl !== undefined) {
+        formData.append("locationTourVideo", locationVideoUrl.trim());
+      }
+      prepareVideoGalleryFormData(formData, videoGallery);
       await appendOptimizedFile(formData, "brochureImage", brochureImage);
       const pdfFolder = pdfFolderByVideoField[videoField] || "city/pdfs";
       if (brochurePdf) {
@@ -498,6 +548,7 @@ const ProjectCityUpdateForm = ({
       for (const [field, file] of Object.entries(sectionImageFiles)) {
         await appendOptimizedFile(formData, field, file);
       }
+      formData.append("existingGalleryImages", JSON.stringify(existingGalleryImages));
       await appendOptimizedFiles(formData, "galleryImages", galleryFiles);
       Object.entries(form).forEach(([key, value]) => formData.append(key, value));
       formData.append("goals", JSON.stringify(goals.filter(Boolean)));
@@ -554,6 +605,7 @@ const ProjectCityUpdateForm = ({
   }, [sectionImagePreviews]);
 
   const effectiveVideo = videoPreview || videoUrl || "";
+  const effectiveLocationVideo = locationVideoPreview || locationVideoUrl || "";
 
   const defaultOverview = [
     "নর্থ সাউথ গ্রুপ রিয়েল এস্টেট খাতের একটি শীর্ষস্থানীয় প্রতিষ্ঠান, যা ক্রেতাদের চাহিদা এবং দীর্ঘমেয়াদী মূল্যায়নের ভিত্তিতে আধুনিক আবাসিক প্রকল্প উপহার দিয়ে আসছে।",
@@ -580,7 +632,10 @@ const ProjectCityUpdateForm = ({
     greenCityLogo,
     squareCityLogo,
   ];
-  const effectiveGallery = galleryPreviews.length ? galleryPreviews : defaultGallery;
+  const effectiveGallery = [
+    ...existingGalleryImages.map((image) => image.url),
+    ...galleryPreviews,
+  ].filter(Boolean);
 
   // Helper UI Sub-Components
   const TextField = ({ label, note, ...props }) => (
@@ -660,8 +715,10 @@ const ProjectCityUpdateForm = ({
   const renderHeroFields = () => (
     <div className="space-y-4">
       {renderSectionImageUpload(imgField("heroImage"))}
-      <TextField label="Small Eyebrow Line" note="Shown above the main headline." name="heroEyebrow" value={form.heroEyebrow} onChange={handleFormChange} />
-      <TextField label="Main Headline Title" note="Large prominent page title." name="heroTitle" value={form.heroTitle} onChange={handleFormChange} />
+      <TextField label="ছোট শিরোনাম" note="মূল শিরোনামের উপরে দেখাবে।" name="heroEyebrow" value={form.heroEyebrow} onChange={handleFormChange} />
+      <TextField label="মূল শিরোনাম" note="ব্যানারের বড় টাইটেল।" name="heroTitle" value={form.heroTitle} onChange={handleFormChange} />
+      <TextAreaField label="বিবরণ ১" note="ব্যানারের নিচের প্রথম লেখা।" name="overviewParagraph1" rows={3} value={form.overviewParagraph1} onChange={handleFormChange} />
+      <TextAreaField label="বিবরণ ২" note="ব্যানারের নিচের দ্বিতীয় লেখা।" name="overviewParagraph2" rows={3} value={form.overviewParagraph2} onChange={handleFormChange} />
     </div>
   );
 
@@ -697,28 +754,8 @@ const ProjectCityUpdateForm = ({
           <input type="file" accept="application/pdf,.pdf" className="hidden" onChange={handlePdfChange(setBrochurePdf, setBrochurePdfLabel)} />
         </label>
       </div>
-    </div>
-  );
 
-  const renderLocationFields = () => (
-    <div className="space-y-4">
-      {renderSectionImageUpload(imgField("locationImage"))}
-
-      <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-        <TextField label="Location Small Line" name="locationEyebrow" value={form.locationEyebrow} onChange={handleFormChange} />
-        <TextField label="Location Heading" name="locationTitle" value={form.locationTitle} onChange={handleFormChange} />
-      </div>
-
-      <TextAreaField
-        label="Location Advantages / Route Story"
-        note="Appears beside the location tour video player on the frontend."
-        name="locationBenefitsText"
-        rows={5}
-        value={form.locationBenefitsText}
-        onChange={handleFormChange}
-      />
-
-      {/* Location Video Controls */}
+      {/* Overview Video Controls (Section 02) */}
       <div className="rounded-2xl border-2 border-emerald-200 bg-white p-4 shadow-sm space-y-3">
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-2">
@@ -727,9 +764,9 @@ const ProjectCityUpdateForm = ({
             </div>
             <div>
               <p className="text-xs font-bold text-slate-900 uppercase tracking-wider">
-                Location Tour Video
+                Project Overview Video (প্রকল্প পরিচিতি ভিডিও)
               </p>
-              <p className="text-[10px] text-slate-400">YouTube link or local MP4 video file</p>
+              <p className="text-[10px] text-slate-400">এই ভিডিওটি ফ্রন্টএন্ডে সেকশন ০২ (প্রকল্প পরিচিতি)-তে প্রদর্শিত হবে।</p>
             </div>
           </div>
 
@@ -759,7 +796,8 @@ const ProjectCityUpdateForm = ({
             onChange={(e) => {
               const val = e.target.value;
               setVideoUrl(val);
-              if (!video) setVideoPreview(val || null);
+              if (video) setVideo(null);
+              setVideoPreview(val || null);
             }}
             className={inp}
           />
@@ -796,7 +834,7 @@ const ProjectCityUpdateForm = ({
             {getYouTubeEmbedUrl(effectiveVideo) ? (
               <iframe
                 src={getYouTubeEmbedUrl(effectiveVideo)}
-                title="Location Tour Preview"
+                title="Overview Video Preview"
                 className="h-full w-full"
                 frameBorder="0"
                 allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
@@ -804,6 +842,118 @@ const ProjectCityUpdateForm = ({
               />
             ) : (
               <video src={effectiveVideo} controls className="h-full w-full object-cover" />
+            )}
+          </div>
+        )}
+      </div>
+    </div>
+  );
+
+  const renderLocationFields = () => (
+    <div className="space-y-4">
+      {renderSectionImageUpload(imgField("locationImage"))}
+
+      <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+        <TextField label="Location Small Line" name="locationEyebrow" value={form.locationEyebrow} onChange={handleFormChange} />
+        <TextField label="Location Heading" name="locationTitle" value={form.locationTitle} onChange={handleFormChange} />
+      </div>
+
+      <TextAreaField
+        label="Location Advantages / Route Story"
+        note="Appears beside the location tour video player on the frontend."
+        name="locationBenefitsText"
+        rows={5}
+        value={form.locationBenefitsText}
+        onChange={handleFormChange}
+      />
+
+      {/* Location Video Controls (Section 03) */}
+      <div className="rounded-2xl border-2 border-emerald-200 bg-white p-4 shadow-sm space-y-3">
+        <div className="flex items-center justify-between">
+          <div className="flex items-center gap-2">
+            <div className="flex h-7 w-7 items-center justify-center rounded-lg bg-rose-100 text-rose-600">
+              <FaYoutube size={16} />
+            </div>
+            <div>
+              <p className="text-xs font-bold text-slate-900 uppercase tracking-wider">
+                Location Tour Video (লোকেশন ট্যুর ভিডিও)
+              </p>
+              <p className="text-[10px] text-slate-400">এই ভিডিওটি ফ্রন্টএন্ডে সেকশন ০৩ (Location & Connectivity)-তে প্রদর্শিত হবে।</p>
+            </div>
+          </div>
+
+          {effectiveLocationVideo && (
+            <button
+              type="button"
+              onClick={() => {
+                setLocationVideo(null);
+                setLocationVideoUrl("");
+                safeRevoke(locationVideoPreview);
+                setLocationVideoPreview(null);
+              }}
+              className="inline-flex items-center gap-1 rounded-lg border border-rose-200 bg-rose-50 px-2 py-1 text-[11px] font-bold text-rose-600 hover:bg-rose-100"
+            >
+              <MdDelete size={14} />
+              Remove Video
+            </button>
+          )}
+        </div>
+
+        <div>
+          <label className={lbl}>Paste YouTube Video Link</label>
+          <input
+            type="text"
+            placeholder="e.g. https://www.youtube.com/watch?v=... or youtu.be/..."
+            value={locationVideoUrl}
+            onChange={(e) => {
+              const val = e.target.value;
+              setLocationVideoUrl(val);
+              if (locationVideo) setLocationVideo(null);
+              setLocationVideoPreview(val || null);
+            }}
+            className={inp}
+          />
+        </div>
+
+        <label className="flex cursor-pointer items-center justify-between gap-3 rounded-xl border border-dashed border-slate-300 bg-slate-50/50 p-3 hover:bg-white hover:border-emerald-400 transition">
+          <div className="flex items-center gap-2.5">
+            <MdCloudUpload className="text-slate-400" size={20} />
+            <div>
+              <p className="text-xs font-semibold text-slate-700">
+                {locationVideo ? locationVideo.name : "Or upload local video file"}
+              </p>
+              <p className="text-[10px] text-slate-400">MP4, WebM (Uploaded to Cloudinary)</p>
+            </div>
+          </div>
+          <span className="text-[11px] font-bold text-emerald-600">Browse</span>
+          <input
+            type="file"
+            accept="video/*"
+            className="hidden"
+            onChange={(e) => {
+              const file = e.target.files?.[0];
+              if (!file) return;
+              safeRevoke(locationVideoPreview);
+              setLocationVideo(file);
+              setLocationVideoUrl("");
+              setLocationVideoPreview(URL.createObjectURL(file));
+            }}
+          />
+        </label>
+
+        {effectiveLocationVideo && (
+          <div className="overflow-hidden rounded-xl border border-slate-800 bg-black aspect-video shadow-sm flex items-center justify-center">
+            {getYouTubeEmbedUrl(effectiveLocationVideo) ? (
+              <iframe
+                src={getYouTubeEmbedUrl(effectiveLocationVideo)}
+                title="Location Tour Preview"
+                className="h-full w-full"
+                frameBorder="0"
+                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                allowFullScreen
+              />
+            ) : (
+              <video src={effectiveLocationVideo} controls className="h-full w-full object-cover" />
             )}
           </div>
         )}
@@ -937,28 +1087,39 @@ const ProjectCityUpdateForm = ({
   const renderGalleryFields = () => (
     <div className="space-y-4">
       <div className="rounded-xl border border-slate-200 bg-slate-50 p-3 text-xs text-slate-600">
-        {galleryFiles.length > 0
-          ? `${galleryFiles.length} new images selected. Saving will replace current gallery.`
-          : `${galleryPreviews.length} images saved. Add more below.`}
+        {`${existingGalleryImages.length} saved images kept. ${galleryFiles.length} new images selected. Saving will keep previous images unless you remove them here.`}
       </div>
 
       <div className="grid grid-cols-3 sm:grid-cols-4 gap-2">
+        {existingGalleryImages.map((image, i) => (
+          <div key={`${image.public_id || image.url}-${i}`} className="relative group aspect-square rounded-xl overflow-hidden border border-slate-200 bg-slate-100">
+            <img src={image.url} alt="" className="w-full h-full object-cover" />
+            <button
+              type="button"
+              onClick={() => removeExistingGalleryImage(i)}
+              className="absolute top-1.5 right-1.5 flex h-6 w-6 items-center justify-center rounded-full bg-slate-900/80 text-white hover:bg-rose-600"
+              title="Remove saved image"
+            >
+              <MdDelete size={13} />
+            </button>
+          </div>
+        ))}
+
         {galleryPreviews.map((src, i) => (
-          <div key={i} className="relative group aspect-square rounded-xl overflow-hidden border border-slate-200 bg-slate-100">
+          <div key={`${src}-${i}`} className="relative group aspect-square rounded-xl overflow-hidden border border-emerald-200 bg-slate-100">
             <img src={src} alt="" className="w-full h-full object-cover" />
-            {galleryFiles.length > 0 && (
               <button
                 type="button"
                 onClick={() => removeGalleryImage(i)}
                 className="absolute top-1.5 right-1.5 flex h-6 w-6 items-center justify-center rounded-full bg-slate-900/80 text-white hover:bg-rose-600"
+                title="Remove new image"
               >
                 <MdDelete size={13} />
               </button>
-            )}
           </div>
         ))}
 
-        {galleryFiles.length < maxGalleryImages && (
+        {existingGalleryImages.length + galleryFiles.length < maxGalleryImages && (
           <label className="aspect-square rounded-xl border-2 border-dashed border-slate-300 flex flex-col items-center justify-center cursor-pointer hover:border-emerald-400 transition bg-slate-50/60">
             <MdCloudUpload className="text-slate-400" size={20} />
             <span className="text-[10px] text-slate-500 font-semibold mt-1">Add Image</span>
@@ -966,6 +1127,18 @@ const ProjectCityUpdateForm = ({
           </label>
         )}
       </div>
+    </div>
+  );
+
+  const renderMediaFields = () => (
+    <div className="space-y-4">
+      <VideoGalleryManager
+        items={videoGallery}
+        setItems={setVideoGallery}
+        title={`${projectName} Films`}
+        note="Controls the video gallery section shown on the frontend. Paste YouTube links or upload video files."
+        accent={theme}
+      />
     </div>
   );
 
@@ -1001,6 +1174,7 @@ const ProjectCityUpdateForm = ({
     goals: renderGoalsFields,
     map: renderMapFields,
     gallery: renderGalleryFields,
+    media: renderMediaFields,
     booking: renderBookingFields,
   };
 
@@ -1282,9 +1456,14 @@ const ProjectCityUpdateForm = ({
                           </div>
 
                           <div className="flex items-center gap-2 shrink-0">
-                            {sec.id === "location" && effectiveVideo && (
+                            {sec.id === "overview" && effectiveVideo && (
                               <span className="hidden sm:inline-flex items-center gap-1 rounded-md bg-rose-100 px-2 py-0.5 text-[10px] font-bold text-rose-700">
-                                <FaYoutube size={11} /> Video
+                                <FaYoutube size={11} /> Overview Video
+                              </span>
+                            )}
+                            {sec.id === "location" && effectiveLocationVideo && (
+                              <span className="hidden sm:inline-flex items-center gap-1 rounded-md bg-rose-100 px-2 py-0.5 text-[10px] font-bold text-rose-700">
+                                <FaYoutube size={11} /> Tour Video
                               </span>
                             )}
                             <div className="flex h-8 w-8 items-center justify-center rounded-full bg-slate-50 text-slate-400 group-hover:bg-emerald-600 group-hover:text-white transition">
@@ -1418,9 +1597,14 @@ const ProjectCityUpdateForm = ({
                           </div>
                         </div>
                         <div className="flex items-center gap-2">
-                          {sec.id === "location" && effectiveVideo && (
+                          {sec.id === "overview" && effectiveVideo && (
                             <span className="hidden sm:inline-flex items-center gap-1 rounded-md bg-rose-100 px-2 py-0.5 text-[10px] font-bold text-rose-700">
-                              <FaYoutube size={11} /> Video
+                              <FaYoutube size={11} /> Overview Video
+                            </span>
+                          )}
+                          {sec.id === "location" && effectiveLocationVideo && (
+                            <span className="hidden sm:inline-flex items-center gap-1 rounded-md bg-rose-100 px-2 py-0.5 text-[10px] font-bold text-rose-700">
+                              <FaYoutube size={11} /> Tour Video
                             </span>
                           )}
                           {isOpen ? <MdExpandLess size={20} className="text-slate-600" /> : <MdExpandMore size={20} className="text-slate-400" />}
@@ -1513,13 +1697,28 @@ const ProjectCityUpdateForm = ({
                     config={liveConfig}
                     logoSrc={defaultLogo}
                     videoSrc={effectiveVideo}
-                    locationVideoSrc={effectiveVideo}
+                    locationVideoSrc={effectiveLocationVideo}
                     brochureImageSrc={brochurePreview || defaultBrochure}
                     brochurePdfHref={brochurePdfLabel ? "#" : ""}
                     bookingPdfHref={bookingPdfLabel ? "#" : ""}
                     mapImageSrc={mapPreview || defaultMap}
                     sectionImages={liveSectionImages}
                     galleryImages={effectiveGallery}
+                    videoGallery={
+                      <GreenCityVideoGallery
+                        videos={
+                          videoGallery?.length
+                            ? videoGallery
+                            : defaultGreenCityVideos
+                        }
+                        projectLabel={projectName}
+                        eyebrow={`${projectName} Films`}
+                        title={`ভিডিওতে দেখুন ${projectName}`}
+                        intro="এক নজরে আমাদের প্রকল্প। পছন্দের ভিডিও বেছে নিন, আরও কাছ থেকে দেখুন।"
+                        sectionId="project-videos"
+                        defaultVideosEnabled={true}
+                      />
+                    }
                     overviewParagraphs={effectiveOverview}
                     specificationsParagraphs={effectiveSpecs}
                     locationText={form.locationBenefitsText || ""}

@@ -461,8 +461,9 @@ function ProjectShowcaseTemplate({
     }
   }, [loadPartners, isLivePreview]);
 
+  const galleryImagePool = galleryImages.filter(Boolean);
   const imagePool = [
-    ...galleryImages.filter(Boolean),
+    ...galleryImagePool,
     brochureImageSrc,
     modalPreviewSrc,
     mapImageSrc,
@@ -533,9 +534,7 @@ function ProjectShowcaseTemplate({
     ...galleryImages.slice(0, 4),
     locationVisual,
   ].filter(Boolean);
-  const projectGalleryImages = galleryImages.length
-    ? galleryImages
-    : imagePool.slice(0, 8);
+  const projectGalleryImages = galleryImagePool;
   const formIdPrefix = projectName.toLowerCase().replace(/\s+/g, "-");
   const isLightPage = config.surfaceTone === "light";
   const eyebrowTone = config.eyebrowTone || "gold";
@@ -804,7 +803,7 @@ function ProjectShowcaseTemplate({
       <section
         id="preview-section-location"
         data-aos="fade-up"
-        className={`${config.locationTextLayout === "paragraphs" ? locationTextStyles.section : ""} relative isolate overflow-hidden scroll-mt-6 transition-all duration-500 ${
+        className={`${config.locationTextLayout === "paragraphs" ? locationTextStyles.section : ""} relative isolate scroll-mt-6 transition-all duration-500 ${
           activeSection === "location"
             ? "ring-4 ring-emerald-500/80 shadow-[0_0_50px_rgba(16,185,129,0.35)]"
             : ""
@@ -814,22 +813,24 @@ function ProjectShowcaseTemplate({
             : "bg-[#0b0b0c]"
         }`}
       >
-        {!isLightPage && (
-          <>
-            <img
-              src={locationVisual}
-              alt={`${projectName} location`}
-              className="absolute inset-0 h-full w-full object-cover"
-            />
-            <div className="absolute inset-0 bg-[linear-gradient(90deg,rgba(9,13,8,0.85)_0%,rgba(9,13,8,0.72)_35%,rgba(9,13,8,0.76)_100%)]" />
-            <div className="absolute inset-0 bg-[radial-gradient(circle_at_top_left,_rgba(243,177,40,0.14),transparent_20%)]" />
-          </>
-        )}
-        {isLightPage && (
-          <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(ellipse_80%_60%_at_50%_0%,rgba(15,119,113,0.08),transparent)]" />
-        )}
+        <div className="absolute inset-0 overflow-hidden pointer-events-none -z-10">
+          {!isLightPage && (
+            <>
+              <img
+                src={locationVisual}
+                alt={`${projectName} location`}
+                className="absolute inset-0 h-full w-full object-cover"
+              />
+              <div className="absolute inset-0 bg-[linear-gradient(90deg,rgba(9,13,8,0.85)_0%,rgba(9,13,8,0.72)_35%,rgba(9,13,8,0.76)_100%)]" />
+              <div className="absolute inset-0 bg-[radial-gradient(circle_at_top_left,_rgba(243,177,40,0.14),transparent_20%)]" />
+            </>
+          )}
+          {isLightPage && (
+            <div className="absolute inset-0 bg-[radial-gradient(ellipse_80%_60%_at_50%_0%,rgba(15,119,113,0.08),transparent)]" />
+          )}
+        </div>
 
-        <div className="relative mx-auto grid max-w-7xl gap-10 lg:gap-14 px-4 py-20 sm:px-6 md:grid-cols-[1.1fr_1fr] md:items-center lg:px-8">
+        <div className="relative mx-auto grid max-w-7xl gap-10 lg:gap-14 px-4 py-20 sm:px-6 md:grid-cols-[1.1fr_1fr] items-start lg:items-start lg:px-8">
           {/* Left Column: Location Video Player on Top + 4 Connectivity Cards Underneath */}
           <div className="flex flex-col gap-3.5">
             {/* Location Video Player Frame */}
@@ -957,7 +958,7 @@ function ProjectShowcaseTemplate({
           </div>
 
           {/* Right Column: Strategic Location Narrative & Highlights */}
-            <div className={`flex min-w-0 flex-col justify-center lg:pl-3 ${config.locationTextLayout === "paragraphs" ? locationTextStyles.narrative : "lg:-translate-y-10"}`}>
+          <div className={`flex min-w-0 flex-col lg:sticky lg:top-32 lg:self-start lg:pb-12 lg:pl-3 ${config.locationTextLayout === "paragraphs" ? locationTextStyles.narrative : ""}`}>
             <SectionEyebrow tone={eyebrowTone}>
               {config.locationEyebrow}
             </SectionEyebrow>
@@ -1550,7 +1551,18 @@ function ProjectShowcaseTemplate({
         </div>
       </section>
 
-      {videoGallery}
+      {videoGallery && (
+        <div
+          id="preview-section-media"
+          className={`scroll-mt-6 transition-all duration-500 ${
+            activeSection === "media"
+              ? "ring-4 ring-emerald-500/80 shadow-[0_0_50px_rgba(16,185,129,0.35)]"
+              : ""
+          }`}
+        >
+          {videoGallery}
+        </div>
+      )}
 
       <section
         id="preview-section-map"

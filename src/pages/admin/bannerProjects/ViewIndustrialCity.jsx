@@ -9,8 +9,9 @@ import {
   MdDelete,
   MdVideocamOff,
 } from "react-icons/md";
-import { FaIndustry } from "react-icons/fa";
+import { FaIndustry, FaYoutube } from "react-icons/fa";
 import { AdminCollectionPage, getAdminGridStyles } from "../adminUi";
+import { getYouTubeEmbedUrl } from "../../../components/VideoUtility";
 
 const mediaGridStyles = {
   ...getAdminGridStyles(),
@@ -60,34 +61,87 @@ const ViewIndustrialCity = () => {
     },
     {
       field: "industrialCityVideo",
-      headerName: "Video Preview",
-      minWidth: 280,
+      headerName: "02. প্রজেক্ট পরিচিতি Video",
+      minWidth: 260,
       flex: 1,
-      renderCell: (p) => (
-        <div className="flex w-full items-center gap-4">
-          <div className="flex h-16 w-28 flex-shrink-0 items-center justify-center overflow-hidden rounded-2xl border border-slate-200 bg-slate-100">
-            {p.value ? (
-              <video
-                src={p.value}
-                className="h-full w-full object-cover"
-                muted
-                playsInline
-                preload="metadata"
-              />
-            ) : (
-              <div className="flex h-full w-full items-center justify-center bg-slate-100 text-slate-400">
-                <MdVideocamOff size={24} />
+      renderCell: (p) => {
+        const embedUrl = p.value ? getYouTubeEmbedUrl(p.value) : null;
+        return (
+          <div className="flex w-full items-center gap-3">
+            <div className="flex h-14 w-24 flex-shrink-0 items-center justify-center overflow-hidden rounded-xl border border-slate-200 bg-slate-100">
+              {p.value ? (
+                embedUrl ? (
+                  <iframe src={embedUrl} title="YouTube Preview" className="h-full w-full pointer-events-none" frameBorder="0" />
+                ) : (
+                  <video src={p.value} className="h-full w-full object-cover" muted playsInline preload="metadata" />
+                )
+              ) : (
+                <div className="flex h-full w-full items-center justify-center bg-slate-100 text-slate-400">
+                  <MdVideocamOff size={20} />
+                </div>
+              )}
+            </div>
+            <div className="min-w-0">
+              <div className="flex items-center gap-1.5">
+                <p className="truncate text-xs font-bold text-slate-900">Overview Video</p>
+                {embedUrl && (
+                  <span className="inline-flex items-center gap-1 rounded bg-rose-100 px-1 py-0.5 text-[9px] font-bold text-rose-600">
+                    <FaYoutube size={10} /> YouTube
+                  </span>
+                )}
               </div>
-            )}
+              <p className="mt-0.5 truncate text-[11px] text-slate-500">
+                {p.value ? (embedUrl ? "YouTube link active" : "MP4 video saved") : "No video uploaded"}
+              </p>
+              <p className="mt-0.5 text-[11px] font-semibold text-cyan-700">
+                {p.row.videoGalleryCount} gallery video{p.row.videoGalleryCount === 1 ? "" : "s"}
+              </p>
+            </div>
           </div>
-          <div className="min-w-0">
-            <p className="truncate text-sm font-bold text-slate-900">Industrial City Hero Video</p>
-            <p className="mt-1 truncate text-xs text-slate-500">
-              {p.value ? "Video uploaded and ready to manage" : "No video uploaded yet"}
-            </p>
+        );
+      },
+    },
+    {
+      field: "locationTourVideo",
+      headerName: "03. Location & Video Tour",
+      minWidth: 260,
+      flex: 1,
+      renderCell: (p) => {
+        const embedUrl = p.value ? getYouTubeEmbedUrl(p.value) : null;
+        return (
+          <div className="flex w-full items-center gap-3">
+            <div className="flex h-14 w-24 flex-shrink-0 items-center justify-center overflow-hidden rounded-xl border border-slate-200 bg-slate-100">
+              {p.value ? (
+                embedUrl ? (
+                  <iframe src={embedUrl} title="Location Tour Preview" className="h-full w-full pointer-events-none" frameBorder="0" />
+                ) : (
+                  <video src={p.value} className="h-full w-full object-cover" muted playsInline preload="metadata" />
+                )
+              ) : (
+                <div className="flex h-full w-full items-center justify-center bg-slate-100 text-slate-400">
+                  <MdVideocamOff size={20} />
+                </div>
+              )}
+            </div>
+            <div className="min-w-0">
+              <div className="flex items-center gap-1.5">
+                <p className="truncate text-xs font-bold text-slate-900">Tour Video</p>
+                {embedUrl && (
+                  <span className="inline-flex items-center gap-1 rounded bg-rose-100 px-1 py-0.5 text-[9px] font-bold text-rose-600">
+                    <FaYoutube size={10} /> YouTube
+                  </span>
+                )}
+              </div>
+              <p className="mt-0.5 truncate text-[11px] text-slate-500">
+                {p.value ? (embedUrl ? "YouTube tour active" : "MP4 tour saved") : "Default tour video"}
+              </p>
+              <span className="mt-0.5 inline-block text-[10px] font-semibold text-cyan-700 bg-cyan-50 px-1.5 py-0.5 rounded border border-cyan-200">
+                Section 03 Tour
+              </span>
+            </div>
           </div>
-        </div>
-      ),
+        );
+      },
     },
     {
       field: "actions",
@@ -117,7 +171,11 @@ const ViewIndustrialCity = () => {
   ];
 
   const rows = Array.isArray(industrialCity) ? industrialCity.map((item, i) => ({
-    id: item._id, no: i + 1, industrialCityVideo: item.industrialCityVideo,
+    id: item._id,
+    no: i + 1,
+    industrialCityVideo: item.industrialCityVideo,
+    locationTourVideo: item.locationTourVideo,
+    videoGalleryCount: item.videoGallery?.length || 0,
   })) : [];
 
   return (
