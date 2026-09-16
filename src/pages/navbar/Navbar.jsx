@@ -50,11 +50,11 @@ const projectItems = [
   },
   {
     label: "Duplex Project",
-    to: "/NorthSouthDuplexHome",
+    to: "/conceptDetails",
   },
   {
     label: "Condominium Project",
-    to: "/nirapadVallecondominiumproject",
+    to: "/purbachalNirapadValley",
   },
   {
     label: "Hotel Project",

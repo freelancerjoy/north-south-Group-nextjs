@@ -11,9 +11,13 @@ import {
 } from "react-icons/md";
 import OptimizedImage from "../../components/OptimizedImage";
 import { useProjectStore } from "../../store/project/projectStore";
+import { useMenuStore } from "../../store/menu/menuStore";
 import { entityId, projectDetailsPath } from "../../utils/entity";
-import heroImage from "../../assets/images/realEstateImg1.jpg";
 import fallbackImage from "../../assets/images/bannerProjectImg2.jpg";
+import landImage from "../../assets/images/land1.jpg";
+import commercialImage from "../../assets/images/bannerProjectImg1.jpg";
+import duplexImage from "../../assets/images/duplex.jpg";
+import condominiumImage from "../../assets/images/realEstateImg3.jpg";
 
 /**
  * OPTIONAL — for the full intended type contrast, add this to index.html <head>:
@@ -43,6 +47,224 @@ const fallbackProjects = [
   },
 ];
 
+const projectDirectoryFallbacks = [
+  {
+    label: "Daily Adin (NewsPaper)",
+    href: "https://www.dailyadin.com/",
+    external: true,
+  },
+  {
+    label: "Mayalok Resort",
+    to: "/aboutUs",
+  },
+  {
+    label: "Northsouth Garments",
+    to: "/northsouthGarments",
+  },
+  {
+    label: "Northsouth Farms Ltd.",
+    to: "/northsouthFarmsLtd",
+  },
+  {
+    label: "Northsouth Square City",
+    to: "/squareCity",
+  },
+  {
+    label: "Northsouth Industrial City",
+    to: "/industrialCity",
+  },
+  {
+    label: "North South Duplex Home",
+    to: "/conceptDetails",
+  },
+  {
+    label: "Northsouth Green City Ltd.",
+    to: "/greenCity",
+  },
+  {
+    label: "Daily Adin Press Media Ltd.",
+    href: "https://www.dailyadin.com/",
+    external: true,
+  },
+  {
+    label: "North South Consortium Ltd.",
+    to: "/northSouthConsortiumLtd",
+  },
+  {
+    label: "Titanic Bay Hotel & Resort Ltd.",
+    href: "https://www.titanicbay.com/",
+    external: true,
+  },
+  {
+    label: "Nirapad Valley Condominium project",
+    to: "/purbachalNirapadValley",
+  },
+  {
+    label: "NorthSouth Humanity Aid Foundation",
+    to: "/northSouthHumanityAidFoundation",
+  },
+  {
+    label: "NorthSouth Building Construction Ltd.",
+    to: "/aboutUs",
+  },
+  {
+    label: "Commercial Project",
+    to: "/commercial-project",
+  },
+];
+
+const directoryImageRules = [
+  { pattern: /green city/i, image: landImage },
+  { pattern: /square city/i, image: landImage },
+  { pattern: /industrial city|building construction/i, image: commercialImage },
+  { pattern: /duplex/i, image: duplexImage },
+  { pattern: /condominium|nirapad/i, image: condominiumImage },
+  { pattern: /hotel|resort|titanic|mayalok/i, image: fallbackImage },
+  { pattern: /commercial|consortium|press|adin|garments|farms|foundation|humanity/i, image: commercialImage },
+];
+
+const getDirectoryImage = (label = "") =>
+  directoryImageRules.find((rule) => rule.pattern.test(label))?.image || fallbackImage;
+
+const getDirectoryDescription = (label = "") => {
+  if (/adin|press|newspaper/i.test(label)) {
+    return "Press, media, and publication activity under the North South Group network.";
+  }
+  if (/resort|hotel|titanic|mayalok/i.test(label)) {
+    return "Hospitality and resort-focused development connected with North South Group.";
+  }
+  if (/green|square|industrial|condominium|duplex|construction/i.test(label)) {
+    return "A North South Group development concern focused on land, housing, construction, and long-term value.";
+  }
+  if (/garments/i.test(label)) {
+    return "Apparel and manufacturing work shaped around dependable delivery and quality control.";
+  }
+  if (/farms/i.test(label)) {
+    return "Agriculture and farm operations focused on responsible production and sustainable growth.";
+  }
+  if (/foundation|humanity/i.test(label)) {
+    return "Social impact and community support initiatives from North South Group.";
+  }
+  return "A North South Group concern presented for visitors exploring every company and project.";
+};
+
+const normalizeDirectoryLabel = (label = "") => {
+  const key = normalize(label);
+  if (key === "purbachal nirapad valley") return "Nirapad Valley Condominium project";
+  if (key === "dailyadin" || key === "daily adin") return "Daily Adin Press Media Ltd.";
+  return label;
+};
+
+const buildDirectoryProjects = (items = []) => {
+  const sourceItems = Array.isArray(items) && items.length ? items : projectDirectoryFallbacks;
+  const seen = new Set();
+
+  return sourceItems
+    .filter((item) => item?.isVisible !== false)
+    .map((item, index) => {
+      const title = normalizeDirectoryLabel(item.label || item.title || "");
+      const key = normalize(title);
+      if (!title || seen.has(key)) return null;
+      seen.add(key);
+
+      return {
+        _id: `directory-${key || index}`,
+        title,
+        status: "Project Directory",
+        image: [getDirectoryImage(title)],
+        to: item.to || (!item.href ? "/aboutUs" : undefined),
+        href: item.href,
+        external: item.external,
+        description: {
+          generalFeature: getDirectoryDescription(title),
+        },
+        specs: {
+          address: "North South Group",
+          apartmentSize: "Concern / Project",
+        },
+      };
+    })
+    .filter(Boolean);
+};
+
+const featuredCategoryProjects = [
+  {
+    _id: "category-land-project",
+    title: "Land Project",
+    status: "Project Category",
+    image: [landImage],
+    to: "/greenCity",
+    description: {
+      generalFeature:
+        "Explore North South Group land developments including Green City, Square City, and Industrial City.",
+    },
+    specs: {
+      address: "Green City, Square City, Industrial City",
+      apartmentSize: "Land Development",
+    },
+  },
+  {
+    _id: "category-commercial-project",
+    title: "Commercial Project",
+    status: "Project Category",
+    image: [commercialImage],
+    to: "/commercial-project",
+    description: {
+      generalFeature:
+        "Commercial development opportunities designed for practical business value and long-term growth.",
+    },
+    specs: {
+      address: "Bangladesh",
+      apartmentSize: "Commercial",
+    },
+  },
+  {
+    _id: "category-duplex-project",
+    title: "Duplex Project",
+    status: "Project Category",
+    image: [duplexImage],
+    to: "/conceptDetails",
+    description: {
+      generalFeature:
+        "Northsouth Duplex Home brings private residential planning with modern family living in focus.",
+    },
+    specs: {
+      address: "Bangladesh",
+      apartmentSize: "Duplex Residence",
+    },
+  },
+  {
+    _id: "category-condominium-project",
+    title: "Condominium Project",
+    status: "Project Category",
+    image: [condominiumImage],
+    to: "/purbachalNirapadValley",
+    description: {
+      generalFeature:
+        "Nirapad Valley Condominium Project offers a planned residential environment with North South Group's development approach.",
+    },
+    specs: {
+      address: "Purbachal",
+      apartmentSize: "Condominium",
+    },
+  },
+  {
+    _id: "category-hotel-project",
+    title: "Hotel Project",
+    status: "Project Category",
+    image: [fallbackImage],
+    href: "https://www.titanicbay.com/",
+    description: {
+      generalFeature:
+        "Titanic Bay Hotel & Resort Ltd. represents the group's hospitality and resort development vision.",
+    },
+    specs: {
+      address: "Bangladesh",
+      apartmentSize: "Hospitality",
+    },
+  },
+];
+
 const statusOptions = [
   { label: "All Project", value: "all" },
   { label: "Ongoing", value: "ongoing" },
@@ -66,6 +288,8 @@ const STATUS_META = {
   "handed over": { label: "Handed Over", dot: "bg-emerald-500", badgeText: "text-emerald-50" },
   ongoing: { label: "Ongoing", dot: "bg-[#C99A4B]", badgeText: "text-amber-50" },
   upcoming: { label: "Upcoming", dot: "bg-sky-400", badgeText: "text-sky-50" },
+  "project category": { label: "Project Category", dot: "bg-emerald-300", badgeText: "text-emerald-50" },
+  "project directory": { label: "Project Directory", dot: "bg-emerald-300", badgeText: "text-emerald-50" },
 };
 
 const getStatusMeta = (project) => {
@@ -91,6 +315,10 @@ const getLocation = (project) =>
   project?.specs?.address || project?.description?.location || "Bangladesh";
 
 const normalize = (value = "") => String(value || "").trim().toLowerCase();
+
+const getProjectLink = (project) => project?.href || project?.to || projectDetailsPath(project);
+
+const isExternalProject = (project) => Boolean(project?.href);
 
 const uniqueProjects = (projects) => {
   const seen = new Set();
@@ -119,6 +347,7 @@ function CornerFrame({ inset = "inset-6", color = "border-white/70", className =
 
 export default function ProjectsPage() {
   const { projects, loadProjects, isLoading } = useProjectStore();
+  const { concernMenuItems, loadConcernMenuItems } = useMenuStore();
   const [searchParams] = useSearchParams();
   const [status, setStatus] = useState("all");
   const [location, setLocation] = useState("all");
@@ -131,17 +360,24 @@ export default function ProjectsPage() {
     loadProjects();
   }, [loadProjects]);
 
+  useEffect(() => {
+    loadConcernMenuItems();
+  }, [loadConcernMenuItems]);
+
   // Read ?status= from URL and apply as filter, then scroll to grid
   useEffect(() => {
     const urlStatus = searchParams.get("status");
     if (urlStatus) {
-      setStatus(urlStatus.toLowerCase());
-      // Scroll to projects grid after a short delay
-      setTimeout(() => {
+      const timer = setTimeout(() => {
+        setStatus(urlStatus.toLowerCase());
         const el = document.getElementById("projects-grid");
         if (el) el.scrollIntoView({ behavior: "smooth", block: "start" });
       }, 300);
+
+      return () => clearTimeout(timer);
     }
+
+    return undefined;
   }, [searchParams]);
 
   const allProjects = useMemo(() => {
@@ -149,8 +385,10 @@ export default function ProjectsPage() {
     const hasTitanicBay = projectList.some((project) =>
       project?.title?.toLowerCase().includes("titanic bay")
     );
-    return uniqueProjects(hasTitanicBay ? projectList : [...projectList, ...fallbackProjects]);
-  }, [projects]);
+    const listedProjects = hasTitanicBay ? projectList : [...projectList, ...fallbackProjects];
+    const directoryProjects = buildDirectoryProjects(concernMenuItems);
+    return uniqueProjects([...directoryProjects, ...featuredCategoryProjects, ...listedProjects]);
+  }, [concernMenuItems, projects]);
 
   const locationOptions = useMemo(() => {
     const locations = allProjects
@@ -186,6 +424,7 @@ export default function ProjectsPage() {
         [
           project?.title,
           project?.status,
+          project?.specs?.category,
           getLocation(project),
           project?.specs?.apartmentSize,
           project?.specs?.landSize,
@@ -218,7 +457,10 @@ export default function ProjectsPage() {
   };
 
   return (
-    <main className="bg-[#FBFAF7] pt-24 text-slate-950">
+    <main
+      className="bg-[#FBFAF7] pt-24 text-slate-950"
+      style={{ fontFamily: '"Manrope", "Montserrat", ui-sans-serif, system-ui, sans-serif' }}
+    >
       {/* ---------------------------------------------------------------- HERO */}
       <section className="relative min-h-[560px] md:min-h-[660px] overflow-hidden bg-slate-950 flex items-center">
         {heroSlides.map((slide, index) => (
@@ -282,7 +524,7 @@ export default function ProjectsPage() {
                   </p>
                 </div>
 
-                <h1 className="max-w-3xl font-serif text-4xl font-black leading-[1.05] text-white drop-shadow-xl md:text-6xl lg:text-7xl">
+                <h1 className="max-w-3xl text-3xl font-extrabold leading-[1.12] text-white drop-shadow-xl md:text-4xl lg:text-5xl">
                   {slide.title || "Our Projects"}
                 </h1>
 
@@ -296,14 +538,26 @@ export default function ProjectsPage() {
                 )}
 
                 {slide._id && slide.title && (
-                  <Link
-                    to={projectDetailsPath(slide)}
-                    state={{ project: slide }}
-                    className="group inline-flex items-center gap-3 border border-white bg-transparent px-8 py-3.5 text-xs font-bold uppercase tracking-[0.2em] text-white transition-colors hover:bg-white hover:text-slate-950"
-                  >
-                    View Details
-                    <MdArrowForward className="text-base transition-transform group-hover:translate-x-1" />
-                  </Link>
+                  isExternalProject(slide) ? (
+                    <a
+                      href={getProjectLink(slide)}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="group inline-flex items-center gap-3 border border-white bg-transparent px-8 py-3.5 text-xs font-bold uppercase tracking-[0.2em] text-white transition-colors hover:bg-white hover:text-slate-950"
+                    >
+                      View Details
+                      <MdArrowForward className="text-base transition-transform group-hover:translate-x-1" />
+                    </a>
+                  ) : (
+                    <Link
+                      to={getProjectLink(slide)}
+                      state={{ project: slide }}
+                      className="group inline-flex items-center gap-3 border border-white bg-transparent px-8 py-3.5 text-xs font-bold uppercase tracking-[0.2em] text-white transition-colors hover:bg-white hover:text-slate-950"
+                    >
+                      View Details
+                      <MdArrowForward className="text-base transition-transform group-hover:translate-x-1" />
+                    </Link>
+                  )
                 )}
               </div>
             );
@@ -417,7 +671,7 @@ export default function ProjectsPage() {
         <div className="mb-12 flex flex-col gap-4 border-b border-stone-200 pb-7 md:flex-row md:items-end md:justify-between">
           <div>
             <p className="mb-3 text-xs font-bold uppercase tracking-[0.3em] text-emerald-700">Portfolio</p>
-            <h2 className="font-serif text-3xl font-black text-slate-950 md:text-4xl">Our Developments</h2>
+            <h2 className="text-2xl font-extrabold text-slate-950 md:text-3xl">Our Developments</h2>
           </div>
           {!isLoading && (
             <p className="font-mono text-xs uppercase tracking-widest text-slate-400">
@@ -434,7 +688,7 @@ export default function ProjectsPage() {
         ) : filteredProjects.length === 0 ? (
           <div className="border border-stone-200 bg-white px-6 py-20 text-center">
             <p className="mb-3 text-xs font-bold uppercase tracking-[0.25em] text-emerald-700">No matches</p>
-            <h2 className="font-serif text-2xl font-bold text-slate-950 md:text-3xl">
+            <h2 className="text-2xl font-bold text-slate-950 md:text-3xl">
               Nothing fits those filters yet
             </h2>
             <p className="mx-auto mt-3 max-w-sm text-sm text-slate-500">
@@ -507,64 +761,80 @@ function FilterSelect({ label, value, onChange, options, disabled = false }) {
 function ProjectCard({ project }) {
   const meta = getStatusMeta(project);
   const secondarySpec = project?.specs?.handover || project?.specs?.apartmentSize;
+  const cardContent = (
+    <>
+      <OptimizedImage
+        src={getProjectImage(project)}
+        alt={project.title}
+        sizes="(max-width: 768px) 100vw, (max-width: 1280px) 50vw, 33vw"
+        className="transition duration-700 group-hover:scale-105"
+      />
+      <div className="absolute inset-0 bg-gradient-to-b from-black/10 via-black/10 to-black/70 transition duration-500 group-hover:from-black/25 group-hover:via-black/35 group-hover:to-black/82" />
+
+      <CornerFrame
+        inset="inset-4"
+        color="border-white/0 transition-colors duration-500 group-hover:border-white/60"
+      />
+
+      <div className="absolute left-6 top-6 z-10">
+        <span
+          className={`inline-flex items-center gap-1.5 rounded-full border border-white/20 bg-black/30 px-3 py-1.5 text-[10px] font-bold uppercase tracking-[0.15em] backdrop-blur-sm ${meta.badgeText}`}
+        >
+          <span className={`h-1.5 w-1.5 rounded-full ${meta.dot}`} />
+          {project.status || meta.label}
+        </span>
+      </div>
+
+      <div className="absolute inset-x-0 bottom-0 p-8 text-white sm:p-9">
+        <div className="transition duration-500 group-hover:-translate-y-6">
+          <h2 className="max-w-[18rem] text-xl font-extrabold uppercase leading-tight tracking-normal md:text-2xl">
+            {project.title}
+          </h2>
+          <div className="mt-3 flex items-center gap-1.5 text-sm font-medium text-white/85">
+            <MdLocationOn className="shrink-0 text-base text-emerald-300" />
+            <span className="truncate">{getLocation(project)}</span>
+          </div>
+
+          {secondarySpec && (
+            <p className="mt-3 font-mono text-[11px] uppercase tracking-widest text-white/60">
+              {secondarySpec}
+            </p>
+          )}
+        </div>
+
+        <div className="max-h-0 translate-y-6 overflow-hidden opacity-0 transition-all duration-500 group-hover:max-h-64 group-hover:translate-y-0 group-hover:opacity-100">
+          <p className="mt-4 line-clamp-4 max-w-[22rem] text-[15px] leading-6 text-white/90">
+            {getDescription(project)}
+          </p>
+          <span className="mt-7 inline-flex items-center gap-2 border-b-2 border-emerald-400 pb-1 text-xs font-bold uppercase tracking-[0.2em] text-white transition-all group-hover:gap-3">
+            Explore
+            <MdArrowForward className="text-sm" />
+          </span>
+        </div>
+      </div>
+    </>
+  );
 
   return (
     <article className="group">
-      <Link
-        to={projectDetailsPath(project)}
-        state={{ project }}
-        className="relative block h-[520px] overflow-hidden bg-slate-900 shadow-sm md:h-[540px]"
-      >
-        <OptimizedImage
-          src={getProjectImage(project)}
-          alt={project.title}
-          sizes="(max-width: 768px) 100vw, (max-width: 1280px) 50vw, 33vw"
-          className="transition duration-700 group-hover:scale-105"
-        />
-        <div className="absolute inset-0 bg-gradient-to-b from-black/10 via-black/10 to-black/70 transition duration-500 group-hover:from-black/25 group-hover:via-black/35 group-hover:to-black/82" />
-
-        <CornerFrame
-          inset="inset-4"
-          color="border-white/0 transition-colors duration-500 group-hover:border-white/60"
-        />
-
-        <div className="absolute left-6 top-6 z-10">
-          <span
-            className={`inline-flex items-center gap-1.5 rounded-full border border-white/20 bg-black/30 px-3 py-1.5 text-[10px] font-bold uppercase tracking-[0.15em] backdrop-blur-sm ${meta.badgeText}`}
-          >
-            <span className={`h-1.5 w-1.5 rounded-full ${meta.dot}`} />
-            {project.status || meta.label}
-          </span>
-        </div>
-
-        <div className="absolute inset-x-0 bottom-0 p-8 text-white sm:p-9">
-          <div className="transition duration-500 group-hover:-translate-y-6">
-            <h2 className="max-w-[18rem] font-serif text-2xl font-black uppercase leading-none tracking-tight md:text-[26px]">
-              {project.title}
-            </h2>
-            <div className="mt-3 flex items-center gap-1.5 text-sm font-medium text-white/85">
-              <MdLocationOn className="shrink-0 text-base text-emerald-300" />
-              <span className="truncate">{getLocation(project)}</span>
-            </div>
-
-            {secondarySpec && (
-              <p className="mt-3 font-mono text-[11px] uppercase tracking-widest text-white/60">
-                {secondarySpec}
-              </p>
-            )}
-          </div>
-
-          <div className="max-h-0 translate-y-6 overflow-hidden opacity-0 transition-all duration-500 group-hover:max-h-64 group-hover:translate-y-0 group-hover:opacity-100">
-            <p className="mt-4 line-clamp-4 max-w-[22rem] text-[15px] leading-6 text-white/90">
-              {getDescription(project)}
-            </p>
-            <span className="mt-7 inline-flex items-center gap-2 border-b-2 border-emerald-400 pb-1 text-xs font-bold uppercase tracking-[0.2em] text-white transition-all group-hover:gap-3">
-              Explore
-              <MdArrowForward className="text-sm" />
-            </span>
-          </div>
-        </div>
-      </Link>
+      {isExternalProject(project) ? (
+        <a
+          href={getProjectLink(project)}
+          target="_blank"
+          rel="noopener noreferrer"
+          className="relative block h-[520px] overflow-hidden bg-slate-900 shadow-sm md:h-[540px]"
+        >
+          {cardContent}
+        </a>
+      ) : (
+        <Link
+          to={getProjectLink(project)}
+          state={{ project }}
+          className="relative block h-[520px] overflow-hidden bg-slate-900 shadow-sm md:h-[540px]"
+        >
+          {cardContent}
+        </Link>
+      )}
     </article>
   );
 }
