@@ -18,6 +18,11 @@ import landImage from "../../assets/images/land1.jpg";
 import commercialImage from "../../assets/images/bannerProjectImg1.jpg";
 import duplexImage from "../../assets/images/duplex.jpg";
 import condominiumImage from "../../assets/images/realEstateImg3.jpg";
+import greenCityImage from "../../assets/images/greenCityImg1.jpg";
+import squareCityImage from "../../assets/images/greenCityImg4.jpg";
+import industrialCityImage from "../../assets/images/greenCityImg2.jpg";
+import titanicBayImage from "../../assets/images/heroTitanicBay.jpg";
+import { getDefaultConcern } from "../ourConcern/defaultConcernData";
 
 /**
  * OPTIONAL — for the full intended type contrast, add this to index.html <head>:
@@ -49,11 +54,6 @@ const fallbackProjects = [
 
 const projectDirectoryFallbacks = [
   {
-    label: "Daily Adin (NewsPaper)",
-    href: "https://www.dailyadin.com/",
-    external: true,
-  },
-  {
     label: "Mayalok Resort",
     to: "/aboutUs",
   },
@@ -80,11 +80,6 @@ const projectDirectoryFallbacks = [
   {
     label: "Northsouth Green City Ltd.",
     to: "/greenCity",
-  },
-  {
-    label: "Daily Adin Press Media Ltd.",
-    href: "https://www.dailyadin.com/",
-    external: true,
   },
   {
     label: "North South Consortium Ltd.",
@@ -114,6 +109,10 @@ const projectDirectoryFallbacks = [
 ];
 
 const directoryImageRules = [
+  { pattern: /green city/i, image: greenCityImage },
+  { pattern: /square city/i, image: squareCityImage },
+  { pattern: /industrial city/i, image: industrialCityImage },
+  { pattern: /titanic/i, image: titanicBayImage },
   { pattern: /green city/i, image: landImage },
   { pattern: /square city/i, image: landImage },
   { pattern: /industrial city|building construction/i, image: commercialImage },
@@ -123,8 +122,50 @@ const directoryImageRules = [
   { pattern: /commercial|consortium|press|adin|garments|farms|foundation|humanity/i, image: commercialImage },
 ];
 
-const getDirectoryImage = (label = "") =>
-  directoryImageRules.find((rule) => rule.pattern.test(label))?.image || fallbackImage;
+const routeSlugMap = {
+  "/northsouthconsortiumltd": "north-south-consortium-ltd",
+  "/purbachalnirapadvalley": "purbachal-nirapad-valley",
+  "/conceptdetails": "concept-details",
+  "/northsouthfarmsltd": "northsouth-farms-ltd",
+  "/northsouthgarments": "northsouth-garments",
+  "/northsouthtourstravels": "northsouth-tours-travels",
+  "/northsouthfoundation": "northsouth-foundation",
+  "/northsouthhumanityaidfoundation": "northsouth-foundation",
+  "/northsouthbutterfly": "northsouth-butterfly",
+};
+
+const labelSlugMap = {
+  "north south consortium ltd.": "north-south-consortium-ltd",
+  "purbachal nirapad valley": "purbachal-nirapad-valley",
+  "nirapad valley condominium project": "purbachal-nirapad-valley",
+  "northsouth duplex home": "concept-details",
+  "north south duplex home": "concept-details",
+  "northsouth farms ltd.": "northsouth-farms-ltd",
+  "northsouth garments": "northsouth-garments",
+  "northsouth tours & travels": "northsouth-tours-travels",
+  "northsouth humanity aid foundation": "northsouth-foundation",
+  "northsouth foundation": "northsouth-foundation",
+  "northsouth butterfly resort & park": "northsouth-butterfly",
+  "titanic bay hotel & resort ltd.": "titanic-bay-hotel-resort-ltd",
+};
+
+const normalizeRouteKey = (value = "") => String(value || "").trim().toLowerCase();
+
+const getDirectorySlug = (item = {}, label = "") => {
+  const route = normalizeRouteKey(item.to || item.routePath || "");
+  if (route.startsWith("/concern/")) return route.split("/concern/")[1];
+  return item.concernSlug || routeSlugMap[route] || labelSlugMap[normalizeRouteKey(label)];
+};
+
+const getDirectoryImage = (label = "", item = {}) => {
+  const defaultConcern = getDefaultConcern(getDirectorySlug(item, label));
+  return (
+    defaultConcern?.heroImage ||
+    defaultConcern?.aboutImage ||
+    directoryImageRules.find((rule) => rule.pattern.test(label))?.image ||
+    fallbackImage
+  );
+};
 
 const getDirectoryDescription = (label = "") => {
   if (/adin|press|newspaper/i.test(label)) {
@@ -155,12 +196,38 @@ const normalizeDirectoryLabel = (label = "") => {
   return label;
 };
 
+const isDailyAdinDirectoryItem = (item = {}) => {
+  const label = normalize(item.label || item.title || "");
+  const href = normalize(item.href || item.to || "");
+  return label.includes("daily adin") || label.includes("dailyadin") || href.includes("dailyadin.com");
+};
+
+const directoryPriority = [
+  /green city/i,
+  /industrial city/i,
+  /square city/i,
+];
+
+const getDirectoryPriority = (project = {}) => {
+  const title = project.title || "";
+  const index = directoryPriority.findIndex((pattern) => pattern.test(title));
+  return index === -1 ? directoryPriority.length : index;
+};
+
+const sortDirectoryProjects = (projects = []) =>
+  [...projects].sort((a, b) => {
+    const priorityDifference = getDirectoryPriority(a) - getDirectoryPriority(b);
+    if (priorityDifference !== 0) return priorityDifference;
+    return String(a?.title || "").localeCompare(String(b?.title || ""));
+  });
+
 const buildDirectoryProjects = (items = []) => {
   const sourceItems = Array.isArray(items) && items.length ? items : projectDirectoryFallbacks;
   const seen = new Set();
 
   return sourceItems
     .filter((item) => item?.isVisible !== false)
+    .filter((item) => !isDailyAdinDirectoryItem(item))
     .map((item, index) => {
       const title = normalizeDirectoryLabel(item.label || item.title || "");
       const key = normalize(title);
@@ -171,7 +238,7 @@ const buildDirectoryProjects = (items = []) => {
         _id: `directory-${key || index}`,
         title,
         status: "Project Directory",
-        image: [getDirectoryImage(title)],
+        image: [getDirectoryImage(title, item)],
         to: item.to || (!item.href ? "/aboutUs" : undefined),
         href: item.href,
         external: item.external,
@@ -386,8 +453,8 @@ export default function ProjectsPage() {
       project?.title?.toLowerCase().includes("titanic bay")
     );
     const listedProjects = hasTitanicBay ? projectList : [...projectList, ...fallbackProjects];
-    const directoryProjects = buildDirectoryProjects(concernMenuItems);
-    return uniqueProjects([...directoryProjects, ...featuredCategoryProjects, ...listedProjects]);
+    const directoryProjects = sortDirectoryProjects(buildDirectoryProjects(concernMenuItems));
+    return uniqueProjects([...listedProjects, ...directoryProjects, ...featuredCategoryProjects]);
   }, [concernMenuItems, projects]);
 
   const locationOptions = useMemo(() => {
@@ -787,7 +854,7 @@ function ProjectCard({ project }) {
 
       <div className="absolute inset-x-0 bottom-0 p-8 text-white sm:p-9">
         <div className="transition duration-500 group-hover:-translate-y-6">
-          <h2 className="max-w-[18rem] text-xl font-extrabold uppercase leading-tight tracking-normal md:text-2xl">
+          <h2 className="max-w-full text-base font-extrabold uppercase leading-snug tracking-normal md:text-lg">
             {project.title}
           </h2>
           <div className="mt-3 flex items-center gap-1.5 text-sm font-medium text-white/85">
