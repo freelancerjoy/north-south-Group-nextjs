@@ -1,4 +1,19 @@
 const defaults = {
+  "north-south-building-construction": {
+    theme: "teal",
+    eyebrow: "North South Group · Building & Construction",
+    title: "North South Building Construction",
+    subtitle: "Thoughtful planning. Purposeful spaces. A considered approach to bringing your building vision to life.",
+    heroImage: "https://images.unsplash.com/photo-1503387762-592deb58ef4e?auto=format&fit=crop&w=1920&q=85",
+    aboutImage: "https://images.unsplash.com/photo-1486406146926-c627a92ad1ab?auto=format&fit=crop&w=1200&q=85",
+    aboutTitle: "Great spaces begin with a clear vision.",
+    aboutParagraphs: ["North South Building Construction brings a focused approach to planning, construction, and the spaces people use every day.", "Discuss your residential or commercial project with our team to explore requirements, scope, and the next steps."],
+    services: [],
+    features: [],
+    highlights: [],
+    stats: [{ value: "Plan", label: "With intention" }, { value: "Build", label: "With care" }, { value: "Deliver", label: "With purpose" }],
+    processItems: ["Discuss your site, priorities, and project requirements.", "Define the scope, design direction, and proposed approach.", "Coordinate the construction stages and project communication.", "Review completed work and discuss the handover requirements."],
+  },
   "north-south-consortium-ltd": {
     theme: "teal",
     eyebrow: "Diversified Business Platform",
@@ -15,7 +30,12 @@ const defaults = {
     eyebrow: "Secure Residential Destination",
     title: "Nirapad Valley Condominium Project",
     subtitle: "A planned, green, and secure living destination shaped for families, professionals, and long-term investors.",
-    heroImage: "https://images.unsplash.com/photo-1600585154340-be6161a56a0c?auto=format&fit=crop&w=1200&q=75",
+    heroImage: "https://images.unsplash.com/photo-1758193431351-68538bf55ec3?auto=format&fit=crop&w=1800&q=85",
+    heroSliderImages: [
+      "https://images.unsplash.com/photo-1758193431351-68538bf55ec3?auto=format&fit=crop&w=1800&q=85",
+      "https://images.unsplash.com/photo-1600585154340-be6161a56a0c?auto=format&fit=crop&w=1800&q=85",
+      "https://images.unsplash.com/photo-1600607687939-ce8a6c25118c?auto=format&fit=crop&w=1800&q=85",
+    ],
     aboutImage: "https://images.unsplash.com/photo-1600607687939-ce8a6c25118c?auto=format&fit=crop&w=900&q=75",
     aboutTitle: "Peaceful living with planned urban comfort",
     aboutParagraphs: ["Nirapad Valley Condominium Project is designed around safety, greenery, road access, and an organized residential lifestyle.", "The project keeps connectivity, daily convenience, and investment value in focus."],
@@ -132,13 +152,19 @@ const common = {
   contactButtonLabel: "Send Message",
 };
 
+const concernAliases = {
+  northsouthbuildingconstruction: "north-south-building-construction",
+  nirapadvallecondominiumproject: "purbachal-nirapad-valley",
+  northsouthhumanityaidfoundations: "northsouth-foundation",
+};
+
 export const hasDefaultConcern = (slug) =>
-  Object.prototype.hasOwnProperty.call(defaults, slug);
+  Object.prototype.hasOwnProperty.call(defaults, concernAliases[slug] || slug);
 
 export const getDefaultConcern = (slug) => {
   if (!hasDefaultConcern(slug)) return null;
 
-  const concern = { ...common, ...defaults[slug] };
+  const concern = { ...common, ...defaults[concernAliases[slug] || slug] };
   const derivedImages = uniqueImages([
     concern.heroImage,
     concern.aboutImage,

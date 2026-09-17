@@ -189,6 +189,10 @@ function App({ scaling }) {
                   element={<DynamicConcernPage slug="purbachal-nirapad-valley" />}
                 />
                 <Route
+                  path="/nirapadVallecondominiumproject"
+                  element={<DynamicConcernPage slug="nirapadVallecondominiumproject" />}
+                />
+                <Route
                   path="/northsouthFarmsLtd"
                   element={<DynamicConcernPage slug="northsouth-farms-ltd" />}
                 />

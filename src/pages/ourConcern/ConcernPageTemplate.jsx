@@ -282,7 +282,7 @@ function Gallery({ images, theme }) {
   );
 }
 
-function ContactSection({ theme, title, description, buttonLabel, ctaTitle, ctaText }) {
+export function ContactSection({ theme, title, description, buttonLabel, ctaTitle, ctaText }) {
   const { addContact, isLoading } = useContactStore();
   const { contactInfo, loadContactInfo } = useContactInfoStore();
   const [form, setForm] = useState({

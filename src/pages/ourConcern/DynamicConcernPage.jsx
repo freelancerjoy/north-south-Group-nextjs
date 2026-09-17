@@ -2,6 +2,9 @@ import { useEffect, useState } from "react";
 import Spinner from "../../components/Spinner";
 import NotFound from "../../components/NotFound";
 import ConcernPageTemplate from "./ConcernPageTemplate";
+import NirapadValleyLuxury from "./NirapadValleyLuxury";
+import FoundationLuxury from "./FoundationLuxury";
+import ConstructionLuxury from "./ConstructionLuxury";
 import { getDefaultConcern, hasDefaultConcern } from "./defaultConcernData";
 import { useConcernStore } from "../../store/concern/concernStore";
 import { slugify } from "../../utils/entity";
@@ -74,7 +77,13 @@ const DynamicConcernPage = ({ slug }) => {
 
   return (
     <div className="opacity-100 transition-opacity">
-      <ConcernPageTemplate {...resolved.data} />
+      {defaultSlug === "purbachal-nirapad-valley" || /nirapad.*valle/i.test(`${defaultSlug} ${resolved.data.title}`)
+        ? <NirapadValleyLuxury {...resolved.data} />
+        : defaultSlug === "northsouth-foundation" || /humanityaidfoundation|northsouth.*foundation/i.test(`${defaultSlug} ${resolved.data.title}`)
+          ? <FoundationLuxury {...resolved.data} />
+          : /north.?south.?building.?construction/i.test(`${defaultSlug} ${resolved.data.title}`)
+            ? <ConstructionLuxury {...resolved.data} />
+            : <ConcernPageTemplate {...resolved.data} />}
     </div>
   );
 };
