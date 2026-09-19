@@ -6,6 +6,21 @@ import { useContactStore } from "../../../store/contact/contactStore";
 import { MdVisibility, MdEdit, MdDelete, MdEmail } from "react-icons/md";
 import { AdminCollectionPage, getAdminGridStyles } from "../adminUi";
 
+const formatSubmittedDate = (value) => {
+  if (!value) return "-";
+
+  const date = new Date(value);
+  if (Number.isNaN(date.getTime())) return "-";
+
+  return date.toLocaleString("en-GB", {
+    day: "2-digit",
+    month: "short",
+    year: "numeric",
+    hour: "2-digit",
+    minute: "2-digit",
+  });
+};
+
 const ViewContact = () => {
   const navigate = useNavigate();
   const { contacts, isLoading, loadContacts, deleteContact } = useContactStore();
@@ -27,6 +42,7 @@ const ViewContact = () => {
     { field: "number", headerName: "Phone", width: 150 },
     { field: "email", headerName: "Email", flex: 1, minWidth: 180 },
     { field: "address", headerName: "Address", flex: 1, minWidth: 160 },
+    { field: "submittedDate", headerName: "Submitted Date", minWidth: 170 },
     { field: "message", headerName: "Message", flex: 1, minWidth: 180 },
     {
       field: "actions", headerName: "Actions", minWidth: 130, sortable: false,
@@ -47,6 +63,7 @@ const ViewContact = () => {
   const rows = Array.isArray(contacts) ? contacts.filter(Boolean).map((c, i) => ({
     id: c._id, no: i + 1, name: c.name || c.fullName || "-",
     number: c.number || "-", address: c.address || "-",
+    submittedDate: formatSubmittedDate(c.createdAt),
     email: c.email || "-", message: c.message || "-",
   })) : [];
 
