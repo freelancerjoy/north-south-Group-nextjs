@@ -1,4 +1,21 @@
 const defaults = {
+  "mayalok-resort": {
+    theme: "teal",
+    eyebrow: "A nature-inspired escape",
+    title: "Mayalok Resort",
+    subtitle: "A quiet escape imagined around nature, open space, and moments worth sharing.",
+    heroImage: "https://images.unsplash.com/photo-1540541338287-41700207dee6?auto=format&fit=crop&w=1920&q=85",
+    heroSliderImages: [
+      "https://images.unsplash.com/photo-1540541338287-41700207dee6?auto=format&fit=crop&w=1920&q=85",
+      "https://images.unsplash.com/photo-1571896349842-33c89424de2d?auto=format&fit=crop&w=1920&q=85",
+      "https://images.unsplash.com/photo-1500534623283-312aade485b7?auto=format&fit=crop&w=1920&q=85",
+    ],
+    aboutImage: "https://images.unsplash.com/photo-1571896349842-33c89424de2d?auto=format&fit=crop&w=1200&q=85",
+    aboutTitle: "A little closer to what matters.",
+    aboutParagraphs: ["Mayalok Resort is envisioned as a place to pause, reconnect, and enjoy a slower rhythm surrounded by nature.", "Explore the resort vision with our team and ask about current plans, experiences, and opportunities."],
+    services: [], features: [], highlights: [],
+    stats: [{ value: "Nature", label: "Inspired" }, { value: "Rest", label: "Reimagined" }, { value: "Moments", label: "Together" }],
+  },
   "north-south-building-construction": {
     theme: "teal",
     eyebrow: "North South Group · Building & Construction",
