@@ -12,6 +12,14 @@ const ViewPlotBooking = () => {
 
   useEffect(() => { loadBookings(); }, [loadBookings]);
 
+  const formatBookingDate = (value) => {
+    if (!value) return "-";
+    const date = new Date(value);
+    return Number.isNaN(date.getTime()) ? "-" : new Intl.DateTimeFormat("en-GB", {
+      day: "2-digit", month: "short", year: "numeric", hour: "2-digit", minute: "2-digit",
+    }).format(date);
+  };
+
   const handleDelete = async (id) => {
     try {
       await deleteBooking(id);
@@ -24,6 +32,7 @@ const ViewPlotBooking = () => {
   const columns = [
     { field: "no", headerName: "#", width: 60 },
     { field: "name", headerName: "Name", width: 140 },
+    { field: "projectName", headerName: "Project / Plot", width: 190 },
     { field: "block", headerName: "Block", width: 90 },
     { field: "plotNo", headerName: "Plot No", width: 100 },
     { field: "size", headerName: "Size (Katha)", width: 120 },
@@ -31,6 +40,7 @@ const ViewPlotBooking = () => {
     { field: "road", headerName: "Road", width: 120 },
     { field: "phone", headerName: "Phone", width: 140 },
     { field: "email", headerName: "Email", flex: 1, minWidth: 180 },
+    { field: "bookingDate", headerName: "Submitted Date", width: 175 },
     {
       field: "actions", headerName: "Actions", width: 70, sortable: false,
       renderCell: (p) => (
@@ -42,9 +52,10 @@ const ViewPlotBooking = () => {
   ];
 
   const rows = Array.isArray(bookings) ? bookings.filter(Boolean).map((b, i) => ({
-    id: b._id, no: i + 1, name: b.name || "-", block: b.block || "-",
+    id: b._id, no: i + 1, projectName: b.projectName || "Unknown project", name: b.name || "-", block: b.block || "-",
     plotNo: b.plotNo || "-", size: b.size || "-", address: b.address || "-",
     road: b.road || "-", phone: b.phone || "-", email: b.email || "-",
+    bookingDate: formatBookingDate(b.createdAt || b.bookingDate || b.date),
   })) : [];
 
   return (

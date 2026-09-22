@@ -20,7 +20,7 @@ const GreenCityLegacyForm = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
 
-    const payload = { name, block, address, road, phone, plotNo, email, size };
+    const payload = { projectName: "North South Green City", name, block, address, road, phone, plotNo, email, size };
 
     try {
       await addBooking(payload);

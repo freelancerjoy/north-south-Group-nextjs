@@ -5,6 +5,7 @@ import { FaSpinner } from "react-icons/fa";
 import { toast } from "react-toastify";
 import { useConcernStore } from "../../../store/concern/concernStore";
 import { uploadSingle } from "../../../utils/cloudinaryUpload";
+import ElementorConcernEditor from "./ElementorConcernEditor";
 
 const inputClass = "w-full rounded-xl border border-slate-200 bg-white px-4 py-2.5 text-sm text-slate-800 transition focus:border-teal-400 focus:outline-none focus:ring-2 focus:ring-teal-100";
 const labelClass = "mb-1.5 block text-sm font-semibold text-slate-600";
@@ -34,6 +35,7 @@ const emptyConcern = {
   processItems: [""],
   heroSliderImages: [],
   galleryImages: [],
+  sections: [],
   ctaTitle: "",
   ctaText: "",
   ctaLabel: "Contact Us",
@@ -271,6 +273,28 @@ function StatList({ values, onChange }) {
   );
 }
 
+function SectionBuilder({ values, onChange }) {
+  const update = (index, field, value) => onChange(values.map((item, i) => (i === index ? { ...item, [field]: value } : item)));
+  const remove = (index) => onChange(values.filter((_, i) => i !== index));
+  const move = (index, direction) => {
+    const next = [...values]; const target = index + direction;
+    if (target < 0 || target >= next.length) return;
+    [next[index], next[target]] = [next[target], next[index]]; onChange(next);
+  };
+  return <div>
+    <label className={labelClass}>Flexible Page Sections</label>
+    <p className="mb-3 text-xs text-slate-400">Add, remove, and reorder editable sections for the public luxury page.</p>
+    <div className="space-y-4">{values.map((section, index) => <div key={index} className="rounded-2xl border border-slate-200 bg-slate-50 p-4">
+      <div className="grid gap-3 md:grid-cols-3"><select className={inputClass} value={section.type || "text"} onChange={(e) => update(index, "type", e.target.value)}><option value="text">Text section</option><option value="image-text">Image + text</option><option value="cards">Card grid</option><option value="quote">Statement</option><option value="cta">Call to action</option></select><input className={inputClass} value={section.eyebrow || ""} onChange={(e) => update(index, "eyebrow", e.target.value)} placeholder="Eyebrow" /><input className={inputClass} value={section.title || ""} onChange={(e) => update(index, "title", e.target.value)} placeholder="Section title" /></div>
+      <textarea className={`${inputClass} mt-3 min-h-24 resize-y`} value={section.text || ""} onChange={(e) => update(index, "text", e.target.value)} placeholder="Section content" />
+      {section.type === "image-text" && <input className={`${inputClass} mt-3`} value={section.image || ""} onChange={(e) => update(index, "image", e.target.value)} placeholder="Image URL" />}
+      {section.type === "cta" && <div className="mt-3 grid gap-3 md:grid-cols-2"><input className={inputClass} value={section.buttonLabel || ""} onChange={(e) => update(index, "buttonLabel", e.target.value)} placeholder="Button label" /><input className={inputClass} value={section.buttonUrl || ""} onChange={(e) => update(index, "buttonUrl", e.target.value)} placeholder="Button URL" /></div>}
+      <div className="mt-3 flex flex-wrap gap-2"><button type="button" onClick={() => move(index, -1)} className="rounded-lg bg-white px-3 py-2 text-xs font-semibold text-slate-600">Move up</button><button type="button" onClick={() => move(index, 1)} className="rounded-lg bg-white px-3 py-2 text-xs font-semibold text-slate-600">Move down</button><button type="button" onClick={() => remove(index)} className="rounded-lg bg-rose-50 px-3 py-2 text-xs font-semibold text-rose-600">Remove section</button></div>
+    </div>)}</div>
+    <button type="button" onClick={() => onChange([...values, { type: "text", eyebrow: "", title: "", text: "", image: "", buttonLabel: "", buttonUrl: "", items: [] }])} className="mt-3 inline-flex items-center gap-2 rounded-xl bg-teal-50 px-3 py-2 text-sm font-semibold text-teal-700 hover:bg-teal-100"><MdAdd /> Add section</button>
+  </div>;
+}
+
 const ConcernForm = () => {
   const { id } = useParams();
   const navigate = useNavigate();
@@ -328,6 +352,14 @@ const ConcernForm = () => {
 
   const title = useMemo(() => (isEdit ? "Update Concern" : "Create Concern"), [isEdit]);
   const setField = (field, value) => setForm((prev) => ({ ...prev, [field]: value }));
+  const previewData = useMemo(() => ({
+    ...form,
+    heroSliderImages: sliderItems.map((item) => item.preview || item.url).filter(Boolean),
+    heroImage: imagePreviews.heroImage || form.heroImage,
+    aboutImage: imagePreviews.aboutImage || form.aboutImage,
+    services: (form.services || []).map((item, index) => ({ ...item, image: serviceImagePreviews[index] || item.image })),
+    sections: form.sections || [],
+  }), [form, sliderItems, imagePreviews, serviceImagePreviews]);
 
   const handleImageFileChange = (field, event) => {
     const file = event.target.files?.[0] || null;
@@ -426,7 +458,7 @@ const ConcernForm = () => {
   };
 
   const handleSubmit = async (e) => {
-    e.preventDefault();
+    e?.preventDefault();
     setIsSaving(true);
 
     try {
@@ -483,6 +515,7 @@ const ConcernForm = () => {
         services: cleanCards((form.services || []).map((service, index) => ({ ...service, image: serviceImageUrls[index] || service.image }))),
         features: cleanCards((form.features || []).map((feature, index) => ({ ...feature, image: featureImageUrls[index] || feature.image }))),
         highlights: cleanCards(form.highlights),
+        sections: (form.sections || []).map((section) => ({ ...section, title: section.title?.trim(), text: section.text?.trim(), eyebrow: section.eyebrow?.trim() })).filter((section) => section.title || section.text || section.image),
       };
 
       if (isEdit) await updateConcern(id, payload);
@@ -501,7 +534,7 @@ const ConcernForm = () => {
   }
 
   return (
-    <div className="mx-auto max-w-5xl space-y-6">
+    <div className="mx-auto max-w-[1500px] space-y-6">
       <div className="flex items-center gap-4">
         <button onClick={() => navigate(-1)} className="flex h-9 w-9 items-center justify-center rounded-xl border border-slate-200 bg-white text-slate-600 shadow-sm transition hover:bg-slate-50">
           <MdArrowBack size={18} />
@@ -512,7 +545,9 @@ const ConcernForm = () => {
         </div>
       </div>
 
-      <form onSubmit={handleSubmit} className="space-y-6 rounded-2xl border border-slate-100 bg-white p-4 shadow-sm sm:p-8">
+      <ElementorConcernEditor form={form} setField={setField} onSubmit={handleSubmit} isSaving={isSaving} isLoading={isLoading} previewData={previewData} />
+
+      <form onSubmit={handleSubmit} className="hidden space-y-6 rounded-2xl border border-slate-100 bg-white p-4 shadow-sm sm:p-8">
         <div className="grid gap-4 md:grid-cols-2">
           <div><label className={labelClass}>Slug *</label><input className={inputClass} value={form.slug} onChange={(e) => setField("slug", e.target.value)} placeholder="northsouth-garments" required /></div>
           <div><label className={labelClass}>Public Route</label><input className={inputClass} value={form.routePath || ""} onChange={(e) => setField("routePath", e.target.value)} placeholder="/northsouthGarments" /></div>
@@ -594,6 +629,8 @@ const ConcernForm = () => {
           <div><label className={labelClass}>Highlights Description</label><input className={inputClass} value={form.highlightsDescription || ""} onChange={(e) => setField("highlightsDescription", e.target.value)} /></div>
         </div>
         <CardList label="Highlight Cards" values={form.highlights || []} onChange={(value) => setField("highlights", value)} />
+
+        <SectionBuilder values={form.sections || []} onChange={(value) => setField("sections", value)} />
 
         <div><label className={labelClass}>Process Title</label><input className={inputClass} value={form.processTitle || ""} onChange={(e) => setField("processTitle", e.target.value)} /></div>
         <TextList label="Process Items" values={form.processItems || []} onChange={(value) => setField("processItems", value)} placeholder="Process step..." />

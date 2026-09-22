@@ -436,6 +436,7 @@ function ProjectShowcaseTemplate({
     config.plotTabs?.[0]?.key || "residential",
   );
   const [form, setForm] = useState({
+    projectName,
     name: "",
     block: "",
     address: "",
@@ -579,9 +580,10 @@ function ProjectShowcaseTemplate({
     event.preventDefault();
 
     try {
-      await addBooking(form);
+      await addBooking({ ...form, projectName });
       toast.success("আপনার বুকিং রিকোয়েস্ট সফলভাবে জমা হয়েছে!");
       setForm({
+        projectName,
         name: "",
         block: "",
         address: "",
@@ -1900,21 +1902,22 @@ function ProjectShowcaseTemplate({
                       value={form.block}
                       onChange={onFormChange}
                       className={inputClass}
+                      style={{ color: isLightPage ? "#0f172a" : "#ffffff", backgroundColor: isLightPage ? "#ffffff" : "#0f172a" }}
                       required
                     >
-                      <option value="" className="bg-slate-900">
+                      <option value="">
                         ব্লক নির্বাচন করুন
                       </option>
-                      <option value="A" className="bg-slate-900">
+                      <option value="A">
                         A
                       </option>
-                      <option value="B" className="bg-slate-900">
+                      <option value="B">
                         B
                       </option>
-                      <option value="C" className="bg-slate-900">
+                      <option value="C">
                         C
                       </option>
-                      <option value="D" className="bg-slate-900">
+                      <option value="D">
                         D
                       </option>
                     </select>

@@ -1,7 +1,6 @@
 import { useEffect, useState } from "react";
 import Spinner from "../../components/Spinner";
 import NotFound from "../../components/NotFound";
-import ConcernPageTemplate from "./ConcernPageTemplate";
 import NirapadValleyLuxury from "./NirapadValleyLuxury";
 import FoundationLuxury from "./FoundationLuxury";
 import ConstructionLuxury from "./ConstructionLuxury";
@@ -89,7 +88,7 @@ const DynamicConcernPage = ({ slug }) => {
             ? <ConstructionLuxury {...resolved.data} />
             : /northsouth.?farms|northsouth.?garments|north.?south.?duplex|north.?south.?consortium/i.test(`${defaultSlug} ${resolved.data.title}`)
             ? <ConcernLuxuryPage {...resolved.data} />
-            : <ConcernPageTemplate {...resolved.data} />}
+            : <ConcernLuxuryPage {...resolved.data} />}
     </div>
   );
 };

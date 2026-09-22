@@ -38,6 +38,9 @@ export default function ConcernLuxuryPage({
   aboutParagraphs = [],
   stats = [],
   services = [],
+  features = [],
+  featuresTitle,
+  featuresDescription,
   servicesTitle,
   servicesDescription,
   highlights = [],
@@ -54,6 +57,7 @@ export default function ConcernLuxuryPage({
   statementTitle = "A stronger future.\nBeautifully considered.",
   statementEyebrow = "Purpose, precision, and long-term value",
   galleryTitle,
+  sections = [],
 }) {
   const fallbackHero = heroImage || services[0]?.image || aboutImage;
   const slides = [...new Set([...heroSliderImages, fallbackHero, aboutImage, ...services.map((item) => item.image)].filter(Boolean))].slice(0, 6);
@@ -111,24 +115,40 @@ export default function ConcernLuxuryPage({
         </div>
       </section>
 
-      <nav className={styles.projectNav} aria-label="Concern sections"><span>{navLabel || title} <em>VISION</em></span><div><a href="#concern-overview">The vision</a><a href="#concern-services">Focus</a><a href="#concern-gallery">Gallery</a></div><a href="#concern-contact" className={styles.enquire}>Enquire now <FiArrowUpRight /></a></nav>
+      <nav className={styles.projectNav} aria-label="Concern sections"><span>{navLabel || title} <em>VISION</em></span><div><a href="#concern-overview">Overview</a><a href="#concern-services">Services</a><a href="#concern-features">Features</a><a href="#concern-highlights">Highlights</a><a href="#concern-process">Process</a><a href="#concern-gallery">Gallery</a></div><a href="#concern-contact" className={styles.enquire}>Enquire now <FiArrowUpRight /></a></nav>
 
       <section id="concern-overview" className={`${styles.section} ${styles.overview}`}>
         <div className={styles.overviewVisual}><img src={aboutImage || slides[0]} alt={`${title} overview`} loading="lazy" /><div className={styles.imageNote}><span>{imageNoteTitle}</span><p>{noteLines.map((line, index) => <span key={index}>{line}{index < noteLines.length - 1 && <br />}</span>)}</p></div></div>
         <div className={styles.overviewCopy}><span className={styles.eyebrow}>A refined North South concern</span><h2>{aboutTitle}</h2><div className={styles.accentRule} />{aboutParagraphs.map((paragraph, index) => <p key={index}>{paragraph}</p>)}<a className={styles.textLink} href="#concern-contact">Start a conversation <FiArrowUpRight /></a></div>
       </section>
 
-      <div className={styles.values}>{stats.map((stat, index) => <div key={index}><span className={styles.valueNumber}>0{index + 1}</span><strong>{stat.value}</strong><span>{stat.label}</span></div>)}</div>
+      <div id="concern-stats" className={styles.values}>{stats.map((stat, index) => <div key={index}><span className={styles.valueNumber}>0{index + 1}</span><strong>{stat.value}</strong><span>{stat.label}</span></div>)}</div>
 
       <section id="concern-services" className={styles.section}><div className={styles.sectionHeading}><div><span className={styles.eyebrow}>Focused capabilities</span><h2>{servicesTitle || "Built around\nmeaningful work."}</h2></div><p>{servicesDescription}</p></div><div className={styles.lifestyleGrid}>{cards.slice(0, 3).map((card, index) => <article className={styles.lifestyleCard} key={index}><div className={styles.cardImage}><img src={card.image || slides[index % slides.length]} alt={card.title} loading="lazy" /><span>0{index + 1}</span></div><h3>{card.title}</h3><p>{card.text}</p></article>)}</div></section>
 
-      <section className={styles.statement}><img src={slides[1] || slides[0]} alt={`${title} statement`} loading="lazy" /><div><span className={styles.eyebrow}>{statementEyebrow}</span><h2>{statementTitle.split("\n").map((line, index) => <span key={index}>{line}{index < statementTitle.split("\n").length - 1 && <br />}</span>)}</h2><a href="#concern-contact" className={styles.heroLink}>Connect with us <FiArrowUpRight /></a></div></section>
+      {features?.length > 0 && <section id="concern-features" className={styles.section}><div className={styles.sectionHeading}><div><span className={styles.eyebrow}>Key features</span><h2>{featuresTitle || "Designed around confidence."}</h2></div><p>{featuresDescription}</p></div><div className={styles.detailGrid}>{features.map((item, index) => <article key={index}><FiShield /><h3>{item.title}</h3><p>{item.text}</p></article>)}</div></section>}
 
-      <section className={`${styles.section} ${styles.details}`}><div><span className={styles.eyebrow}>Why it matters</span><h2>{highlightsTitle || "Confidence in\nevery detail."}</h2><p>{highlightsDescription}</p></div><div className={styles.detailGrid}>{detailItems.slice(0, 6).map((item, index) => { const Icon = icons[index % icons.length]; return <article key={index}><Icon /><h3>{item.title}</h3><p>{item.text}</p></article>; })}</div></section>
+      <section id="concern-statement" className={styles.statement}><img src={slides[1] || slides[0]} alt={`${title} statement`} loading="lazy" /><div><span className={styles.eyebrow}>{statementEyebrow}</span><h2>{statementTitle.split("\n").map((line, index) => <span key={index}>{line}{index < statementTitle.split("\n").length - 1 && <br />}</span>)}</h2><a href="#concern-contact" className={styles.heroLink}>Connect with us <FiArrowUpRight /></a></div></section>
+
+      <section id="concern-highlights" className={`${styles.section} ${styles.details}`}><div><span className={styles.eyebrow}>Why it matters</span><h2>{highlightsTitle || "Confidence in\nevery detail."}</h2><p>{highlightsDescription}</p></div><div className={styles.detailGrid}>{detailItems.slice(0, 6).map((item, index) => { const Icon = icons[index % icons.length]; return <article key={index}><Icon /><h3>{item.title}</h3><p>{item.text}</p></article>; })}</div></section>
+
+      {processItems?.length > 0 && <section id="concern-process" className={`${styles.section} ${styles.details}`}><div><span className={styles.eyebrow}>How we work</span><h2>Process and delivery.</h2></div><div className={styles.detailGrid}>{processItems.map((item, index) => <article key={index}><span className={styles.valueNumber}>0{index + 1}</span><h3>Step {index + 1}</h3><p>{item}</p></article>)}</div></section>}
+
+      {sections.filter((section) => section && section.type !== "gallery").map((section, sectionIndex) => (
+        <section id={`concern-custom-${sectionIndex}`} key={section._id || sectionIndex} className={`${styles.section} ${section.type === "quote" ? styles.statement : ""}`}>
+          {section.type === "image-text" ? <div className={styles.overview}>
+            <div className={styles.overviewVisual}><img src={section.image || slides[sectionIndex % slides.length]} alt={section.title || title} loading="lazy" /></div>
+            <div className={styles.overviewCopy}><span className={styles.eyebrow}>{section.eyebrow}</span><h2>{section.title}</h2><div className={styles.accentRule} /><p>{section.text}</p></div>
+          </div> : section.type === "cards" ? <>
+            <div className={styles.sectionHeading}><div><span className={styles.eyebrow}>{section.eyebrow}</span><h2>{section.title}</h2></div><p>{section.text}</p></div>
+            <div className={styles.lifestyleGrid}>{(section.items || []).map((item, index) => <article className={styles.lifestyleCard} key={index}><div className={styles.cardImage}><img src={item.image || slides[index % slides.length]} alt={item.title} loading="lazy" /></div><h3>{item.title}</h3><p>{item.text}</p></article>)}</div>
+          </> : <div className={styles.overviewCopy}><span className={styles.eyebrow}>{section.eyebrow}</span><h2>{section.title}</h2><div className={styles.accentRule} /><p>{section.text}</p>{section.type === "cta" && <a className={styles.textLink} href={section.buttonUrl || "#concern-contact"}>{section.buttonLabel || "Connect with us"} <FiArrowUpRight /></a>}</div>}
+        </section>
+      ))}
 
       <section id="concern-gallery" className={`${styles.section} ${styles.gallerySection}`}><div className={styles.sectionHeading}><div><span className={styles.eyebrow}>Visual identity</span><h2>{galleryTitle || "The collection."}</h2></div><p>Select an image to explore this concern's visual direction.</p></div><div className={styles.gallery}>{gallery.map((src, index) => <button key={src} onClick={() => setLightbox(index)} aria-label={`Open image ${index + 1}`}><img src={src} alt={`${title} gallery ${index + 1}`} loading="lazy" /><span>Explore image <FiArrowUpRight /></span></button>)}</div><p className={styles.galleryNote}>Imagery is used to present the concern's visual direction. Contact our team for current project photographs, availability, and specifications.</p></section>
 
-      <div className={styles.contact}><ContactSection theme={palette} title={ctaTitle} description={ctaText} buttonLabel="Send enquiry" ctaTitle={ctaTitle} ctaText={ctaText} /></div>
+      <div id="concern-contact" className={styles.contact}><ContactSection theme={palette} title={ctaTitle} description={ctaText} buttonLabel="Send enquiry" ctaTitle={ctaTitle} ctaText={ctaText} /></div>
 
       {lightbox !== null && <div className={styles.lightbox} role="dialog" aria-modal="true" aria-label={`${title} image viewer`} onClick={() => setLightbox(null)}><button autoFocus className={styles.close} onClick={() => setLightbox(null)} aria-label="Close image viewer"><FiX /></button><button onClick={(event) => { event.stopPropagation(); setLightbox((lightbox - 1 + gallery.length) % gallery.length); }} aria-label="Previous image"><FiChevronLeft /></button><img src={gallery[lightbox]} alt={`${title} enlarged gallery`} onClick={(event) => event.stopPropagation()} /><button onClick={(event) => { event.stopPropagation(); setLightbox((lightbox + 1) % gallery.length); }} aria-label="Next image"><FiChevronRight /></button></div>}
     </main>
