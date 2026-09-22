@@ -6,6 +6,7 @@ import NirapadValleyLuxury from "./NirapadValleyLuxury";
 import FoundationLuxury from "./FoundationLuxury";
 import ConstructionLuxury from "./ConstructionLuxury";
 import MayalokResortLuxury from "./MayalokResortLuxury";
+import ConcernLuxuryPage from "./ConcernLuxuryPage";
 import { getDefaultConcern, hasDefaultConcern } from "./defaultConcernData";
 import { useConcernStore } from "../../store/concern/concernStore";
 import { slugify } from "../../utils/entity";
@@ -86,6 +87,8 @@ const DynamicConcernPage = ({ slug }) => {
             ? <MayalokResortLuxury {...resolved.data} />
             : /north.?south.?building.?construction/i.test(`${defaultSlug} ${resolved.data.title}`)
             ? <ConstructionLuxury {...resolved.data} />
+            : /northsouth.?farms|northsouth.?garments|north.?south.?duplex|north.?south.?consortium/i.test(`${defaultSlug} ${resolved.data.title}`)
+            ? <ConcernLuxuryPage {...resolved.data} />
             : <ConcernPageTemplate {...resolved.data} />}
     </div>
   );
