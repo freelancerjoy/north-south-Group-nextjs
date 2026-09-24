@@ -1,31 +1,8 @@
-import { FaCheckCircle, FaCookieBite, FaEnvelope, FaGlobe, FaLock, FaShieldAlt } from "react-icons/fa";
-import privacy from "../assets/images/privacy.png";
-
-const displayFont = { fontFamily: '"Montserrat", sans-serif' };
-const bodyFont = { fontFamily: '"Montserrat", sans-serif' };
-const accentFont = {
-  fontFamily: '"Montserrat", sans-serif',
-  letterSpacing: "0.16em",
-  fontWeight: 700,
-};
-
-const highlights = [
-  {
-    icon: FaShieldAlt,
-    title: "Privacy First",
-    text: "We collect only the information needed to respond, support, and improve our services.",
-  },
-  {
-    icon: FaLock,
-    title: "Secure Handling",
-    text: "Personal information is handled with practical safeguards and controlled internal access.",
-  },
-  {
-    icon: FaCookieBite,
-    title: "Transparent Tracking",
-    text: "Cookies and basic analytics may be used to improve browsing experience and site performance.",
-  },
-];
+import { useEffect, useState } from "react";
+import { FiArrowDown, FiArrowUpRight, FiCheck, FiClock, FiFileText, FiMail, FiMapPin, FiShield } from "react-icons/fi";
+import propertyImage from "../assets/images/realEstateImg2.jpg";
+import { useContactInfoStore } from "../store/contactInfo/contactInfoStore";
+import styles from "./PrivacyPolicy.module.css";
 
 const sections = [
   {
@@ -116,168 +93,92 @@ const sections = [
   },
 ];
 
-const PrivacyPolicy = () => {
+
+export default function PrivacyPolicy() {
+  const [activeSection, setActiveSection] = useState("01");
+  const contactInfo = useContactInfoStore((state) => state.contactInfo);
+  const loadContactInfo = useContactInfoStore((state) => state.loadContactInfo);
+  const email = contactInfo?.emails?.[0] || "info@northsouthgroup.com";
+  const readMinutes = Math.ceil(sections.map((section) => [section.title, section.body, ...(section.bullets || [])].filter(Boolean).join(" ")).join(" ").split(/\s+/).length / 200);
+
+  useEffect(() => { loadContactInfo(); }, [loadContactInfo]);
+
+  useEffect(() => {
+    const policySections = Array.from(document.querySelectorAll("[data-privacy-section]"));
+    let frame = 0;
+    const updateActiveSection = () => {
+      cancelAnimationFrame(frame);
+      frame = requestAnimationFrame(() => {
+        const reached = policySections.filter((section) => section.getBoundingClientRect().top <= 150);
+        setActiveSection(reached.at(-1)?.dataset.section || "01");
+      });
+    };
+    updateActiveSection();
+    window.addEventListener("scroll", updateActiveSection, { passive: true });
+    window.addEventListener("resize", updateActiveSection);
+    return () => {
+      cancelAnimationFrame(frame);
+      window.removeEventListener("scroll", updateActiveSection);
+      window.removeEventListener("resize", updateActiveSection);
+    };
+  }, []);
+
+  const contents = <ol className={styles.contentsList}>{sections.map((section) => (
+    <li key={section.number}><a href={`#privacy-${section.number}`} aria-current={activeSection === section.number ? "location" : undefined} onClick={() => setActiveSection(section.number)}><span>{section.number}</span>{section.title}</a></li>
+  ))}</ol>;
+
   return (
-    <main className="overflow-hidden bg-white text-slate-900" style={bodyFont}>
-      <section className="relative isolate min-h-[560px] overflow-hidden">
-        <img src={privacy} alt="Privacy Policy" className="absolute inset-0 h-full w-full object-cover" />
-        <div className="absolute inset-0 bg-[linear-gradient(90deg,rgba(2,6,23,0.84)_0%,rgba(2,6,23,0.68)_48%,rgba(2,6,23,0.28)_100%)]" />
-        <div className="absolute inset-0 bg-[radial-gradient(circle_at_16%_18%,rgba(34,197,94,0.22),transparent_24%),radial-gradient(circle_at_82%_18%,rgba(234,179,8,0.18),transparent_22%)]" />
-
-        <div className="relative mx-auto flex min-h-[560px] max-w-7xl items-end px-4 pb-14 pt-28 sm:px-6 lg:px-8">
-          <div className="grid w-full gap-10 lg:grid-cols-[1fr_0.72fr] lg:items-end">
-            <div className="max-w-4xl">
-              <p className="text-xs font-bold uppercase text-green-200" style={accentFont}>
-                Legal Information
-              </p>
-              <h1 className="mt-5 max-w-3xl text-4xl font-semibold leading-tight text-white sm:text-5xl lg:text-[4.25rem]" style={displayFont}>
-                Privacy Policy for North South Group
-              </h1>
-              <p className="mt-6 max-w-2xl text-base leading-8 text-white/82 sm:text-lg">
-                This page explains how information may be collected, used, protected, and managed when you visit our
-                website or communicate with our team.
-              </p>
-            </div>
-
-            <div className="rounded-[2rem] border border-white/15 bg-white/10 p-5 shadow-[0_28px_80px_-42px_rgba(0,0,0,0.9)] backdrop-blur-xl">
-              <p className="text-xs font-bold uppercase text-green-100" style={accentFont}>
-                Effective Date
-              </p>
-              <p className="mt-3 text-3xl font-semibold text-white" style={displayFont}>
-                April 28, 2026
-              </p>
-              <p className="mt-4 text-sm leading-7 text-slate-200">
-                We recommend reviewing this policy periodically if you regularly submit inquiries, applications, or
-                project-related information through our website.
-              </p>
-            </div>
+    <main className={styles.page}>
+      <section className={styles.hero}>
+        <img className={styles.heroImage} src={propertyImage} alt="Residential architecture surrounded by greenery" fetchPriority="high" />
+        <div className={styles.heroShade} />
+        <div className={styles.container}>
+          <div className={styles.heroTop}><span>North South Group</span><span>Trust & transparency</span></div>
+          <div className={styles.heroGrid}>
+            <div><p className={styles.eyebrow}>Our commitment to clarity</p><h1>Your confidence.<br /><em>Our responsibility.</em></h1><p className={styles.heroDescription}>From your first property enquiry to your next conversation with us, understand how information is handled when you use our website.</p><a href="#privacy-overview" className={styles.heroLink}>Explore our privacy policy <FiArrowDown /></a></div>
+            <div className={styles.policySeal}><FiShield aria-hidden="true" /><span>Privacy Policy</span><p>Clear information.<br />Considered decisions.</p><div>North South Group</div></div>
           </div>
         </div>
       </section>
 
-      <section className="relative isolate px-4 py-20 sm:px-6 lg:px-8">
-        <div className="absolute inset-0 bg-[radial-gradient(circle_at_12%_8%,rgba(34,197,94,0.14),transparent_24%),radial-gradient(circle_at_88%_14%,rgba(234,179,8,0.12),transparent_22%),linear-gradient(180deg,#ffffff_0%,#f5fbf5_46%,#ffffff_100%)]" />
-        <div className="relative mx-auto max-w-7xl">
-          <div className="max-w-3xl">
-            <p className="text-xs font-bold uppercase text-green-700" style={accentFont}>
-              Privacy Overview
-            </p>
-            <h2 className="mt-4 text-3xl font-semibold leading-tight text-slate-950 sm:text-4xl" style={displayFont}>
-              Clear, readable, and transparent information handling
-            </h2>
-            <p className="mt-5 text-sm leading-8 text-slate-600 sm:text-base">
-              We want this page to be practical, not confusing. The summary below highlights the most important ideas
-              before the detailed sections.
-            </p>
-          </div>
+      <div className={styles.documentBar}><div className={styles.container}><span><FiFileText /> Website privacy policy</span><span>Effective <time dateTime="2026-04-28">28 April 2026</time></span><span><FiClock /> {readMinutes} min read</span></div></div>
 
-          <div className="mt-12 grid gap-5 lg:grid-cols-3">
-            {highlights.map((item) => {
-              const Icon = item.icon;
-              return (
-                <div
-                  key={item.title}
-                  className="rounded-[1.75rem] border border-green-100 bg-white/88 p-6 shadow-[0_24px_70px_-48px_rgba(22,101,52,0.72)] ring-1 ring-green-50"
-                >
-                  <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-green-600 text-white shadow-[0_18px_40px_-22px_rgba(34,197,94,0.8)]">
-                    <Icon className="text-lg" />
-                  </div>
-                  <h3 className="mt-5 text-2xl font-semibold text-slate-950" style={displayFont}>
-                    {item.title}
-                  </h3>
-                  <p className="mt-3 text-sm leading-7 text-slate-600">{item.text}</p>
-                </div>
-              );
-            })}
-          </div>
-
-          <div className="mt-14 grid gap-6">
-            {sections.map((section) => (
-              <section
-                key={section.number}
-                className="rounded-[2rem] border border-slate-200 bg-white/92 p-6 shadow-[0_24px_70px_-52px_rgba(15,23,42,0.35)] sm:p-8"
-              >
-                <div className="grid gap-6 lg:grid-cols-[120px_1fr]">
-                  <div>
-                    <div className="inline-flex rounded-full border border-green-200 bg-green-50 px-4 py-2 text-xs font-bold uppercase text-green-700">
-                      Section {section.number}
-                    </div>
-                  </div>
-                  <div>
-                    <h3 className="text-2xl font-semibold text-slate-950 sm:text-3xl" style={displayFont}>
-                      {section.title}
-                    </h3>
-                    {section.body ? (
-                      <p className="mt-4 text-sm leading-8 text-slate-600 sm:text-base">{section.body}</p>
-                    ) : null}
-                    {section.bullets ? (
-                      <div className="mt-5 grid gap-3 sm:grid-cols-2">
-                        {section.bullets.map((point) => (
-                          <div
-                            key={point}
-                            className="flex items-start gap-3 rounded-2xl border border-slate-100 bg-slate-50/85 px-4 py-3"
-                          >
-                            <FaCheckCircle className="mt-1 shrink-0 text-green-600" />
-                            <p className="text-sm leading-7 text-slate-700">{point}</p>
-                          </div>
-                        ))}
-                      </div>
-                    ) : null}
-                  </div>
-                </div>
-              </section>
-            ))}
-          </div>
-        </div>
+      <section id="privacy-overview" className={`${styles.container} ${styles.overview}`}>
+        <div><p className={styles.eyebrow}>A foundation of trust</p><h2>Before you share,<br /><em>know where you stand.</em></h2></div>
+        <div><p>Whether you are exploring a plot, comparing residential projects or contacting our team about a property, this policy explains how information may be collected and used through our website.</p><p>Read the sections below to understand the information you provide, website technologies and how to get in touch with a privacy question.</p></div>
       </section>
 
-      <section className="px-4 pb-24 sm:px-6 lg:px-8">
-        <div className="mx-auto max-w-7xl">
-          <div className="overflow-hidden rounded-[2.25rem] bg-[linear-gradient(135deg,#052e16_0%,#14532d_44%,#166534_100%)] p-8 text-white shadow-[0_32px_100px_-52px_rgba(22,101,52,0.9)] sm:p-10">
-            <div className="grid gap-10 lg:grid-cols-[1fr_0.9fr] lg:items-center">
-              <div>
-                <p className="text-xs font-bold uppercase text-green-100" style={accentFont}>
-                  Contact Us
-                </p>
-                <h2 className="mt-4 text-3xl font-semibold leading-tight text-white sm:text-4xl" style={displayFont}>
-                  Questions about this policy?
-                </h2>
-                <p className="mt-5 max-w-2xl text-sm leading-8 text-green-50/90 sm:text-base">
-                  If you need clarification about how your information is handled, feel free to contact North South
-                  Group through the details below.
-                </p>
-              </div>
+      <div className={`${styles.container} ${styles.topicCards}`}>
+        <a href="#privacy-02"><FiMapPin /><div><span>01 / Your enquiries</span><h3>Information you share</h3><p>Contact details, messages and enquiry information.</p></div><FiArrowUpRight /></a>
+        <a href="#privacy-05"><FiShield /><div><span>02 / Your visit</span><h3>Your website experience</h3><p>Logs, cookies and external services.</p></div><FiArrowUpRight /></a>
+        <a href="#privacy-contact"><FiMail /><div><span>03 / Your questions</span><h3>A clear point of contact</h3><p>Reach our team for clarification about this policy.</p></div><FiArrowUpRight /></a>
+      </div>
 
-              <div className="grid gap-4">
-                <div className="rounded-[1.5rem] border border-white/12 bg-white/10 p-5 backdrop-blur">
-                  <div className="flex items-center gap-3">
-                    <div className="flex h-11 w-11 items-center justify-center rounded-2xl bg-white/15 text-white">
-                      <FaEnvelope />
-                    </div>
-                    <div>
-                      <p className="text-xs font-bold uppercase text-green-100">Email</p>
-                      <p className="mt-1 text-sm text-white/90 sm:text-base">info@northsouthgroup.com</p>
-                    </div>
-                  </div>
-                </div>
-                <div className="rounded-[1.5rem] border border-white/12 bg-white/10 p-5 backdrop-blur">
-                  <div className="flex items-center gap-3">
-                    <div className="flex h-11 w-11 items-center justify-center rounded-2xl bg-white/15 text-white">
-                      <FaGlobe />
-                    </div>
-                    <div>
-                      <p className="text-xs font-bold uppercase text-green-100">Website</p>
-                      <p className="mt-1 text-sm text-white/90 sm:text-base">www.northsouthgroup.com</p>
-                    </div>
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
+      <div className={`${styles.container} ${styles.documentLayout}`}>
+        <aside className={styles.sidebar}>
+          <nav className={styles.desktopContents} aria-label="Privacy policy sections"><p className={styles.eyebrow}>In this policy</p>{contents}</nav>
+          <details className={styles.mobileContents}><summary>Explore policy sections <FiArrowDown /></summary><nav aria-label="Privacy policy sections">{contents}</nav></details>
+          <div className={styles.sideNote}><FiShield /><p>Read at your own pace.</p><span>Each section explains a different part of how this website handles information.</span><a href="#privacy-contact">Have a question? <FiArrowUpRight /></a></div>
+        </aside>
+        <article className={styles.document} aria-labelledby="policy-document-title">
+          <header className={styles.documentHeader}><p className={styles.eyebrow}>The full policy</p><h2 id="policy-document-title">Privacy Policy</h2><p>For visitors to the North South Group website.</p></header>
+          {sections.map((section) => (
+            <section key={section.number} id={`privacy-${section.number}`} data-privacy-section data-section={section.number} className={styles.policySection} aria-labelledby={`privacy-heading-${section.number}`}>
+              <div className={styles.sectionTitle}><span>{section.number}</span><h3 id={`privacy-heading-${section.number}`}>{section.title}</h3></div>
+              {section.body && <p>{section.body}</p>}
+              {section.bullets && <ul>{section.bullets.map((point) => <li key={point}><FiCheck aria-hidden="true" /><span>{point}</span></li>)}</ul>}
+            </section>
+          ))}
+          <a className={styles.backToContents} href="#privacy-overview">Back to overview <FiArrowUpRight /></a>
+        </article>
+      </div>
+
+      <section id="privacy-contact" className={styles.contact}>
+        <div className={`${styles.container} ${styles.contactGrid}`}>
+          <div><p className={styles.eyebrow}>A conversation brings clarity</p><h2>Questions about<br /><em>your information?</em></h2><p>Contact North South Group if you would like clarification about this policy or how your information is handled.</p></div>
+          <div className={styles.contactCard}><FiMail /><span className={styles.eyebrow}>Write to our team</span><a href={`mailto:${email}?subject=Privacy%20policy%20enquiry`}>{email}<FiArrowUpRight /></a><p>For a question about a previous enquiry, mention the project name or enquiry date to help explain your request.</p></div>
         </div>
       </section>
     </main>
   );
-};
-
-export default PrivacyPolicy;
+}

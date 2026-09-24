@@ -1,299 +1,214 @@
-import { useState } from "react";
-import career1 from "../../assets/images/career1.jpg";
-import { IoCloseOutline } from "react-icons/io5";
+﻿import { useEffect, useRef, useState } from "react";
 import {
-  FaBriefcase,
-  FaUsers,
-  FaChartLine,
-  FaGraduationCap,
-  FaHandshake,
-  FaBalanceScale,
-  FaArrowRight,
-  FaUpload,
-  FaCheckCircle,
-} from "react-icons/fa";
+  FiArrowDown, FiArrowUpRight, FiAward, FiBookOpen, FiBriefcase,
+  FiCheck, FiCompass, FiFileText, FiHeart, FiMail, FiUsers, FiX,
+} from "react-icons/fi";
+import { useContactInfoStore } from "../../store/contactInfo/contactInfoStore";
+import styles from "./Career.module.css";
 
 const benefits = [
-  {
-    icon: FaBalanceScale,
-    title: "Equal Employment Opportunity",
-    desc: "North South Group offers a wide range of equal employment opportunities for undergraduate and graduate students, ensuring fair treatment for every applicant regardless of background.",
-  },
-  {
-    icon: FaBriefcase,
-    title: "Excellent Work Environment",
-    desc: "We provide an outstanding workplace culture built on mutual respect, open communication, and a supportive team atmosphere that helps everyone do their best work.",
-  },
-  {
-    icon: FaGraduationCap,
-    title: "Training & Skill Development",
-    desc: "Extensive training programs help employees grow their technical and soft skills continuously, giving them the tools to thrive in their current role and beyond.",
-  },
-  {
-    icon: FaHandshake,
-    title: "Dynamic Corporate Culture",
-    desc: "A professional yet positive environment where innovation is encouraged, ideas are valued, and every employee plays an active part in shaping the company's direction.",
-  },
-  {
-    icon: FaUsers,
-    title: "Versatile Team Collaboration",
-    desc: "Working within a multicultural team opens up new perspectives, fresh problem-solving approaches, and opportunities to build skills that a homogeneous team cannot offer.",
-  },
-  {
-    icon: FaChartLine,
-    title: "Rapid Career Progress",
-    desc: "North South Group offers some of the fastest career advancement paths in the industry, recognising and rewarding talent, dedication, and results consistently.",
-  },
+  { icon: FiHeart, title: "A place to belong", text: "A welcoming workplace where different backgrounds, perspectives and experiences are valued." },
+  { icon: FiUsers, title: "Better, together", text: "Work alongside people who share ideas, support one another and take pride in a shared result." },
+  { icon: FiBookOpen, title: "Room to keep learning", text: "Build your knowledge through hands-on work, collaboration and opportunities to develop your skills." },
+  { icon: FiCompass, title: "Space for your ideas", text: "Bring a fresh perspective. Ask thoughtful questions. Help shape the way we work and what we create." },
+  { icon: FiBriefcase, title: "Work with purpose", text: "Contribute to the places and experiences that connect people, businesses and communities." },
+  { icon: FiAward, title: "A future you can shape", text: "Take ownership of your work, build confidence and explore the next chapter of your professional journey." },
 ];
 
-const inp =
-  "w-full rounded-xl border border-gray-200 bg-gray-50 px-4 py-3 text-sm text-gray-800 transition placeholder:text-gray-400 focus:border-[#0f7771] focus:bg-white focus:outline-none focus:ring-2 focus:ring-[#0f7771]/20";
-const lbl = "mb-1.5 block text-sm font-semibold text-gray-700";
+const careerAreas = [
+  { title: "Design & engineering", detail: "Architecture · Planning · Project delivery", number: "01" },
+  { title: "Sales & marketing", detail: "Relationships · Communication · Brand", number: "02" },
+  { title: "Business & operations", detail: "Finance · Administration · Team support", number: "03" },
+  { title: "Early careers", detail: "Fresh perspectives · Learning · New beginnings", number: "04" },
+];
 
-const Career = () => {
+const careerQuestions = [
+  { question: "How do I apply?", answer: "Choose a career area or select Start your application. Fill in your details to prepare an email, attach your CV as a PDF, then send it from your email app. You can also use the email address shown in the application form." },
+  { question: "Can I apply at the beginning of my career?", answer: "You can select Early careers to introduce yourself. Include your education, projects, relevant skills and the kind of experience you hope to gain. Opportunities depend on current team needs." },
+  { question: "What should I include in my CV?", answer: "Include up-to-date contact details, education, relevant experience and a clear summary of your skills. For creative or technical work, add a link to your portfolio or a few relevant projects." },
+  { question: "Can I apply for a different area?", answer: "Yes. Choose Introduce yourself and enter your preferred role or department. Tell us how your experience could contribute to the team." },
+  { question: "What happens after I send my application?", answer: "Your email gives the team an opportunity to review your background against current needs. If there is a suitable fit, the team can contact you using the details you provide. A general application does not guarantee an interview or a role." },
+];
+
+export default function Career() {
+  const dialogRef = useRef(null);
   const [open, setOpen] = useState(false);
-  const [submitted, setSubmitted] = useState(false);
-  const [formData, setFormData] = useState({
-    fullName: "",
-    email: "",
-    phone: "",
-    position: "",
-    address: "",
-    cv: null,
-  });
+  const [position, setPosition] = useState("");
+  const [draftOpened, setDraftOpened] = useState(false);
+  const contactInfo = useContactInfoStore((state) => state.contactInfo);
+  const loadContactInfo = useContactInfoStore((state) => state.loadContactInfo);
+  const email = contactInfo?.emails?.[0] || "northsouthgroupbd@gmail.com";
 
-  const handleChange = (e) => {
-    const { name, value, files } = e.target;
-    setFormData((prev) => ({ ...prev, [name]: files ? files[0] : value }));
-  };
+  useEffect(() => { loadContactInfo(); }, [loadContactInfo]);
 
-  const handleSubmit = (e) => {
-    e.preventDefault();
-    setSubmitted(true);
-    setTimeout(() => {
-      setOpen(false);
-      setSubmitted(false);
-      setFormData({ fullName: "", email: "", phone: "", position: "", address: "", cv: null });
-    }, 2200);
-  };
+  useEffect(() => {
+    if (!open) return undefined;
+    const previousOverflow = document.body.style.overflow;
+    document.body.style.overflow = "hidden";
+    return () => { document.body.style.overflow = previousOverflow; };
+  }, [open]);
+
+  function openApplication(area = "") {
+    setPosition(area);
+    setDraftOpened(false);
+    setOpen(true);
+    dialogRef.current.showModal();
+  }
+
+  function closeApplication() {
+    dialogRef.current.close();
+    setOpen(false);
+  }
+
+  function prepareApplication(event) {
+    event.preventDefault();
+    const data = Object.fromEntries(new FormData(event.currentTarget));
+    const subject = `Career enquiry — ${data.position || "General application"}`;
+    const body = [
+      "Hello North South Group,", "", "I would like to express my interest in joining your team.", "",
+      `Name: ${data.fullName}`, `Email: ${data.email}`, `Phone: ${data.phone}`,
+      `Area of interest: ${data.position || "General application"}`, `Address: ${data.address}`,
+      "", "A little about me:", data.message || "", "", "Please find my CV attached.", "", `Kind regards,\n${data.fullName}`,
+    ].join("\n");
+    window.location.href = `mailto:${encodeURIComponent(email)}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
+    setDraftOpened(true);
+  }
 
   return (
-    <div className="bg-white">
-      {/* ── Hero ── */}
-      <div className="relative h-64 w-full overflow-hidden md:h-80 lg:h-[70vh]">
-        <img src={career1} alt="Career at North South" className="h-full w-full object-cover" />
-        <div className="absolute inset-0 bg-gradient-to-b from-black/20 via-black/45 to-black/75" />
-        <div className="absolute inset-0 flex flex-col items-center justify-center px-4 text-center">
-          <p className="mb-3 text-xs font-bold uppercase tracking-[5px] text-green-300">
-            Join Our Team
-          </p>
-          <h1 className="text-3xl font-extrabold leading-tight text-white md:text-5xl lg:text-6xl">
-            Build Your Career With<br className="hidden md:block" /> North South Group
-          </h1>
-          <p className="mt-4 max-w-xl text-sm leading-relaxed text-white/80 md:text-base">
-            Be part of a team that is shaping the future of real estate and urban development in Bangladesh.
-          </p>
-          <button
-            onClick={() => setOpen(true)}
-            className="mt-7 inline-flex items-center gap-2 rounded-full bg-[#0f7771] px-7 py-3.5 text-sm font-bold uppercase tracking-widest text-white shadow-lg transition hover:bg-[#0a5e5a]"
-          >
-            Apply Now <FaArrowRight size={12} />
-          </button>
-        </div>
-      </div>
-
-      {/* ── Why Join Us ── */}
-      <section className="bg-gray-50 px-5 py-20 md:px-10">
-        <div className="mx-auto max-w-screen-xl">
-          {/* heading */}
-          <div className="mx-auto mb-14 max-w-2xl text-center">
-            <p className="mb-2 text-xs font-bold uppercase tracking-[4px] text-[#0f7771]">
-              Why North South Group
-            </p>
-            <h2 className="text-3xl font-extrabold text-gray-900 md:text-4xl">
-              Why You Should Join Us
-            </h2>
-            <div className="mx-auto mt-4 h-1 w-14 rounded-full bg-[#0f7771]" />
-          </div>
-
-          {/* cards */}
-          <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
-            {benefits.map(({ icon: Icon, title, desc }) => (
-              <div
-                key={title}
-                className="group rounded-2xl border border-gray-100 bg-white p-7 shadow-sm transition-all duration-300 hover:-translate-y-1 hover:border-[#0f7771]/30 hover:shadow-lg"
-              >
-                <div className="mb-5 flex h-13 w-13 items-center justify-center rounded-xl bg-[#0f7771]/10 text-[#0f7771] transition group-hover:bg-[#0f7771] group-hover:text-white">
-                  <Icon size={22} />
-                </div>
-                <h3 className="mb-2 text-base font-bold text-gray-800">{title}</h3>
-                <p className="text-sm leading-relaxed text-gray-500">{desc}</p>
-              </div>
-            ))}
-          </div>
-        </div>
-      </section>
-
-      {/* ── CTA Banner ── */}
-      <section className="relative overflow-hidden bg-[#0f7771] px-5 py-20 text-center md:px-10">
-        <div className="pointer-events-none absolute -left-20 -top-20 h-72 w-72 rounded-full bg-white/5" />
-        <div className="pointer-events-none absolute -bottom-16 -right-16 h-56 w-56 rounded-full bg-white/5" />
-        <div className="relative mx-auto max-w-2xl">
-          <p className="mb-3 text-xs font-bold uppercase tracking-[4px] text-green-200">
-            We Are Hiring
-          </p>
-          <h2 className="text-3xl font-extrabold text-white md:text-4xl">
-            Help North South Build A Better Tomorrow
-          </h2>
-          <p className="mx-auto mt-4 max-w-lg text-sm leading-relaxed text-white/75">
-            We are always looking for talented, passionate, and driven individuals to join our growing team across departments.
-          </p>
-          <button
-            onClick={() => setOpen(true)}
-            className="mt-8 inline-flex items-center gap-2 rounded-full border-2 border-white bg-white px-8 py-4 text-sm font-bold uppercase tracking-widest text-[#0f7771] shadow-lg transition hover:bg-transparent hover:text-white"
-          >
-            Submit Your CV <FaArrowRight size={12} />
-          </button>
-        </div>
-      </section>
-
-      {/* ── Modal ── */}
-      {open && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4 backdrop-blur-sm">
-          <div className="relative w-full max-w-lg overflow-hidden rounded-2xl bg-white shadow-2xl">
-            {/* modal header */}
-            <div className="flex items-center justify-between border-b border-gray-100 px-6 py-5">
-              <div>
-                <p className="text-xs font-bold uppercase tracking-[3px] text-[#0f7771]">
-                  Career Application
-                </p>
-                <h3 className="mt-0.5 text-xl font-extrabold text-gray-900">Submit Your CV</h3>
-              </div>
-              <button
-                onClick={() => { setOpen(false); setSubmitted(false); }}
-                className="flex h-9 w-9 items-center justify-center rounded-full bg-gray-100 text-gray-500 transition hover:bg-gray-200"
-              >
-                <IoCloseOutline size={20} />
-              </button>
+    <main className={styles.page}>
+      <section className={styles.hero}>
+        <img className={styles.heroBackdrop} src="/images/careers/teamwork.jpg" alt="Professionals connecting and collaborating around a meeting table" width="1000" height="667" fetchPriority="high" />
+        <div className={styles.heroOverlay} />
+        <div className={`${styles.container} ${styles.heroGrid}`}>
+          <div className={styles.heroCopy}>
+            <p className={styles.eyebrow}><span /> Careers at North South Group</p>
+            <h1>A remarkable<br />future.<br /><em>Begins with you.</em></h1>
+            <p className={styles.heroDescription}>Bring your ambition. Find your people. Build a meaningful career with a team shaping the places we call tomorrow.</p>
+            <div className={styles.heroActions}>
+              <a href="#career-opportunities" className={styles.primaryButton}>Find your direction <FiArrowUpRight /></a>
+              <a href="#life-at-north-south" className={styles.textLink}>Life at North South <FiArrowDown /></a>
             </div>
+            <div className={styles.heroFootnote}><span>People first.</span> Possibilities ahead.</div>
+          </div>
+          <aside className={styles.heroSignature}><span className={styles.eyebrow}>The North South spirit</span><p>Different minds.<br /><em>Shared ambition.</em></p><span className={styles.signatureLine} /></aside>
+        </div>
+        <div className={`${styles.container} ${styles.heroBottom}`}><span>Build with purpose</span><span>Grow with people</span><span>Make a difference</span></div>
+      </section>
 
-            {/* success state */}
-            {submitted ? (
-              <div className="flex flex-col items-center justify-center px-6 py-16 text-center">
-                <FaCheckCircle className="mb-4 text-[#0f7771]" size={48} />
-                <h4 className="text-xl font-bold text-gray-800">Application Received!</h4>
-                <p className="mt-2 text-sm text-gray-500">
-                  Thank you for applying. Our team will review your CV and get back to you.
-                </p>
-              </div>
-            ) : (
-              <form onSubmit={handleSubmit} className="max-h-[75vh] overflow-y-auto px-6 py-6">
-                <div className="space-y-4">
-                  <div className="grid gap-4 sm:grid-cols-2">
-                    <div>
-                      <label className={lbl}>Full Name *</label>
-                      <input
-                        type="text"
-                        name="fullName"
-                        value={formData.fullName}
-                        onChange={handleChange}
-                        placeholder="Your full name"
-                        className={inp}
-                        required
-                      />
-                    </div>
-                    <div>
-                      <label className={lbl}>Phone Number *</label>
-                      <input
-                        type="tel"
-                        name="phone"
-                        value={formData.phone}
-                        onChange={handleChange}
-                        placeholder="+880 ..."
-                        className={inp}
-                        required
-                      />
-                    </div>
-                  </div>
+      <section id="life-at-north-south" className={`${styles.container} ${styles.culture}`}>
+        <div className={styles.sectionHeading}>
+          <div><p className={styles.eyebrow}>More than a workplace</p><h2>A place to contribute.<br /><em>A place to become.</em></h2></div>
+          <p>Behind every project is a team of people who care. We believe the best work happens when people feel supported, heard and inspired to grow.</p>
+        </div>
+        <div className={styles.cultureGallery}>
+          <figure className={styles.galleryFeature}>
+            <img src="/images/careers/team-meeting.jpg" alt="Professionals sharing ideas during a collaborative work session" width="1200" height="1800" loading="lazy" decoding="async" />
+            <figcaption><span className={styles.eyebrow}>Connection & collaboration</span><h3>Good people.<br /><em>Even better possibilities.</em></h3></figcaption>
+          </figure>
+          <figure className={styles.galleryPortrait}>
+            <img src="/images/careers/collaboration.jpg" alt="A professional sharing a report during a team discussion" width="1100" height="733" loading="lazy" decoding="async" />
+            <figcaption><span className={styles.eyebrow}>Ideas & initiative</span><h3>Bring your perspective.<br /><em>Make it count.</em></h3></figcaption>
+          </figure>
+        </div>
+        <div className={styles.benefitHeading}><span className={styles.eyebrow}>The things that matter</span><p>Purpose in your work. Support along the way.</p></div>
+        <div className={styles.benefitGrid}>
+          {benefits.map(({ icon, title, text }, index) => {
+            const Icon = icon;
+            return (
+            <article className={styles.benefit} key={title}>
+              <div className={styles.benefitTop}><Icon aria-hidden="true" /><span>0{index + 1}</span></div>
+              <h3>{title}</h3><p>{text}</p>
+            </article>
+            );
+          })}
+        </div>
+      </section>
 
-                  <div>
-                    <label className={lbl}>Email Address *</label>
-                    <input
-                      type="email"
-                      name="email"
-                      value={formData.email}
-                      onChange={handleChange}
-                      placeholder="you@email.com"
-                      className={inp}
-                      required
-                    />
-                  </div>
+      <section className={styles.statement}>
+        <div className={styles.container}>
+          <p className={styles.eyebrow}>One team. A shared sense of purpose.</p>
+          <h2>We build places for people.<br /><em>It starts with our own.</em></h2>
+          <p>Curiosity, care and collaboration. The foundations of how we work.</p>
+        </div>
+        <span className={styles.statementMark} aria-hidden="true">N/S</span>
+      </section>
 
-                  <div>
-                    <label className={lbl}>Position Applying For</label>
-                    <input
-                      type="text"
-                      name="position"
-                      value={formData.position}
-                      onChange={handleChange}
-                      placeholder="e.g. Sales Executive, Architect..."
-                      className={inp}
-                    />
-                  </div>
+      <section id="career-opportunities" className={`${styles.container} ${styles.opportunities}`}>
+        <div className={styles.opportunityIntro}>
+          <p className={styles.eyebrow}>Find your direction</p>
+          <h2>Different talents.<br /><em>Shared possibilities.</em></h2>
+          <p>Explore areas of interest for a general application. Specific roles depend on current team needs.</p>
+          <div className={styles.generalApplication}><FiCompass /><div><h3>Your path looks a little different?</h3><p>We’d still like to hear what you can bring.</p><button type="button" onClick={() => openApplication()}>Introduce yourself <FiArrowUpRight /></button></div></div>
+        </div>
+        <div className={styles.careerAreas}>
+          {careerAreas.map((area) => (
+            <button type="button" key={area.title} className={styles.area} onClick={() => openApplication(area.title)} aria-label={`Express interest in ${area.title}`}>
+              <span className={styles.areaNumber}>{area.number}</span>
+              <span className={styles.areaCopy}><span>{area.title}</span><small>{area.detail}</small></span>
+              <span className={styles.areaArrow}><FiArrowUpRight /></span>
+            </button>
+          ))}
+          <p className={styles.areaNote}><FiFileText /> Have your CV ready and tell us where you’d like to contribute.</p>
+        </div>
+      </section>
 
-                  <div>
-                    <label className={lbl}>Contact Address *</label>
-                    <textarea
-                      name="address"
-                      value={formData.address}
-                      rows={3}
-                      onChange={handleChange}
-                      placeholder="Your current address"
-                      className={inp}
-                      required
-                    />
-                  </div>
-
-                  {/* CV Upload */}
-                  <div>
-                    <label className={lbl}>
-                      Upload CV <span className="font-normal text-gray-400">(PDF only) *</span>
-                    </label>
-                    <label className="flex cursor-pointer items-center gap-3 rounded-xl border-2 border-dashed border-gray-200 bg-gray-50 px-4 py-4 transition hover:border-[#0f7771] hover:bg-[#0f7771]/5">
-                      <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-[#0f7771]/10 text-[#0f7771]">
-                        <FaUpload size={14} />
-                      </div>
-                      <div className="min-w-0 flex-1">
-                        <p className="truncate text-sm font-semibold text-gray-700">
-                          {formData.cv ? formData.cv.name : "Click to upload your CV"}
-                        </p>
-                        <p className="text-xs text-gray-400">PDF format, max 5MB</p>
-                      </div>
-                      <input
-                        type="file"
-                        name="cv"
-                        accept="application/pdf"
-                        onChange={handleChange}
-                        className="hidden"
-                        required
-                      />
-                    </label>
-                  </div>
-                </div>
-
-                <button
-                  type="submit"
-                  className="mt-6 w-full rounded-xl bg-[#0f7771] py-3.5 text-sm font-bold uppercase tracking-widest text-white shadow-md transition hover:bg-[#0a5e5a]"
-                >
-                  Submit Application
-                </button>
-              </form>
-            )}
+      <section className={styles.preparation}>
+        <div className={`${styles.container} ${styles.preparationGrid}`}>
+          <div>
+            <p className={styles.eyebrow}>Make a thoughtful first impression</p>
+            <h2>Your experience.<br /><em>Your story to tell.</em></h2>
+            <p>A good application helps us understand both what you have done and what you would love to do next.</p>
+            <button type="button" className={styles.preparationLink} onClick={() => openApplication()}>Ready to introduce yourself? <FiArrowUpRight /></button>
+          </div>
+          <div className={styles.preparationCard}>
+            <div className={styles.preparationTitle}><FiFileText /><h3>Before you apply</h3></div>
+            <ul>
+              <li><FiCheck /><div><strong>Keep your CV clear and current</strong><p>Highlight the experience, skills and projects most relevant to your interests.</p></div></li>
+              <li><FiCheck /><div><strong>Show us what you can do</strong><p>Add portfolio or project links if they help explain your work.</p></div></li>
+              <li><FiCheck /><div><strong>Make it easy to reach you</strong><p>Check your phone number and email, then attach your CV as a PDF before sending.</p></div></li>
+            </ul>
           </div>
         </div>
-      )}
-    </div>
-  );
-};
+      </section>
 
-export default Career;
+      <section className={styles.applicationSection}>
+        <div className={`${styles.container} ${styles.applicationGrid}`}>
+          <div><p className={styles.eyebrow}>A simple first step</p><h2>Good things begin<br /><em>with a conversation.</em></h2><p className={styles.applicationDescription}>Tell us who you are, what inspires you and where you want to go next.</p><button type="button" className={styles.primaryButton} onClick={() => openApplication()}>Start your application <FiArrowUpRight /></button></div>
+          <ol className={styles.applicationSteps}>
+            <li><span>01</span><div><h3>Introduce yourself</h3><p>Share your details and the area you’re interested in.</p></div></li>
+            <li><span>02</span><div><h3>Send your story</h3><p>Open your email draft, attach your CV as a PDF and send it to our team.</p></div></li>
+            <li><span>03</span><div><h3>Explore the fit</h3><p>If your experience matches a team need, we can take the conversation further.</p></div></li>
+          </ol>
+        </div>
+      </section>
+
+      <section className={`${styles.container} ${styles.faqSection}`} aria-labelledby="career-faq-heading">
+        <div className={styles.faqIntro}><p className={styles.eyebrow}>A little more clarity</p><h2 id="career-faq-heading">Before your<br /><em>next step.</em></h2><p>A few useful answers as you prepare to introduce yourself.</p></div>
+        <div className={styles.faqList}>
+          {careerQuestions.map(({ question, answer }) => (
+            <details key={question} className={styles.faqItem} name="career-questions"><summary>{question}<span aria-hidden="true">+</span></summary><p>{answer}</p></details>
+          ))}
+        </div>
+      </section>
+
+      <dialog ref={dialogRef} className={styles.dialog} onClose={() => setOpen(false)} aria-labelledby="career-application-title" aria-describedby="career-application-description">
+        <div className={styles.dialogHeader}><div><p className={styles.eyebrow}>Your next chapter</p><h2 id="career-application-title">Let’s get to know you.</h2></div><button type="button" onClick={closeApplication} className={styles.closeButton} aria-label="Close application"><FiX /></button></div>
+        <form className={styles.form} onSubmit={prepareApplication}>
+          <p id="career-application-description" className={styles.formIntro}>Prepare an application email. Attach your CV and send it from your email app. Fields marked * are required.</p>
+          <div className={styles.fieldGrid}>
+            <label htmlFor="career-name">Full name *<input id="career-name" name="fullName" autoComplete="name" placeholder="Your full name" maxLength={100} required /></label>
+            <label htmlFor="career-phone">Phone number *<input id="career-phone" name="phone" type="tel" autoComplete="tel" placeholder="Your phone number" maxLength={30} required /></label>
+            <label className={styles.fullField} htmlFor="career-email">Email address *<input id="career-email" name="email" type="email" autoComplete="email" placeholder="you@example.com" maxLength={150} required /></label>
+            <label className={styles.fullField} htmlFor="career-position">Area of interest<input id="career-position" name="position" value={position} onChange={(event) => setPosition(event.target.value)} placeholder="Your preferred role or department" maxLength={100} /></label>
+            <label className={styles.fullField} htmlFor="career-address">Contact address *<input id="career-address" name="address" autoComplete="street-address" placeholder="Your current address" maxLength={180} required /></label>
+            <label className={styles.fullField} htmlFor="career-message">A little about you<textarea id="career-message" name="message" rows={3} placeholder="Your experience, interests or what you’d love to work on…" maxLength={600} /></label>
+          </div>
+          <div className={styles.cvNote}><FiFileText /><p><strong>Bring your story with you.</strong><br />Attach your CV as a PDF in the email draft before sending.</p></div>
+          <button type="submit" className={styles.submitButton}>Open application email <FiArrowUpRight /></button>
+          <div className={styles.draftStatus} role="status" aria-live="polite">{draftOpened && <p><FiCheck /> Your email draft has been requested. Attach your CV and send it to complete your application. If no email app opens, use the address below.</p>}</div>
+          <p className={styles.emailFallback}><FiMail /> You can also email your CV directly:<br /><a href={`mailto:${email}`}>{email}</a></p>
+        </form>
+      </dialog>
+    </main>
+  );
+}

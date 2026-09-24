@@ -15,26 +15,11 @@ import { useCommercialProjectStore } from "../../store/commercialProject/commerc
 ----------------------------------------------------------- */
 
 const heroSliderImages = [
-  {
-    url: "https://images.unsplash.com/photo-1486406146926-c627a92ad1ab?q=80&w=2070&auto=format&fit=crop",
-    caption: "Tower Exterior Perspective",
-    tag: "25 Stories Landmark",
-  },
-  {
-    url: "https://images.unsplash.com/photo-1545324418-cc1a3fa10c00?q=80&w=2000&auto=format&fit=crop",
-    caption: "Parametric Glazed Facade",
-    tag: "Double-Glazed Low-E Glass",
-  },
-  {
-    url: "https://images.unsplash.com/photo-1497366216548-37526070297c?q=80&w=2069&auto=format&fit=crop",
-    caption: "Executive Corporate Suites",
-    tag: "Column-Free Modular Layout",
-  },
-  {
-    url: "https://images.unsplash.com/photo-1512917774080-9991f1c4c750?q=80&w=2070&auto=format&fit=crop",
-    caption: "Sky Lounge & Terrace Level",
-    tag: "Panoramic Rooftop Deck",
-  },
+  { url: "/images/commercial/glass-tower.jpg", caption: "Reflective Glass Tower", tag: "Glass Architecture" },
+  { url: "/images/commercial/business-towers.jpg", caption: "Corporate Glass Towers", tag: "Contemporary Commercial Design" },
+  { url: "/images/commercial/glass-highrise.jpg", caption: "Modern Glazed Elevation", tag: "Glass & Steel Facade" },
+  { url: "/images/commercial/blue-glass.jpg", caption: "Blue Glass Curtain Wall", tag: "Reflective Facade Detail" },
+  { url: "/images/commercial/reflective-facade.jpg", caption: "Sculpted Glass Facade", tag: "Architectural Rhythm" },
 ];
 
 const floorPlans = [
@@ -125,34 +110,14 @@ const CommercialProject = () => {
   const heroSubtitle = data?.heroSubtitle || "TOWER";
   const heroBadge = data?.heroBadge || "Grade A+ Commercial Landmark";
 
-  const overviewImg = data?.overviewImage?.url || heroSliderImages[1].url;
-  const architectureImg1 =
-    data?.architectureImage1?.url || heroSliderImages[0].url;
-  const architectureImg2 =
-    data?.architectureImage2?.url || heroSliderImages[2].url;
-
-  const galleryImages =
-    data?.galleryImages?.length > 0
-      ? data.galleryImages.map((img) => ({
-          src: img.url,
-          title: img.title || "Architectural Detail",
-        }))
-      : [
-          { src: heroSliderImages[1].url, title: "Parametric Glazed Facade" },
-          {
-            src: "https://images.unsplash.com/photo-1497215728101-856f4ea42174?q=80&w=2070&auto=format&fit=crop",
-            title: "Triple-Height Grand Atrium",
-          },
-          { src: heroSliderImages[2].url, title: "Executive Floor Span" },
-          {
-            src: heroSliderImages[3].url,
-            title: "Skyline Lounge & Boardroom",
-          },
-          {
-            src: "https://images.unsplash.com/photo-1506146332389-18140dc7b2fb?q=80&w=2000&auto=format&fit=crop",
-            title: "Nocturnal Illumination",
-          },
-        ];
+  // Curated glass-building imagery for this page; project copy remains CMS-driven.
+  const overviewImg = heroSliderImages[0].url;
+  const architectureImg1 = heroSliderImages[4].url;
+  const architectureImg2 = heroSliderImages[1].url;
+  const galleryImages = heroSliderImages.map((image) => ({
+    src: image.url,
+    title: image.caption,
+  }));
 
   const specs =
     data?.specs?.length > 0
@@ -369,7 +334,8 @@ const CommercialProject = () => {
             <div className="relative rounded-2xl overflow-hidden border border-[#1C4438] group">
               <img
                 src={overviewImg}
-                alt="Overview"
+                alt="Reflective glass commercial tower"
+                loading="lazy"
                 className="w-full h-[520px] object-cover transition duration-700 group-hover:scale-105"
               />
               <div className="absolute inset-0 bg-gradient-to-t from-[#0E231C]/90 via-transparent to-transparent" />
@@ -463,14 +429,15 @@ const CommercialProject = () => {
           <div className="lg:col-span-7">
             <div className="relative rounded-2xl overflow-hidden border border-[#1C4438] bg-[#15342B] p-8 text-center">
               <img
-                src="https://images.unsplash.com/photo-1503387762-592deb58ef4e?q=80&w=1931&auto=format&fit=crop"
-                alt="Blueprint Plan"
-                className="w-full h-[380px] object-cover rounded-lg filter invert opacity-75"
+                src={heroSliderImages[activeFloor + 1].url}
+                alt="Glass building facade inspiration"
+                loading="lazy"
+                className="w-full h-[380px] object-cover rounded-lg"
               />
               <div className="mt-6 flex justify-between items-center text-left border-t border-[#1C4438] pt-4">
                 <div>
                   <p className="font-tech text-xs uppercase text-[#9EBC3A]">
-                    Active Schematic
+                    Facade Inspiration
                   </p>
                   <p className="font-serif-luxury text-xl text-[#F5F2EB]">
                     {floorPlans[activeFloor].title}
@@ -493,7 +460,8 @@ const CommercialProject = () => {
         <div className="relative h-[540px] overflow-hidden group">
           <img
             src={architectureImg1}
-            alt="Facade Detail"
+            alt="Reflective glass and steel facade detail"
+            loading="lazy"
             className="w-full h-full object-cover transition duration-1000 group-hover:scale-105"
           />
           <div className="absolute inset-0 bg-gradient-to-t from-[#0E231C]/95 via-[#0E231C]/30 to-transparent p-12 flex flex-col justify-end">
@@ -501,10 +469,10 @@ const CommercialProject = () => {
               Material Selection
             </span>
             <h3 className="font-serif-luxury text-3xl md:text-4xl text-[#F5F2EB] mt-1">
-              Anodized Framing & Travertine Accents
+              Reflective Glass & Sculpted Lines
             </h3>
             <p className="text-sm text-[#B2C0B9] mt-2 max-w-md font-light">
-              Sustainable materials engineered to withstand ambient weathering while reflecting changing daylight hues.
+              Glass surfaces and precise framing create a facade that reflects the light and character of its surroundings.
             </p>
           </div>
         </div>
@@ -512,18 +480,19 @@ const CommercialProject = () => {
         <div className="relative h-[540px] overflow-hidden group border-t lg:border-t-0 lg:border-l border-[#1C4438]">
           <img
             src={architectureImg2}
-            alt="Interior Executive"
+            alt="Commercial towers with glass exteriors"
+            loading="lazy"
             className="w-full h-full object-cover transition duration-1000 group-hover:scale-105"
           />
           <div className="absolute inset-0 bg-gradient-to-t from-[#0E231C]/95 via-[#0E231C]/30 to-transparent p-12 flex flex-col justify-end">
             <span className="font-tech text-xs uppercase tracking-[0.3em] text-[#9EBC3A]">
-              Spatial Experience
+              Commercial Architecture
             </span>
             <h3 className="font-serif-luxury text-3xl md:text-4xl text-[#F5F2EB] mt-1">
-              Column-Free Executive Headquarters
+              A Distinctive Glass Skyline
             </h3>
             <p className="text-sm text-[#B2C0B9] mt-2 max-w-md font-light">
-              Engineered for seamless spatial modularity, optimal acoustics, and personalized climate zoning.
+              A collection of contemporary glass-front buildings, exploring scale, reflection and a strong corporate presence.
             </p>
           </div>
         </div>
@@ -575,6 +544,7 @@ const CommercialProject = () => {
             </span>
           </div>
 
+          <p className="text-sm text-[#B2C0B9] mb-8">Architectural inspiration photographs of glass-front commercial buildings.</p>
           <div className="grid md:grid-cols-3 gap-6">
             {galleryImages.map((img, idx) => (
               <div
