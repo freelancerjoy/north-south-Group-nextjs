@@ -36,8 +36,8 @@ const formatDate = (dateStr) => {
 /* ---------------- Hero Slider (luxury editorial finish) ---------------- */
 const HeroSlider = () => {
   return (
-      <div className="relative w-full px-3 md:px-6 pt-24 md:pt-28 lg:pt-[4.75rem] pb-3 md:pb-6 bg-[#f2f8f7]">
-      <div className="relative w-full h-[58vh] md:h-[74vh] lg:h-[82vh] overflow-hidden rounded-sm ring-1 ring-[#5ec9c1]/15 shadow-[0_40px_90px_-25px_rgba(6,32,30,0.7)]">
+      <div className="relative w-full pt-20 md:pt-24 bg-[#f2f8f7]">
+      <div className="relative w-full h-[54vh] min-h-[410px] md:h-[470px] overflow-hidden ring-1 ring-[#5ec9c1]/15 shadow-[0_24px_60px_-25px_rgba(6,32,30,0.7)]">
         <Swiper
           modules={[Autoplay, EffectFade, Pagination]}
           effect="fade"
@@ -60,7 +60,7 @@ const HeroSlider = () => {
                 <div className="absolute inset-0 bg-gradient-to-b from-black/15 via-transparent to-transparent" />
 
                 {/* Content, bottom-docked */}
-                <div className="absolute inset-0 flex flex-col justify-end p-7 md:p-14 lg:p-16">
+                <div className="absolute inset-0 flex flex-col justify-center px-7 md:px-[9%] pt-16">
                   {/* Eyebrow badge */}
                   <div className="flex items-center gap-3 mb-4">
                     <span className="h-px w-9 bg-[#5ec9c1]" />
@@ -76,7 +76,7 @@ const HeroSlider = () => {
                     )}
                   </div>
 
-                  <h1 className="font-serif text-white text-4xl md:text-6xl lg:text-[5rem] leading-[1.05] tracking-tight max-w-4xl drop-shadow-[0_6px_30px_rgba(0,0,0,0.4)]">
+                  <h1 className="font-serif text-white text-4xl md:text-6xl lg:text-[4rem] leading-[1.05] tracking-tight max-w-4xl drop-shadow-[0_6px_30px_rgba(0,0,0,0.4)]">
                     {slide.title}
                   </h1>
 
@@ -256,7 +256,7 @@ const ImageLightbox = ({ card, onClose }) => {
 const FeaturedCard = ({ card, onView }) => (
   <button
     onClick={() => onView(card)}
-    className="group relative flex flex-col w-full h-[24rem] md:h-[30rem] lg:h-[34rem] overflow-hidden text-left"
+    className="group relative flex flex-col w-full h-[24rem] md:h-[420px] overflow-hidden rounded-xl text-left shadow-[0_18px_45px_-24px_rgba(6,48,47,.55)]"
   >
     <img
       src={card.image}
@@ -298,7 +298,7 @@ const FeaturedCard = ({ card, onView }) => (
 const NewsCard = ({ card, onView }) => (
   <button
     onClick={() => onView(card)}
-    className="group relative flex flex-col h-[22rem] overflow-hidden rounded-[2px] shadow-[0_20px_40px_-18px_rgba(10,61,58,0.45)] transition-all duration-500 hover:-translate-y-1 hover:shadow-[0_28px_55px_-15px_rgba(10,61,58,0.55)] text-left"
+    className="group relative flex flex-col h-[20rem] overflow-hidden rounded-xl shadow-[0_14px_34px_-18px_rgba(10,61,58,0.35)] transition-all duration-500 hover:-translate-y-1 hover:shadow-[0_24px_45px_-18px_rgba(10,61,58,0.5)] text-left"
   >
     <img
       src={card.image}
@@ -323,6 +323,18 @@ const NewsCard = ({ card, onView }) => (
         <span>View Image</span>
       </div>
     </div>
+  </button>
+);
+
+const SideCard = ({ card, onView }) => (
+  <button onClick={() => onView(card)} className="group grid grid-cols-[110px_1fr_30px] md:grid-cols-[135px_1fr_32px] items-center gap-4 flex-1 py-3.5 text-left border-b border-[#d9e8e6] last:border-b-0">
+    <img src={card.image} alt={card.title} className="w-[110px] md:w-[135px] h-[76px] md:h-[88px] rounded-lg object-cover transition-transform duration-500 group-hover:scale-[1.03]" />
+    <span className="min-w-0">
+      <small className="block text-[9px] font-bold uppercase tracking-[0.22em] text-[#0f8f88]">News</small>
+      <strong className="block mt-1 mb-2 font-serif text-base md:text-lg leading-tight text-[#073d3d] line-clamp-2">{card.title}</strong>
+      <span className="flex items-center gap-2 text-[9px] text-[#477d7a]"><FaCalendarAlt className="text-[#149b94]" />{formatDate(card.createdAt)}</span>
+    </span>
+    <span className="grid place-items-center w-8 h-8 rounded-full border border-[#6aaca8] text-[#087f7a]"><span>→</span></span>
   </button>
 );
 
@@ -371,7 +383,7 @@ const NewsEvent = () => {
         </div>
       </div>
 
-      <div className="h-8 md:h-12" />
+      <div className="h-6 md:h-8" />
 
       {newsEvents.length === 0 ? (
         <div className="text-center py-24 text-gray-400 text-lg font-light">
@@ -380,19 +392,28 @@ const NewsEvent = () => {
       ) : (
         <>
           {featured && (
-            <div className="w-full">
+            <div className="w-full max-w-[1260px] mx-auto px-5 md:px-8 lg:px-0 grid lg:grid-cols-[1.7fr_1fr] gap-5">
               <FeaturedCard card={featured} onView={setActiveImage} />
+              <div className="flex flex-col px-4 md:px-5 bg-white rounded-xl border border-[#dce9e7] shadow-[0_12px_36px_-22px_rgba(6,61,60,.4)]">
+                {rest.slice(0, 3).map((card) => <SideCard key={card._id} card={card} onView={setActiveImage} />)}
+              </div>
             </div>
           )}
 
-          <div className="w-full px-5 md:px-10 lg:px-16 py-16 md:py-20">
+          <div className="relative w-full mt-10 px-5 md:px-10 lg:px-16 py-14 md:py-16 bg-gradient-to-b from-[#f7fcfb] to-[#edf8f7]">
+            <div className="max-w-[1260px] mx-auto">
+              <div className="mb-7">
+                <p className="text-[11px] font-bold uppercase tracking-[.28em] text-[#0a9d96]">Latest</p>
+                <h2 className="mt-1 font-serif text-3xl md:text-4xl text-[#073d3d]">Recent News &amp; Events</h2>
+              </div>
             {rest.length > 0 && (
-              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-7">
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5">
                 {rest.map((card) => (
                   <NewsCard key={card._id} card={card} onView={setActiveImage} />
                 ))}
               </div>
             )}
+            </div>
           </div>
         </>
       )}
