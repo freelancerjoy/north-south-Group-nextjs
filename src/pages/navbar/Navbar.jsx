@@ -50,7 +50,7 @@ const projectItems = [
   },
   {
     label: "Duplex Project",
-    to: "/conceptDetails",
+    to: "/NorthSouthDuplexHome",
   },
   {
     label: "Condominium Project",
