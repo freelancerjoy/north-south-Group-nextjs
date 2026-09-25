@@ -4,20 +4,76 @@ import { ContactSection } from "./ConcernPageTemplate";
 import luxury from "./NirapadValleyLuxury.module.css";
 import styles from "./FoundationLuxury.module.css";
 
+
+const FOUNDATION_IMAGES = {
+  hero:
+    "https://res.cloudinary.com/dpsjkcaa/image/upload/v1790330598/1144.jpg.jpg",
+  about:
+    "https://res.cloudinary.com/dpsjkcaa/image/upload/v1790330596/11.jpg.jpg",
+  community:
+    "https://res.cloudinary.com/dpsjkcaa/image/upload/v1790330598/1133.jpg.jpg",
+  outreach:
+    "https://res.cloudinary.com/dpsjkcaa/image/upload/v1790330597/1122.jpg.jpg",
+};
+
+const BANGLADESH_EDUCATION_IMAGE =
+  "https://images.unsplash.com/photo-1780282148151-e53f763cbb30?auto=format&fit=crop&fm=jpg&q=82&w=1600";
+
+const BANGLADESH_HEALTH_IMAGE =
+  "https://images.pexels.com/photos/19438560/pexels-photo-19438560.jpeg?auto=compress&cs=tinysrgb&w=1600";
+
 const programs = [
-  { title: "Education & opportunity", text: "Supporting access to learning, skills, and the confidence to build a brighter future.", image: "https://plus.unsplash.com/premium_photo-1742926577749-e05ee300c1ad?auto=format&fit=crop&w=1000&q=80", icon: FiBookOpen },
-  { title: "Health & wellbeing", text: "Promoting community health awareness, practical care, and access to support.", image: "https://images.unsplash.com/photo-1659019479972-82d9e3e8cfb7?auto=format&fit=crop&w=1000&q=80", icon: FiHeart },
-  { title: "Stronger communities", text: "Bringing people together around local needs and opportunities for lasting change.", image: "https://images.unsplash.com/photo-1559027615-cd4628902d4a?auto=format&fit=crop&w=1000&q=80", icon: FiUsers },
+  {
+    title: "Education & opportunity",
+    text: "Supporting access to learning, skills, and the confidence to build a brighter future.",
+    image: BANGLADESH_EDUCATION_IMAGE,
+    icon: FiBookOpen,
+  },
+  {
+    title: "Health & wellbeing",
+    text: "Promoting community health awareness, practical care, and access to support.",
+    image: BANGLADESH_HEALTH_IMAGE,
+    icon: FiHeart,
+  },
+  {
+    title: "Community & relief support",
+    text: "Organized humanitarian assistance, essential distribution, and practical support for communities in times of need.",
+    image: FOUNDATION_IMAGES.community,
+    icon: FiUsers,
+  },
 ];
 const palette = { darkGradient: "from-[#142b24] via-[#142b24] to-[#213d32]", buttonGradient: "from-[#0f7771] to-[#0b625d]" };
-const pexels = (id) => `https://images.pexels.com/photos/${id}/pexels-photo-${id}.jpeg?auto=compress&cs=tinysrgb&w=1920`;
 const collection = [
-  { src: pexels(6646775), category: "Community", label: "Coming together to care" },
-  { src: pexels(18449721), category: "Education", label: "Opening doors to learning" },
-  { src: pexels(15311442), category: "Community", label: "Support with dignity" },
-  { src: pexels(7156162), category: "Volunteers", label: "Every helping hand matters" },
-  { src: pexels(6646864), category: "Community", label: "Compassion in action" },
-  { src: pexels(6646855), category: "Volunteers", label: "A shared commitment" },
+  {
+    src: FOUNDATION_IMAGES.hero,
+    category: "Foundation",
+    label: "North South Humanity Aid Foundations community support initiative",
+  },
+  {
+    src: FOUNDATION_IMAGES.about,
+    category: "Foundation",
+    label: "Foundation field activity and organized community support",
+  },
+  {
+    src: FOUNDATION_IMAGES.community,
+    category: "Relief",
+    label: "Humanitarian relief and essential support distribution",
+  },
+  {
+    src: FOUNDATION_IMAGES.outreach,
+    category: "Outreach",
+    label: "Community outreach and support in action",
+  },
+  {
+    src: BANGLADESH_EDUCATION_IMAGE,
+    category: "Education",
+    label: "Children and education in Bangladesh",
+  },
+  {
+    src: BANGLADESH_HEALTH_IMAGE,
+    category: "Health",
+    label: "Healthcare professional in Dhaka, Bangladesh",
+  },
 ];
 const commitments = [
   { icon: FiHeart, title: "Dignity at the centre", text: "An approach to support that respects people, their voices, and their individual circumstances." },
@@ -30,9 +86,43 @@ const commitments = [
 
 export default function FoundationLuxury({ title, subtitle, eyebrow, heroImage, heroSliderImages = [], aboutImage, aboutTitle, aboutParagraphs = [], services = [], stats = [], galleryImages = [], processItems = [] }) {
   const displayTitle = !title || title === "Northsouth Foundation" ? "North South Humanity Aid Foundations" : title;
-  const cards = services.some((item) => item.image) ? services : programs;
-  const images = [...new Map([...collection, ...galleryImages.filter(Boolean).map((src) => ({ src, category: "Foundation", label: "Our foundation collection" }))].map((image) => [image.src, image])).values()];
-  const slides = [...new Set([...heroSliderImages, heroImage, collection[0].src, collection[1].src, collection[3].src].filter(Boolean))].slice(0, 6);
+  const cards = services.some((item) => item.image)
+    ? services.map((item, index) => {
+        if (index === 0) return { ...item, image: BANGLADESH_EDUCATION_IMAGE };
+        if (index === 1) return { ...item, image: BANGLADESH_HEALTH_IMAGE };
+        if (index === 2) return { ...item, image: FOUNDATION_IMAGES.community };
+        if (index === 3) return { ...item, image: FOUNDATION_IMAGES.outreach };
+        return item;
+      })
+    : programs;
+
+  const images = [
+    ...new Map(
+      [
+        ...collection,
+        ...galleryImages
+          .filter(Boolean)
+          .map((src) => ({
+            src,
+            category: "Foundation",
+            label: "Our foundation collection",
+          })),
+      ].map((image) => [image.src, image])
+    ).values(),
+  ];
+
+  const slides = [
+    ...new Set(
+      [
+        FOUNDATION_IMAGES.hero,
+        FOUNDATION_IMAGES.about,
+        FOUNDATION_IMAGES.community,
+        FOUNDATION_IMAGES.outreach,
+        ...heroSliderImages,
+        heroImage,
+      ].filter(Boolean)
+    ),
+  ].slice(0, 6);
   const [current, setCurrent] = useState(0);
   const [paused, setPaused] = useState(false);
   const [hovering, setHovering] = useState(false);
@@ -74,7 +164,7 @@ export default function FoundationLuxury({ title, subtitle, eyebrow, heroImage, 
 
   return <main className={`${luxury.page} ${styles.foundation}`}>
     <section className={`${luxury.hero} ${styles.hero}`} aria-label="Foundation visual stories" aria-roledescription="carousel" onMouseEnter={() => setHovering(true)} onMouseLeave={() => setHovering(false)}>
-      {slides.map((src, index) => <img key={src} className={`${luxury.heroImage} ${index === current ? luxury.active : ""}`} src={src} alt="People coming together in support of their community" aria-hidden={index !== current} fetchPriority={index === 0 ? "high" : "auto"} />)}
+      {slides.map((src, index) => <img key={src} className={`${luxury.heroImage} ${index === current ? luxury.active : ""}`} src={src} alt="North South Humanity Aid Foundations community and relief activities" aria-hidden={index !== current} fetchPriority={index === 0 ? "high" : "auto"} />)}
       <div className={luxury.shade} />
       <div className={luxury.heroTop}><span>NORTH SOUTH GROUP</span><span>COMPASSION IN ACTION</span></div>
       <div className={`${luxury.heroCopy} ${styles.heroCopy}`}><span className={luxury.eyebrow}>{eyebrow || "A shared purpose. A brighter tomorrow."}</span><h1>{displayTitle}</h1><p>{subtitle || "Bringing care, opportunity, and hope closer to the communities that need them."}</p><a href="#foundation-mission" className={luxury.heroLink}>Discover our purpose <FiArrowDown /></a></div>
@@ -85,7 +175,7 @@ export default function FoundationLuxury({ title, subtitle, eyebrow, heroImage, 
 
     <nav className={luxury.projectNav} aria-label="Foundation sections"><span>HUMANITY <em>& HOPE</em></span><div><a href="#foundation-mission">Our mission</a><a href="#foundation-programs">Our focus</a><a href="#foundation-approach">Our approach</a></div><a className={luxury.enquire} href="#concern-contact">Get involved <FiArrowUpRight /></a></nav>
 
-    <section id="foundation-mission" className={`${luxury.section} ${luxury.overview}`}><div className={luxury.overviewVisual}><img src={aboutImage || programs[2].image} alt="Community support and shared opportunities" loading="lazy" /><div className={luxury.imageNote}><span>HUMANITY COMES FIRST</span><p>Small acts of care.<br />Possibilities that last.</p></div></div><div className={luxury.overviewCopy}><span className={luxury.eyebrow}>Our reason for being</span><h2>{aboutTitle || "A better tomorrow begins with care."}</h2><div className={luxury.accentRule} />{(aboutParagraphs.length ? aboutParagraphs : ["We bring compassion and organized action together to support education, health, and community wellbeing.", "Our purpose is to help people move toward better opportunities, with dignity at the heart of every initiative."]).map((paragraph, index) => <p key={index}>{paragraph}</p>)}<a href="#concern-contact" className={luxury.textLink}>Be part of our purpose <FiArrowUpRight /></a></div></section>
+    <section id="foundation-mission" className={`${luxury.section} ${luxury.overview}`}><div className={luxury.overviewVisual}><img src={FOUNDATION_IMAGES.about} alt="North South Humanity Aid Foundations community support activity" loading="lazy" /><div className={luxury.imageNote}><span>HUMANITY COMES FIRST</span><p>Small acts of care.<br />Possibilities that last.</p></div></div><div className={luxury.overviewCopy}><span className={luxury.eyebrow}>Our reason for being</span><h2>{aboutTitle || "A better tomorrow begins with care."}</h2><div className={luxury.accentRule} />{(aboutParagraphs.length ? aboutParagraphs : ["We bring compassion and organized action together to support education, health, and community wellbeing.", "Our purpose is to help people move toward better opportunities, with dignity at the heart of every initiative."]).map((paragraph, index) => <p key={index}>{paragraph}</p>)}<a href="#concern-contact" className={luxury.textLink}>Be part of our purpose <FiArrowUpRight /></a></div></section>
 
     <div className={luxury.values}>{(stats.length ? stats : [{ value: "Care", label: "At our heart" }, { value: "People", label: "At our centre" }, { value: "Hope", label: "For tomorrow" }]).map((stat, index) => <div key={index}><span className={luxury.valueNumber}>0{index + 1}</span><strong>{stat.value}</strong><span>{stat.label}</span></div>)}</div>
 
@@ -100,12 +190,12 @@ export default function FoundationLuxury({ title, subtitle, eyebrow, heroImage, 
     <section className={styles.outreach}>
       <div className={`${luxury.section} ${styles.outreachInner}`}>
         <div className={styles.outreachCopy}><span className={luxury.eyebrow}>A helping hand. A human connection.</span><h2>Essential care.<br /><em>Extraordinary kindness.</em></h2><p>Food, everyday essentials, and a listening ear can be the beginning of a more hopeful tomorrow. Our community-focused purpose brings practical needs into the conversation.</p><div className={styles.outreachDetails}><div><FiHeart /><h3>Support with dignity</h3><p>Respecting individual circumstances and the voices of the people we hope to support.</p></div><div><FiUsers /><h3>Neighbours helping neighbours</h3><p>Connecting people who want to contribute with conversations about local needs.</p></div></div><a href="#concern-contact" className={luxury.heroLink}>Share a community need <FiArrowUpRight /></a></div>
-        <div className={styles.outreachVisual}><img src={collection[4].src} alt="Volunteers organizing everyday essentials for community support" loading="lazy" /><div><span>COMPASSION IN ACTION</span><p>Care begins<br />with connection.</p></div></div>
+        <div className={styles.outreachVisual}><img src={FOUNDATION_IMAGES.community} alt="Foundation humanitarian relief and community support distribution" loading="lazy" /><div><span>COMPASSION IN ACTION</span><p>Care begins<br />with connection.</p></div></div>
       </div>
     </section>
 
     <section className={`${luxury.section} ${styles.volunteerStory}`}>
-      <div className={styles.volunteerVisual}><img src={collection[3].src} alt="People contributing their time to support others" loading="lazy" /><span>YOUR TIME CAN OPEN NEW POSSIBILITIES</span></div>
+      <div className={styles.volunteerVisual}><img src={FOUNDATION_IMAGES.outreach} alt="Bangladesh community outreach activity by North South Humanity Aid Foundations" loading="lazy" /><span>YOUR TIME CAN OPEN NEW POSSIBILITIES</span></div>
       <div className={styles.storyCopy}><span className={luxury.eyebrow}>The people behind the purpose</span><h2>A little of your time.<br /><em>A world of possibility.</em></h2><p>Bring your experience, curiosity, and compassion. Whether you are an individual or an organization, a meaningful contribution starts with understanding how your skills can help.</p><div className={styles.volunteerPaths}><div><strong>01</strong><span>Share your skills</span></div><div><strong>02</strong><span>Explore collaboration</span></div><div><strong>03</strong><span>Connect with our team</span></div></div><a className={luxury.textLink} href="#concern-contact">Find your way to get involved <FiArrowUpRight /></a></div>
     </section>
 
@@ -115,11 +205,11 @@ export default function FoundationLuxury({ title, subtitle, eyebrow, heroImage, 
 
     <section id="foundation-approach" className={`${luxury.section} ${styles.approach}`}><div><span className={luxury.eyebrow}>From intention to action</span><h2>Thoughtful steps.<br /><em>Human connections.</em></h2><p>We believe meaningful support starts by listening and grows through collaboration.</p><FiGlobe className={styles.globe} /></div><div className={styles.steps}>{steps.map((step, index) => <article key={index}><span>0{index + 1}</span><div><h3>{["Understand", "Plan", "Collaborate", "Reflect"][index % 4]}</h3><p>{step}</p></div></article>)}</div></section>
 
-    <section id="foundation-gallery" className={`${luxury.section} ${luxury.gallerySection}`}><div className={luxury.sectionHeading}><div><span className={luxury.eyebrow}>People, purpose, and possibility</span><h2>A window into <em>our world.</em></h2></div><p>Explore moments of care and connection.<br />Select any photograph for a closer look.</p></div><div className={styles.filters} aria-label="Gallery categories">{["All", ...new Set(images.map((image) => image.category))].map((category) => <button key={category} aria-pressed={filter === category} onClick={() => setFilter(category)}>{category}</button>)}</div><div className={styles.galleryGrid}>{visibleImages.map((image, index) => <button className={styles.galleryImage} key={`${image.src}-${index}`} onClick={(event) => { openerRef.current = event.currentTarget; setSelected(index); }} aria-label={`View ${image.label}`}><img src={image.src} alt={image.label} loading="lazy" /><span><small>{image.category}</small>{image.label}<FiPlus /></span></button>)}</div><p className={luxury.galleryNote}>Stock imagery illustrates our areas of focus and does not document Foundation activities. Photography from Pexels and Unsplash.</p></section>
+    <section id="foundation-gallery" className={`${luxury.section} ${luxury.gallerySection}`}><div className={luxury.sectionHeading}><div><span className={luxury.eyebrow}>People, purpose, and possibility</span><h2>A window into <em>our world.</em></h2></div><p>Explore moments of care and connection.<br />Select any photograph for a closer look.</p></div><div className={styles.filters} aria-label="Gallery categories">{["All", ...new Set(images.map((image) => image.category))].map((category) => <button key={category} aria-pressed={filter === category} onClick={() => setFilter(category)}>{category}</button>)}</div><div className={styles.galleryGrid}>{visibleImages.map((image, index) => <button className={styles.galleryImage} key={`${image.src}-${index}`} onClick={(event) => { openerRef.current = event.currentTarget; setSelected(index); }} aria-label={`View ${image.label}`}><img src={image.src} alt={image.label} loading="lazy" /><span><small>{image.category}</small>{image.label}<FiPlus /></span></button>)}</div><p className={luxury.galleryNote}>Foundation photographs document selected community and relief activities in Bangladesh. Education and healthcare illustrations also use Bangladesh-focused photography.</p></section>
 
     <section className={luxury.section}><div className={luxury.sectionHeading}><div><span className={luxury.eyebrow}>Your skills. Your time. Your purpose.</span><h2>Find your way<br /><em>to get involved.</em></h2></div><p>Start with a conversation. We will help you explore opportunities that fit your interests.</p></div><div className={styles.involvement}>{[{ title: "Volunteer your time", text: "Share your interests, availability, and the skills you would like to contribute.", icon: FiUsers }, { title: "Build a partnership", text: "Explore how your organization can connect with our community-focused purpose.", icon: FiGlobe }, { title: "Share a community need", text: "Help our team understand the priorities and concerns in your community.", icon: FiHeart }].map((item, index) => { const { title, text, icon: Icon } = item; return <article key={title}><span>0{index + 1}</span><Icon /><h3>{title}</h3><p>{text}</p><a href="#concern-contact">Start a conversation <FiArrowUpRight /></a></article>; })}</div></section>
 
-    <section className={`${luxury.section} ${styles.faq}`}><div><span className={luxury.eyebrow}>A little more clarity</span><h2>Before you<br /><em>take the next step.</em></h2></div><div>{[{ question: "How can I get involved?", answer: "Use the contact form below to tell us whether you are interested in volunteering, partnership, or sharing a community need. Our team can discuss available opportunities with you." }, { question: "Can my organization explore a partnership?", answer: "Yes. Share your organization’s focus and the kind of collaboration you have in mind through the contact form." }, { question: "Where can I learn about current initiatives?", answer: "Contact our team for up-to-date information about activities, locations, and ways to participate." }, { question: "Are these photographs from Foundation events?", answer: "The online stock photographs are illustrative. Please contact the Foundation for verified photographs and details of current initiatives." }].map(({ question, answer }) => <details key={question}><summary>{question}<FiPlus /></summary><p>{answer}</p></details>)}</div></section>
+    <section className={`${luxury.section} ${styles.faq}`}><div><span className={luxury.eyebrow}>A little more clarity</span><h2>Before you<br /><em>take the next step.</em></h2></div><div>{[{ question: "How can I get involved?", answer: "Use the contact form below to tell us whether you are interested in volunteering, partnership, or sharing a community need. Our team can discuss available opportunities with you." }, { question: "Can my organization explore a partnership?", answer: "Yes. Share your organization’s focus and the kind of collaboration you have in mind through the contact form." }, { question: "Where can I learn about current initiatives?", answer: "Contact our team for up-to-date information about activities, locations, and ways to participate." }, { question: "Are these photographs from Foundation events?", answer: "Several photographs on this page are from North South Humanity Aid Foundations activities in Bangladesh. Education and healthcare images are Bangladesh-focused illustrations where dedicated Foundation photography is not yet available." }].map(({ question, answer }) => <details key={question}><summary>{question}<FiPlus /></summary><p>{answer}</p></details>)}</div></section>
 
     <section className={styles.invitation}><span className={luxury.eyebrow}>There is a place for you here</span><h2>Give your time.<br />Share your expertise.<br /><em>Make a connection.</em></h2><p>Speak with our team about volunteering, partnership, or community collaboration.</p><a className={luxury.textLink} href="#concern-contact">Let’s take the first step <FiArrowUpRight /></a></section>
     <div className={luxury.contact}><ContactSection theme={palette} title="Let’s make a difference together." description="Tell us how you would like to get involved. Our team will help you explore the next step." buttonLabel="Send your message" ctaTitle="Every meaningful connection starts with a conversation." ctaText="Connect with North South Humanity Aid Foundations about volunteering, partnership, or community support." /></div>
