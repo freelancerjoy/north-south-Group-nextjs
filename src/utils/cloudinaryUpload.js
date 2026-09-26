@@ -16,10 +16,27 @@ const DIRECT_UPLOAD_CONCURRENCY = 3;
 let activeDirectUploads = 0;
 const directUploadQueue = [];
 
+export const getUploadErrorMessage = (error) =>
+  error?.response?.data?.message ||
+  error?.response?.data?.error?.message ||
+  error?.message ||
+  "Image upload failed. Please try again.";
+
 // Fetch a signed upload config from the backend (one call per batch)
 const getSignature = async (folder) => {
-  const { data } = await apiInstance.get(`/project/upload-signature?folder=${folder}`);
-  return data;
+  try {
+    const { data } = await apiInstance.get("/project/upload-signature", {
+      params: { folder },
+    });
+
+    if (!data?.signature || !data?.timestamp || !data?.cloudName || !data?.apiKey) {
+      throw new Error("Upload service configuration is incomplete");
+    }
+
+    return data;
+  } catch (error) {
+    throw new Error(getUploadErrorMessage(error));
+  }
 };
 
 const getCloudinaryResourceType = (file) => {
@@ -202,7 +219,7 @@ const uploadOneAsset = async (file, sig) => {
     };
   } catch (error) {
     const cloudinaryMessage = error?.response?.data?.error?.message;
-    throw new Error(cloudinaryMessage || "Cloudinary upload failed");
+    throw new Error(cloudinaryMessage || getUploadErrorMessage(error));
   }
 };
 

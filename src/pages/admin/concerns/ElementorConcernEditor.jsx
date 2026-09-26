@@ -1,14 +1,28 @@
 import { useEffect, useState } from "react";
 import { MdAdd, MdDelete, MdDragIndicator, MdSave } from "react-icons/md";
+import { toast } from "react-toastify";
 import ConcernLuxuryPage from "../../ourConcern/ConcernLuxuryPage";
-import { uploadSingle } from "../../../utils/cloudinaryUpload";
+import { getUploadErrorMessage, uploadSingle } from "../../../utils/cloudinaryUpload";
 
 const input = "w-full rounded-lg border border-slate-200 bg-white px-3 py-2 text-sm outline-none focus:border-teal-500";
 const names = { hero: "Hero", overview: "Overview", services: "Services", features: "Features", highlights: "Highlights", stats: "Stats", process: "Process", media: "Slider & Gallery", statement: "Statement", contact: "Contact / CTA", settings: "Page settings" };
 
 function MediaField({ label, value, onChange, folder = "concerns" }) {
   const [busy, setBusy] = useState(false);
-  const upload = async (event) => { const file = event.target.files?.[0]; if (!file) return; setBusy(true); try { onChange(await uploadSingle(file, folder)); } finally { setBusy(false); event.target.value = ""; } };
+  const upload = async (event) => {
+    const file = event.target.files?.[0];
+    if (!file) return;
+
+    setBusy(true);
+    try {
+      onChange(await uploadSingle(file, folder));
+    } catch (error) {
+      toast.error(getUploadErrorMessage(error));
+    } finally {
+      setBusy(false);
+      event.target.value = "";
+    }
+  };
   return <div className="space-y-2"><span className="block text-[11px] font-bold uppercase tracking-wide text-slate-500">{label}</span><div className="overflow-hidden rounded-xl border border-slate-200 bg-slate-50">{value ? <div className="relative aspect-[16/9]"><img src={value} alt={label} className="h-full w-full object-cover" /><button type="button" onClick={() => onChange("")} className="absolute right-2 top-2 rounded-lg bg-white/95 px-2 py-1 text-[11px] font-bold text-rose-600 shadow">Remove</button></div> : <div className="flex aspect-[16/9] items-center justify-center text-xs text-slate-400">No image selected</div>}<label className="flex cursor-pointer items-center justify-center gap-2 border-t border-slate-200 bg-white px-3 py-3 text-xs font-bold text-teal-700 hover:bg-teal-50">{busy ? "Uploading..." : value ? "Replace image" : "Upload image"}<input type="file" accept="image/*" className="hidden" disabled={busy} onChange={upload} /></label></div></div>;
 }
 
@@ -16,7 +30,23 @@ export default function ElementorConcernEditor({ form, setField, onSubmit, isSav
   const [active, setActive] = useState("hero");
   const [uploading, setUploading] = useState(false);
   useEffect(() => { const aliases = { overview: "concern-overview", services: "concern-services", features: "concern-features", highlights: "concern-highlights", stats: "concern-stats", process: "concern-process", media: "concern-gallery", statement: "concern-statement", contact: "concern-contact" }; const target = active.startsWith("custom-") ? `concern-custom-${Number(active.slice(7))}` : aliases[active]; document.getElementById(target)?.scrollIntoView({ behavior: "smooth", block: "start" }); }, [active]);
-  const uploadList = async (key, event) => { const files = Array.from(event.target.files || []); if (!files.length) return; setUploading(true); try { const urls = await Promise.all(files.map((file) => uploadSingle(file, `concerns/${key}`))); setField(key, [...(form[key] || []), ...urls]); } finally { setUploading(false); event.target.value = ""; } };
+  const uploadList = async (key, event) => {
+    const files = Array.from(event.target.files || []);
+    if (!files.length) return;
+
+    setUploading(true);
+    try {
+      const urls = await Promise.all(
+        files.map((file) => uploadSingle(file, `concerns/${key}`))
+      );
+      setField(key, [...(form[key] || []), ...urls]);
+    } catch (error) {
+      toast.error(getUploadErrorMessage(error));
+    } finally {
+      setUploading(false);
+      event.target.value = "";
+    }
+  };
   const structure = ["hero", "overview", "services", "features", "highlights", "stats", "process", ...(form.sections || []).map((_, i) => `custom-${i}`), "media", "statement", "contact", "settings"];
   const customIndex = active.startsWith("custom-") ? Number(active.slice(7)) : -1;
   const imageField = (label, key) => <MediaField label={label} value={form[key] || ""} onChange={(value) => setField(key, value)} />;

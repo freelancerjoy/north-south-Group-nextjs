@@ -4,7 +4,7 @@ import { MdArrowBack, MdAdd, MdClose, MdCloudUpload, MdDelete } from "react-icon
 import { FaSpinner } from "react-icons/fa";
 import { toast } from "react-toastify";
 import { useConcernStore } from "../../../store/concern/concernStore";
-import { uploadSingle } from "../../../utils/cloudinaryUpload";
+import { getUploadErrorMessage, uploadSingle } from "../../../utils/cloudinaryUpload";
 import ElementorConcernEditor from "./ElementorConcernEditor";
 
 const inputClass = "w-full rounded-xl border border-slate-200 bg-white px-4 py-2.5 text-sm text-slate-800 transition focus:border-teal-400 focus:outline-none focus:ring-2 focus:ring-teal-100";
@@ -523,7 +523,7 @@ const ConcernForm = () => {
       navigate("/adminDashboard/viewConcerns");
     } catch (error) {
       console.error("Concern save failed:", error);
-      toast.error(error?.message || "Concern image upload failed. Please try a JPG, PNG, or WEBP image.");
+      toast.error(getUploadErrorMessage(error));
     } finally {
       setIsSaving(false);
     }

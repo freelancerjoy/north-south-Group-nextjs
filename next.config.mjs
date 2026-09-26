@@ -29,7 +29,7 @@ const nextConfig = {
     remotePatterns: [
       {
         protocol: "https",
-        hostname: "northsouthbackend.vercel.app",
+        hostname: "northsoutbackends.expertitsolutionsbd.com",
       },
       {
         protocol: "https",
@@ -49,7 +49,7 @@ const nextConfig = {
     return [
       {
         source: "/api/v1/:path*",
-        destination: "https://northsouthbackend.vercel.app/api/v1/:path*",
+        destination: "https://northsoutbackends.expertitsolutionsbd.com/api/v1/:path*",
       },
     ];
   },
