@@ -1,7 +1,5 @@
-import React, { useEffect, useMemo, useRef, useState } from "react";
+import React, { useEffect, useMemo, useState } from "react";
 import { AnimatePresence, motion } from "framer-motion";
-import { Swiper, SwiperSlide } from "swiper/react";
-import { Autoplay, Navigation } from "swiper/modules";
 import {
   FaArrowRight,
   FaAward,
@@ -13,22 +11,21 @@ import {
   FaLeaf,
   FaPlay,
   FaQuoteLeft,
+  FaRegNewspaper,
   FaShieldAlt,
   FaTimes,
 } from "react-icons/fa";
-import { IoIosArrowBack, IoIosArrowForward } from "react-icons/io";
 import {
-  HiOutlineClock,
-  HiOutlineChartBar,
   HiOutlineBuildingOffice2,
+  HiOutlineChartBar,
+  HiOutlineClock,
   HiOutlineShieldCheck,
 } from "react-icons/hi2";
 import { getYouTubeEmbedUrl } from "../../components/VideoUtility";
 import { defaultAboutContent } from "./defaultAboutContent";
 import { useAboutStore } from "../../store/about/aboutStore";
-
-import "swiper/css";
-import "swiper/css/navigation";
+import mojamelHokImg from "../../assets/images/MojamelHok.jpg";
+import avatarPlaceholderImg from "../../assets/images/avatarPlaceholder.png";
 
 const MotionDiv = motion.div;
 const MotionImg = motion.img;
@@ -52,14 +49,158 @@ const signatureVentures = [
   "Agro Farm",
 ];
 
+/*
+ * DAILY ADIN MEDIA ARCHIVE
+ * Real newsroom, front-desk, print-edition and circulation images.
+ */
+const DAILY_ADIN_MEDIA = [
+  {
+    id: "daily-adin-news-desk",
+    title: "Daily Adin News Desk",
+    subtitle: "Editorial newsroom, reporting desk & digital news operations",
+    img: "https://res.cloudinary.com/dpsjkcaa/image/upload/v1790327080/WhatsApp_Image_2026-09-24_at_5.50.27_PM_1.jpg",
+    isPlaceholder: false,
+    type: "office",
+  },
+  {
+    id: "daily-adin-front-desk",
+    title: "Daily Adin Front Desk",
+    subtitle: "Reception, coordination & publication operations",
+    img: "https://res.cloudinary.com/dpsjkcaa/image/upload/v1790327081/WhatsApp_Image_2026-09-24_at_5.50.27_PM.jpg",
+    isPlaceholder: false,
+    type: "office",
+  },
+  {
+    id: "daily-adin-print-edition",
+    title: "Daily Adin Print Edition",
+    subtitle: "The Daily Adin alongside Bangladesh's daily newspaper circulation",
+    img: "https://res.cloudinary.com/dpsjkcaa/image/upload/v1790327085/WhatsApp_Image_2026-09-24_at_5.55.00_PM.jpg",
+    isPlaceholder: false,
+    type: "paper",
+  },
+  {
+    id: "daily-adin-newsstand",
+    title: "Daily Adin At The Newsstand",
+    subtitle: "Print presence at a local newspaper and magazine point",
+    img: "https://res.cloudinary.com/dpsjkcaa/image/upload/v1790327081/WhatsApp_Image_2026-09-24_at_5.55.01_PM_1.jpg",
+    isPlaceholder: false,
+    type: "distribution",
+  },
+  {
+    id: "daily-adin-reader-reach",
+    title: "Daily Adin In The Community",
+    subtitle: "Connecting print journalism with readers across the city",
+    img: "https://res.cloudinary.com/dpsjkcaa/image/upload/v1790327083/WhatsApp_Image_2026-09-24_at_5.55.01_PM.jpg",
+    isPlaceholder: false,
+    type: "distribution",
+  },
+  {
+    id: "daily-adin-paper-stack",
+    title: "Print & Distribution",
+    subtitle: "Daily newspapers prepared for retail circulation and readership",
+    img: "https://res.cloudinary.com/dpsjkcaa/image/upload/v1790327084/WhatsApp_Image_2026-09-24_at_5.55.02_PM_1.jpg",
+    isPlaceholder: false,
+    type: "distribution",
+  },
+  {
+    id: "daily-adin-retail-display",
+    title: "Daily Print Presence",
+    subtitle: "Daily Adin displayed among newspapers at a retail point",
+    img: "https://res.cloudinary.com/dpsjkcaa/image/upload/v1790327085/WhatsApp_Image_2026-09-24_at_5.55.02_PM.jpg",
+    isPlaceholder: false,
+    type: "distribution",
+  },
+  {
+    id: "daily-adin-print-spread",
+    title: "Publication & Circulation",
+    subtitle: "Print editions presented within Bangladesh's newspaper ecosystem",
+    img: "https://res.cloudinary.com/dpsjkcaa/image/upload/v1790327082/WhatsApp_Image_2026-09-24_at_5.55.01_PM_2.jpg",
+    isPlaceholder: false,
+    type: "paper",
+  },
+];
+
+/*
+ * TEMPORARY OFFICE IMAGES
+ * Replace with your actual Site Office / Corporate Office / meeting-space photos later.
+ */
+const TEMPORARY_OFFICE_IMAGES = [
+  {
+    id: "site-office",
+    title: "Site Office",
+    subtitle: "Project operations, site coordination & client service",
+    img: "https://images.unsplash.com/photo-1497366811353-6870744d04b2?auto=format&fit=crop&w=1800&q=88",
+    isPlaceholder: true,
+  },
+  {
+    id: "corporate-office",
+    title: "Corporate Office",
+    subtitle: "Management, planning & business operations",
+    img: "https://images.unsplash.com/photo-1524758631624-e2822e304c36?auto=format&fit=crop&w=1800&q=88",
+    isPlaceholder: true,
+  },
+  {
+    id: "meeting-space",
+    title: "Meeting & Planning",
+    subtitle: "Presentation, collaboration & project review",
+    img: "https://images.unsplash.com/photo-1497366216548-37526070297c?auto=format&fit=crop&w=1800&q=88",
+    isPlaceholder: true,
+  },
+  {
+    id: "client-lounge",
+    title: "Client Experience",
+    subtitle: "A welcoming environment for visitors & partners",
+    img: "https://images.unsplash.com/photo-1497366412874-3415097a27e7?auto=format&fit=crop&w=1800&q=88",
+    isPlaceholder: true,
+  },
+];
+
+const PLACEHOLDER_LEADER_IMAGES = [
+  "https://images.unsplash.com/photo-1560250097-0b93528c311a?auto=format&fit=crop&w=900&q=88",
+  "https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?auto=format&fit=crop&w=900&q=88",
+];
+
+function SectionEyebrow({ children, light = false }) {
+  return (
+    <div className="mb-4 flex items-center gap-3">
+      <span className={`h-px w-9 sm:w-11 ${light ? "bg-emerald-300" : "bg-emerald-600"}`} />
+      <span
+        className={`text-[9px] font-extrabold uppercase tracking-[0.26em] sm:text-[10px] ${
+          light ? "text-emerald-200" : "text-emerald-700"
+        }`}
+      >
+        {children}
+      </span>
+    </div>
+  );
+}
+
+function PrimaryButton({ href, children }) {
+  return (
+    <a
+      href={href}
+      className="group inline-flex h-11 items-center justify-center gap-2.5 rounded-full bg-emerald-800 px-6 text-[10px] font-extrabold uppercase tracking-[0.18em] text-white shadow-[0_14px_34px_rgba(6,78,59,0.20)] transition hover:bg-emerald-950 sm:h-12 sm:px-7 sm:text-[11px]"
+    >
+      {children}
+      <FaArrowRight className="text-[10px] transition-transform group-hover:translate-x-1" />
+    </a>
+  );
+}
+
+function PremiumHeading({ children, className = "" }) {
+  return (
+    <h2
+      className={`font-about-display text-3xl font-medium leading-[1.02] tracking-[-0.04em] text-slate-950 sm:text-4xl lg:text-5xl ${className}`}
+    >
+      {children}
+    </h2>
+  );
+}
+
 export default function AboutUs() {
   const [currentSlide, setCurrentSlide] = useState(0);
   const [selectedLeader, setSelectedLeader] = useState(null);
-  const [selectedCsrImage, setSelectedCsrImage] = useState(null);
-  const [swiperReady, setSwiperReady] = useState(false);
-  const swiperRef = useRef(null);
-  const prevRef = useRef(null);
-  const nextRef = useRef(null);
+  const [selectedGalleryItem, setSelectedGalleryItem] = useState(null);
 
   const { aboutContent, loadAboutContent } = useAboutStore();
 
@@ -100,128 +241,220 @@ export default function AboutUs() {
         aboutContent.overviewParagraphs.length > 0
           ? aboutContent.overviewParagraphs
           : defaultAboutContent.overviewParagraphs,
+      officeImages:
+        Array.isArray(aboutContent?.officeImages) && aboutContent.officeImages.length > 0
+          ? aboutContent.officeImages
+          : TEMPORARY_OFFICE_IMAGES,
+      mediaImages:
+        Array.isArray(aboutContent?.mediaImages) && aboutContent.mediaImages.length > 0
+          ? aboutContent.mediaImages
+          : DAILY_ADIN_MEDIA,
     }),
     [aboutContent]
   );
 
-  const [hero1 = defaultAboutContent.heroSlides[0]] = data.heroSlides || [];
-  const overviewImage = data.heroSlides?.[1] || hero1;
-  const overviewGallery = [
-    overviewImage,
-    data.csrImages?.[0]?.img,
-    data.csrImages?.[2]?.img,
-  ].filter(Boolean);
+  const heroSlides =
+    Array.isArray(data.heroSlides) && data.heroSlides.length > 0
+      ? data.heroSlides
+      : TEMPORARY_OFFICE_IMAGES.map((item) => item.img);
+
+  const heroImage = heroSlides[currentSlide] || heroSlides[0];
+  const overviewImage = heroSlides[1] || heroSlides[0] || TEMPORARY_OFFICE_IMAGES[0].img;
+  const secondOverviewImage =
+    heroSlides[2] || data.csrImages?.[0]?.img || TEMPORARY_OFFICE_IMAGES[1].img;
+
   const embedUrl = getYouTubeEmbedUrl(data.videoUrl);
+
   const sortedLeaders = useMemo(() => {
-    return [...data.leaders].sort((a, b) => {
-      const aIsChairman = /chairman/i.test(`${a.role || ""} ${a.id || ""}`);
-      const bIsChairman = /chairman/i.test(`${b.role || ""} ${b.id || ""}`);
-      if (aIsChairman === bIsChairman) return 0;
-      return aIsChairman ? -1 : 1;
-    });
+    const source = Array.isArray(data.leaders) ? [...data.leaders] : [];
+
+    const rolePriority = (leader = {}) => {
+      const id = String(leader.id || "").toLowerCase();
+      const role = String(leader.role || "").toLowerCase();
+      const value = `${id} ${role}`;
+
+      if (/managing-director/.test(id) || /^managing director$/i.test(leader.role || "")) return 0;
+      if (/chairman/.test(value)) return 1;
+      if (/deputy.*managing.*director/.test(value)) return 2;
+      if (/\bceo\b|chief executive officer/.test(value)) return 3;
+      if (/^director$/.test(role) || id === "director") return 4;
+      if (/hr|admin/.test(value)) return 5;
+      return 20;
+    };
+
+    return source.sort((a, b) => rolePriority(a) - rolePriority(b));
   }, [data.leaders]);
 
-  useEffect(() => {
-    if (!data.heroSlides || data.heroSlides.length <= 1) return undefined;
-    const interval = setInterval(() => {
-      setCurrentSlide((prev) => (prev + 1) % data.heroSlides.length);
-    }, 5200);
-    return () => clearInterval(interval);
-  }, [data.heroSlides]);
+  const managementTeam = useMemo(() => {
+    const actualLeaders = sortedLeaders.map((leader) => ({
+      ...leader,
+      isPlaceholder: false,
+    }));
+
+    // Always inject Khandoker Mojammel Hoque with real photo
+    const mojamelHok = {
+      id: "daily-adin-editor",
+      name: "Khandoker Mojammel Hoque",
+      role: "Executive Editor",
+      img: mojamelHokImg,
+      description:
+        "Executive Editor of North South Daily Adin Pressmedia Ltd., leading editorial operations, journalism standards and media outreach across Bangladesh.",
+      isPlaceholder: false,
+    };
+    const hasHok = actualLeaders.some((l) => l.id === "daily-adin-editor");
+    const withHok = hasHok ? actualLeaders : [...actualLeaders, mojamelHok];
+
+    // Add a single "No Name" avatar placeholder at the end
+    const noNamePlaceholder = {
+      id: "no-name-placeholder",
+      name: "No Name",
+      role: "Management Team",
+      img: avatarPlaceholderImg,
+      description: "Profile details will be updated when available.",
+      isPlaceholder: true,
+    };
+
+    return [...withHok, noNamePlaceholder];
+  }, [sortedLeaders]);
+
+  const officeGallery =
+    Array.isArray(data.officeImages) && data.officeImages.length > 0
+      ? data.officeImages.slice(0, 4)
+      : TEMPORARY_OFFICE_IMAGES;
+
+  // Use the supplied Daily Adin archive images directly so the real
+  // newsroom / front-desk / newspaper photos always appear on this page.
+  const mediaGallery = DAILY_ADIN_MEDIA;
 
   useEffect(() => {
-    const swiperInstance = swiperRef.current;
-    if (swiperInstance && prevRef.current && nextRef.current) {
-      swiperInstance.params.navigation.prevEl = prevRef.current;
-      swiperInstance.params.navigation.nextEl = nextRef.current;
-      swiperInstance.navigation.init();
-      swiperInstance.navigation.update();
-    }
-  }, [swiperReady]);
+    if (heroSlides.length <= 1) return undefined;
+
+    const interval = setInterval(() => {
+      setCurrentSlide((prev) => (prev + 1) % heroSlides.length);
+    }, 5200);
+
+    return () => clearInterval(interval);
+  }, [heroSlides.length]);
 
   return (
-    <div className="min-h-screen bg-[#06211f] text-[#f4fbf9] selection:bg-[#f3b128] selection:text-[#0a2a66]">
+    <main
+      className="min-h-screen overflow-x-hidden bg-white text-slate-900 selection:bg-emerald-200 selection:text-emerald-950"
+      style={{ fontFamily: '"Manrope", "Inter", ui-sans-serif, system-ui, sans-serif' }}
+    >
       <style>{`
-        @import url('https://fonts.googleapis.com/css2?family=Cinzel:wght@400;500;600;700&family=Manrope:wght@400;500;600;700;800&display=swap');
-        .about-display { font-family: 'Cinzel', Georgia, serif; }
-        .about-body { font-family: 'Manrope', sans-serif; }
-        .champagne-text {
-          background: linear-gradient(120deg, #ffffff 0%, #f3b128 45%, #0f7771 100%);
-          -webkit-background-clip: text;
-          -webkit-text-fill-color: transparent;
-        }
+        @import url('https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&family=Playfair+Display:wght@500;600;700&display=swap');
+        .font-about-display { font-family: 'Playfair Display', Georgia, serif; }
       `}</style>
 
-      <section className="relative flex min-h-[92vh] items-end overflow-hidden bg-[#06211f] pt-24">
-        <AnimatePresence mode="wait">
-          <MotionImg
-            key={currentSlide}
-            src={data.heroSlides[currentSlide] || hero1}
-            alt="North South Group development"
-            initial={{ opacity: 0, scale: 1.05 }}
-            animate={{ opacity: 1, scale: 1 }}
-            exit={{ opacity: 0 }}
-            transition={{ duration: 1.15, ease: "easeInOut" }}
-            className="absolute inset-0 h-full w-full object-cover"
-          />
-        </AnimatePresence>
-        <div className="absolute inset-0 bg-gradient-to-r from-[#06211f]/92 via-[#06211f]/52 to-[#06211f]/12" />
-        <div className="absolute inset-0 bg-gradient-to-t from-[#06211f] via-transparent to-[#06211f]/55" />
-        <div className="absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-[#f3b128]/70 to-transparent" />
+      {/* ================================================================ HERO */}
+      <section className="relative overflow-hidden bg-[#F7FAF7] pt-20 sm:pt-24">
+        <div className="pointer-events-none absolute -left-32 top-20 h-80 w-80 rounded-full bg-emerald-100/70 blur-3xl" />
+        <div className="pointer-events-none absolute -right-32 bottom-8 h-[420px] w-[420px] rounded-full bg-green-100/60 blur-3xl" />
 
-        <div className="relative z-10 mx-auto grid w-full max-w-7xl gap-10 px-4 pb-10 sm:px-6 md:pb-16 lg:grid-cols-[1.1fr_0.7fr] lg:px-8">
+        <div className="relative mx-auto grid min-h-[calc(100svh-5rem)] max-w-[1650px] items-center gap-10 px-4 py-10 sm:px-6 sm:py-14 lg:grid-cols-[0.88fr_1.12fr] lg:px-10 lg:py-16 xl:px-14">
           <MotionDiv
-            initial={{ opacity: 0, y: 24 }}
+            initial={{ opacity: 0, y: 22 }}
             animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.7 }}
-            className="max-w-4xl"
+            transition={{ duration: 0.75 }}
+            className="max-w-2xl"
           >
-            <div className="mb-6 inline-flex items-center gap-3 border-y border-[#f3b128]/35 bg-[#06211f]/30 py-2 pr-4 backdrop-blur-sm">
-              <span className="h-px w-10 bg-[#0f7771]" />
-              <span className="about-body text-[11px] font-bold uppercase tracking-[0.32em] text-[#f3b128]">
-                {data.heroEyebrow}
-              </span>
-            </div>
-            <h1 className="about-display max-w-5xl text-4xl font-semibold uppercase leading-[1.04] text-[#ffffff] sm:text-6xl lg:text-7xl">
+            <SectionEyebrow>{data.heroEyebrow || "About North South Group"}</SectionEyebrow>
+
+            <h1 className="font-about-display max-w-3xl text-[42px] font-medium leading-[0.96] tracking-[-0.045em] text-slate-950 sm:text-6xl md:text-7xl xl:text-[82px]">
               {data.heroTitle}
             </h1>
-            <p className="about-body mt-6 max-w-2xl text-base leading-8 text-[#d8f3ee] sm:text-lg">
+
+            <p className="mt-5 max-w-xl text-sm leading-7 text-slate-600 sm:mt-6 sm:text-base sm:leading-8">
               {data.heroSubtitle}
             </p>
-            <div className="mt-9 flex flex-wrap items-center gap-4">
-              <a
-                href="#overview"
-                className="about-body inline-flex items-center gap-3 bg-[#f3b128] px-7 py-3 text-xs font-extrabold uppercase tracking-[0.2em] text-[#0a2a66] shadow-[0_18px_60px_rgba(15,119,113,0.28)] transition hover:bg-[#ffe4a3]"
-              >
-                Explore Legacy <FaArrowRight className="text-[11px]" />
-              </a>
+
+            <div className="mt-8 flex flex-wrap items-center gap-3">
+              <PrimaryButton href="#story">Discover Our Story</PrimaryButton>
+
               <a
                 href="#leadership"
-                className="about-body inline-flex items-center gap-3 border border-[#f3b128]/50 bg-[#06211f]/35 px-7 py-3 text-xs font-bold uppercase tracking-[0.2em] text-[#ffffff] backdrop-blur-sm transition hover:border-[#f3b128] hover:text-[#f3b128]"
+                className="inline-flex h-11 items-center justify-center rounded-full border border-emerald-200 bg-white/80 px-6 text-[10px] font-extrabold uppercase tracking-[0.18em] text-emerald-900 transition hover:border-emerald-800 hover:bg-emerald-50 sm:h-12 sm:px-7 sm:text-[11px]"
               >
-                Leadership
+                Management
               </a>
+            </div>
+
+            <div className="mt-9 grid max-w-xl grid-cols-2 gap-3 border-t border-emerald-100 pt-6 sm:grid-cols-4">
+              {signatureVentures.slice(0, 4).map((venture, index) => (
+                <div key={venture}>
+                  <p className="font-mono text-[9px] tracking-[0.16em] text-emerald-500">
+                    0{index + 1}
+                  </p>
+                  <p className="mt-1 text-[10px] font-bold uppercase leading-4 tracking-[0.10em] text-slate-600">
+                    {venture}
+                  </p>
+                </div>
+              ))}
             </div>
           </MotionDiv>
 
-          <div className="self-end justify-self-start lg:justify-self-end">
-            <div className="border-l-2 border-[#f3b128] bg-[#06211f]/55 p-5 backdrop-blur-md">
-              <p className="about-body text-[11px] font-extrabold uppercase tracking-[0.24em] text-[#f3b128]">
-                {data.overviewBadge}
+          <div className="relative min-h-[500px] sm:min-h-[610px] lg:min-h-[680px]">
+            <div className="absolute left-[8%] top-[4%] h-[88%] w-[82%] rounded-[32px] border border-emerald-100 bg-white shadow-[0_34px_90px_rgba(15,76,58,0.14)] sm:rounded-[40px]" />
+
+            <AnimatePresence mode="wait">
+              <MotionImg
+                key={currentSlide}
+                src={heroImage}
+                alt="North South Group"
+                initial={{ opacity: 0, scale: 1.025 }}
+                animate={{ opacity: 1, scale: 1 }}
+                exit={{ opacity: 0 }}
+                transition={{ duration: 0.95, ease: "easeInOut" }}
+                className="absolute left-[10%] top-[6%] h-[84%] w-[78%] rounded-[28px] object-cover sm:rounded-[36px]"
+              />
+            </AnimatePresence>
+
+            <div className="absolute left-[10%] top-[6%] h-[84%] w-[78%] rounded-[28px] bg-gradient-to-t from-emerald-950/45 via-transparent to-transparent sm:rounded-[36px]" />
+
+            {/* editorial/news card */}
+            <button
+              type="button"
+              onClick={() => setSelectedGalleryItem(mediaGallery[2] || mediaGallery[0])}
+              className="group absolute bottom-[2%] left-0 z-20 w-[46%] max-w-[270px] rotate-[-3deg] overflow-hidden rounded-[18px] border border-white bg-white p-2 shadow-[0_24px_60px_rgba(15,76,58,0.20)] transition hover:rotate-0 sm:bottom-[4%] sm:rounded-[22px]"
+            >
+              <div className="relative aspect-[4/5] overflow-hidden rounded-[14px] bg-emerald-50 sm:rounded-[18px]">
+                <img
+                  src={(mediaGallery[2] || mediaGallery[0])?.img}
+                  alt="Daily Adin publication"
+                  className="h-full w-full object-cover transition duration-700 group-hover:scale-105"
+                />
+                <div className="absolute inset-0 bg-gradient-to-t from-emerald-950/70 via-transparent to-transparent" />
+                <div className="absolute inset-x-0 bottom-0 p-3 text-left">
+                  <p className="text-[7px] font-extrabold uppercase tracking-[0.18em] text-emerald-200">
+                    Daily Adin
+                  </p>
+                  <p className="mt-1 text-xs font-bold leading-snug text-white sm:text-sm">
+                    News & Publication
+                  </p>
+                </div>
+              </div>
+            </button>
+
+            <div className="absolute right-0 top-[14%] z-20 rounded-[18px] border border-emerald-100 bg-white/92 px-4 py-4 shadow-[0_20px_50px_rgba(15,76,58,0.12)] backdrop-blur-xl sm:px-5">
+              <p className="text-[8px] font-extrabold uppercase tracking-[0.20em] text-emerald-700">
+                Group Perspective
               </p>
-              <p className="about-display mt-2 max-w-sm text-2xl font-semibold uppercase leading-tight text-white">
+              <p className="mt-2 max-w-[170px] font-about-display text-lg font-semibold leading-tight text-slate-950 sm:text-xl">
                 {data.overviewHighlightTitle}
               </p>
             </div>
-            <div className="mt-6 flex items-center gap-3">
-              {data.heroSlides.map((_, idx) => (
+
+            <div className="absolute bottom-[8%] right-[4%] z-20 flex items-center gap-2">
+              {heroSlides.map((_, index) => (
                 <button
-                  key={idx}
+                  key={index}
                   type="button"
-                  onClick={() => setCurrentSlide(idx)}
-                  aria-label={`Show slide ${idx + 1}`}
-                  className={`h-1.5 transition-all ${
-                    currentSlide === idx ? "w-14 bg-[#f3b128]" : "w-7 bg-white/40 hover:bg-white"
+                  onClick={() => setCurrentSlide(index)}
+                  aria-label={`Show slide ${index + 1}`}
+                  className={`h-2 rounded-full transition-all duration-300 ${
+                    currentSlide === index
+                      ? "w-8 bg-white"
+                      : "w-2 bg-white/55 hover:bg-white/80"
                   }`}
                 />
               ))}
@@ -230,358 +463,502 @@ export default function AboutUs() {
         </div>
       </section>
 
-      <section className="relative z-10 bg-[#06211f] text-white">
-        <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-          <div className="-mt-8 grid overflow-hidden border border-[#0f7771]/35 bg-[#082b28] shadow-[0_30px_90px_rgba(0,0,0,0.28)] sm:grid-cols-2 lg:grid-cols-4">
+      {/* ================================================================ STATS */}
+      <section className="relative z-20 bg-white">
+        <div className="mx-auto max-w-[1540px] px-4 sm:px-6 lg:px-10 xl:px-14">
+          <div className="-mt-3 grid overflow-hidden rounded-[24px] border border-emerald-100 bg-white shadow-[0_24px_70px_rgba(15,76,58,0.09)] sm:grid-cols-2 lg:-mt-8 lg:grid-cols-4">
             {data.stats.map((stat, index) => {
               const Icon = statIcons[index % statIcons.length];
               return (
-                <div
+                <MotionDiv
                   key={stat.label}
-                  className="group relative min-h-[150px] border-b border-[#0f7771]/20 p-6 transition hover:bg-[#0b3a36] sm:border-r lg:border-b-0"
+                  initial={{ opacity: 0, y: 20 }}
+                  whileInView={{ opacity: 1, y: 0 }}
+                  viewport={{ once: true }}
+                  transition={{ duration: 0.55, delay: index * 0.1 }}
+                  className="group relative min-h-[142px] border-b border-emerald-100 p-5 transition hover:bg-[#F8FBF8] sm:border-r sm:p-6 lg:border-b-0"
                 >
-                  <div className="absolute inset-x-0 top-0 h-1 bg-[#f3b128] opacity-0 transition group-hover:opacity-100" />
-                  <div className="mb-5 flex items-center justify-between">
-                    <Icon className="text-2xl text-[#0f7771]" />
-                    <span className="about-body text-[11px] font-bold uppercase tracking-[0.18em] text-[#7bc1b8]">
-                      0{index + 1}
+                  <div className="absolute inset-x-0 top-0 h-[2px] origin-left scale-x-0 bg-emerald-700 transition-transform duration-500 group-hover:scale-x-100" />
+                  <div className="flex items-start justify-between">
+                    <span className="grid h-10 w-10 place-items-center rounded-full bg-emerald-50 text-lg text-emerald-700">
+                      <Icon />
                     </span>
+                    <span className="font-mono text-[9px] tracking-[0.16em] text-slate-300">0{index + 1}</span>
                   </div>
-                  <p className="about-display text-4xl font-semibold leading-none champagne-text">
-                    {stat.value}
-                  </p>
-                  <p className="about-body mt-3 text-xs font-extrabold uppercase tracking-[0.2em] text-[#cdece7]">
-                    {stat.label}
-                  </p>
-                </div>
+                  <div className="mt-6">
+                    <p className="font-about-display text-4xl font-semibold tracking-[-0.035em] text-slate-950">{stat.value}</p>
+                    <p className="mt-2 text-[9px] font-extrabold uppercase tracking-[0.18em] text-slate-500">{stat.label}</p>
+                  </div>
+                </MotionDiv>
               );
             })}
           </div>
         </div>
       </section>
 
-      <section id="overview" className="bg-white py-20 lg:py-28 text-slate-800">
-        <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-          
-          {/* ── ROW 1: Solution 1 (Text Left, Image Right) ── */}
-          <div className="grid items-center gap-12 lg:grid-cols-2 lg:gap-16">
-            <div className="space-y-5">
-              <div>
-                <span className="inline-block rounded bg-[#0f7771]/10 px-3 py-1 font-brand-body text-[11px] font-bold uppercase tracking-wider text-[#0f7771]">
-                  {data.overviewEyebrow}
-                </span>
-              </div>
-              <h2 className="font-brand-body text-3xl font-bold tracking-tight text-slate-900 sm:text-4xl lg:text-[2.6rem] leading-tight">
-                {data.overviewTitle}
-              </h2>
-              <p className="font-brand-body text-sm sm:text-base leading-relaxed text-slate-600 font-light">
-                {data.overviewText}
-              </p>
+      {/* ================================================================ DAILY ADIN FEATURE */}
+      <section className="relative overflow-hidden bg-white py-16 sm:py-20 lg:py-28">
+        <div className="pointer-events-none absolute -left-40 bottom-0 h-[380px] w-[380px] rounded-full bg-green-100/45 blur-3xl" />
+        <div className="pointer-events-none absolute right-[-180px] top-16 h-[460px] w-[460px] rounded-full bg-emerald-100/55 blur-3xl" />
 
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-6 pt-6 mt-4 border-t border-slate-100">
-                <div>
-                  <div className="mb-2.5 flex h-9 w-9 items-center justify-center rounded-full bg-[#0f7771]/10 text-[#0f7771]">
-                    <HiOutlineClock size={19} />
-                  </div>
-                  <h4 className="font-brand-body text-sm font-bold text-slate-900">
-                    {data.strengths?.[0]?.title || "Planned Development"}
-                  </h4>
-                  <p className="font-brand-body mt-1 text-xs leading-relaxed text-slate-500 font-light">
-                    {data.strengths?.[0]?.text || "Residential and industrial communities shaped around long-term value, access, and daily convenience."}
-                  </p>
-                </div>
-                <div>
-                  <div className="mb-2.5 flex h-9 w-9 items-center justify-center rounded-full bg-[#0f7771]/10 text-[#0f7771]">
-                    <HiOutlineChartBar size={19} />
-                  </div>
-                  <h4 className="font-brand-body text-sm font-bold text-slate-900">
-                    {data.strengths?.[1]?.title || "Sustainable Living"}
-                  </h4>
-                  <p className="font-brand-body mt-1 text-xs leading-relaxed text-slate-500 font-light">
-                    {data.strengths?.[1]?.text || "Green spaces, civic facilities, and organized layouts guide our approach to healthier township growth."}
-                  </p>
-                </div>
-              </div>
+        <div className="relative mx-auto max-w-[1540px] px-4 sm:px-6 lg:px-10 xl:px-14">
+          <div className="mb-10 grid gap-6 lg:grid-cols-[1fr_0.78fr] lg:items-end">
+            <div>
+              <SectionEyebrow>Media & Publication</SectionEyebrow>
+
+              <PremiumHeading className="max-w-4xl">
+                Daily Adin — newsroom, print journalism and circulation in one media ecosystem.
+              </PremiumHeading>
             </div>
 
-            {/* Right: Rounded Image with 2 Floating Stat Cards */}
-            <div className="relative">
-              <div className="relative h-[360px] sm:h-[420px] lg:h-[450px] w-full overflow-hidden rounded-3xl bg-slate-100 shadow-2xl">
-                <img
-                  src={overviewGallery[0] || hero2}
-                  alt={data.overviewTitle}
-                  className="h-full w-full object-cover object-center"
-                />
-                <div className="pointer-events-none absolute inset-0 bg-slate-900/10" />
+            <div className="lg:justify-self-end">
+              <p className="max-w-xl text-sm leading-7 text-slate-500">
+                A closer look at Daily Adin's newsroom operations, front desk, print editions
+                and real-world newspaper distribution.
+              </p>
 
-                {/* Floating Card 1 (Top right) */}
-                <div className="absolute right-6 top-6 sm:right-8 sm:top-8 flex min-w-[160px] items-start justify-between gap-4 rounded-2xl border border-slate-100/90 bg-white/95 p-4 sm:p-5 shadow-2xl backdrop-blur-md">
-                  <div>
-                    <p className="font-brand-body text-2xl sm:text-3xl font-black leading-none text-slate-900">
-                      {data.stats?.[1]?.value || "7+"}
-                    </p>
-                    <p className="font-brand-body mt-1 text-xs font-medium text-slate-500">
-                      {data.stats?.[1]?.label || "Sister Concerns"}
-                    </p>
-                  </div>
-                  <span className="mt-1 h-2.5 w-2.5 shrink-0 rounded-full bg-[#0f7771]" />
-                </div>
-
-                {/* Floating Card 2 (Bottom right) */}
-                <div className="absolute bottom-6 right-6 sm:bottom-8 sm:right-8 flex min-w-[175px] items-start justify-between gap-4 rounded-2xl border border-slate-100/90 bg-white/95 p-4 sm:p-5 shadow-2xl backdrop-blur-md">
-                  <div>
-                    <p className="font-brand-body text-2xl sm:text-3xl font-black leading-none text-slate-900">
-                      {data.stats?.[3]?.value || "600+"}
-                    </p>
-                    <p className="font-brand-body mt-1 text-xs font-medium text-slate-500">
-                      {data.stats?.[3]?.label || "Acres Planned"}
-                    </p>
-                  </div>
-                  <span className="mt-1 h-2.5 w-2.5 shrink-0 rounded-sm bg-amber-400" />
-                </div>
+              <div className="mt-4 inline-flex items-center gap-2 rounded-full border border-emerald-100 bg-[#F6FAF7] px-3.5 py-2">
+                <FaRegNewspaper className="text-sm text-emerald-700" />
+                <span className="text-[8px] font-extrabold uppercase tracking-[0.17em] text-emerald-800">
+                  Daily Adin · Media Wing
+                </span>
               </div>
             </div>
           </div>
 
-          {/* ── SUBTLE DOTTED DIVIDER ── */}
-          <div className="my-16 lg:my-24 border-t border-dashed border-slate-200" />
+          {/* Main editorial composition */}
+          <div className="grid gap-4 lg:grid-cols-[1.18fr_0.82fr]">
+            {/* News Desk — strongest office image */}
+            <button
+              type="button"
+              onClick={() => setSelectedGalleryItem(mediaGallery[0])}
+              className="group relative min-h-[440px] overflow-hidden rounded-[28px] bg-emerald-950 text-left shadow-[0_30px_85px_rgba(15,76,58,0.14)] sm:min-h-[520px] lg:min-h-[650px]"
+            >
+              <img
+                src={mediaGallery[0]?.img}
+                alt={mediaGallery[0]?.title || "Daily Adin News Desk"}
+                className="absolute inset-0 h-full w-full object-cover transition duration-[1100ms] group-hover:scale-[1.03]"
+              />
 
-          {/* ── ROW 2: Solution 2 (Image Left, Text Right — Zigzag) ── */}
-          <div className="grid items-center gap-12 lg:grid-cols-2 lg:gap-16">
-            {/* Left: Rounded Image with Testimonial/Quote Card */}
-            <div className="relative order-2 lg:order-1">
-              <div className="relative h-[360px] sm:h-[420px] lg:h-[450px] w-full overflow-hidden rounded-3xl bg-slate-100 shadow-2xl">
-                <img
-                  src={overviewGallery[1] || overviewGallery[0] || hero1}
-                  alt={data.overviewHighlightTitle}
-                  className="h-full w-full object-cover object-center"
-                />
-                <div className="pointer-events-none absolute inset-0 bg-slate-900/10" />
+              <div className="absolute inset-0 bg-gradient-to-t from-emerald-950/88 via-emerald-950/8 to-transparent" />
 
-                {/* Floating Quote Card at bottom */}
-                <div className="absolute bottom-5 left-5 right-5 sm:max-w-md rounded-2xl border border-slate-100/90 bg-white/95 p-5 sm:p-6 shadow-2xl backdrop-blur-md">
-                  <p className="font-brand-body text-xs sm:text-sm font-medium leading-relaxed text-slate-700 italic">
-                    "{data.overviewHighlightTitle || data.heroSubtitle}"
-                  </p>
-                  <div className="mt-4 flex items-center justify-between border-t border-slate-100 pt-3">
-                    <div className="flex items-center gap-2.5">
-                      <div className="flex h-7 w-7 shrink-0 items-center justify-center rounded-lg bg-[#0f7771] text-xs font-bold text-white shadow-sm">
-                        NS
-                      </div>
-                      <div>
-                        <p className="font-brand-body text-xs font-bold uppercase tracking-wider text-slate-900">
-                          {data.overviewHighlightEyebrow || "North South Group"}
-                        </p>
-                        <p className="font-brand-body text-[10px] text-slate-400">
-                          Corporate Development
-                        </p>
-                      </div>
-                    </div>
-                    <span className="font-brand-body text-[10px] font-bold uppercase px-2.5 py-1 rounded bg-[#0f7771]/10 text-[#0f7771]">
-                      {data.overviewBadge || "Since 2019"}
-                    </span>
-                  </div>
-                </div>
+              <div className="absolute left-5 top-5 flex items-center gap-2 rounded-full border border-white/35 bg-white/12 px-3 py-1.5 text-[8px] font-bold uppercase tracking-[0.17em] text-white backdrop-blur-md sm:left-6 sm:top-6">
+                <span className="h-1.5 w-1.5 rounded-full bg-emerald-300" />
+                News Desk
               </div>
-            </div>
 
-            {/* Right: Content, Solution Tag, Title, Paragraph, Stacked List */}
-            <div className="space-y-5 order-1 lg:order-2">
-              <div>
-                <span className="inline-block rounded bg-[#0f7771]/10 px-3 py-1 font-brand-body text-[11px] font-bold uppercase tracking-wider text-[#0f7771]">
-                  {data.overviewHighlightEyebrow || "North South Group"}
-                </span>
-              </div>
-              <h2 className="font-brand-body text-3xl font-bold tracking-tight text-slate-900 sm:text-4xl lg:text-[2.6rem] leading-tight">
-                {data.overviewHighlightTitle || "Planned Projects Shaped Around Trust & Long-term Value"}
-              </h2>
-              <p className="font-brand-body text-sm sm:text-base leading-relaxed text-slate-600 font-light">
-                {data.overviewParagraphs?.[0]}
-              </p>
-
-              {data.overviewParagraphs?.[1] && (
-                <p className="font-brand-body text-sm sm:text-base leading-relaxed text-slate-600 font-light">
-                  {data.overviewParagraphs[1]}
+              <div className="absolute inset-x-0 bottom-0 p-5 sm:p-7 lg:p-9">
+                <p className="text-[8px] font-extrabold uppercase tracking-[0.21em] text-emerald-200 sm:text-[9px]">
+                  Inside Daily Adin
                 </p>
-              )}
 
-              <div className="space-y-5 pt-3">
-                <div className="flex items-start gap-3.5">
-                  <div className="mt-0.5 flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-[#0f7771]/10 text-[#0f7771]">
-                    <HiOutlineBuildingOffice2 size={19} />
-                  </div>
-                  <div>
-                    <h4 className="font-brand-body text-sm sm:text-base font-bold text-slate-900">
-                      {data.strengths?.[2]?.title || "Reliable Governance"}
-                    </h4>
-                    <p className="font-brand-body mt-1 text-xs sm:text-sm leading-relaxed text-slate-500 font-light">
-                      {data.strengths?.[2]?.text || "Disciplined project planning and professional leadership keep delivery aligned with client confidence."}
-                    </p>
-                  </div>
-                </div>
+                <h3 className="mt-3 max-w-2xl font-about-display text-3xl font-semibold leading-[1.02] text-white sm:text-4xl lg:text-5xl">
+                  {mediaGallery[0]?.title || "Daily Adin News Desk"}
+                </h3>
 
-                <div className="flex items-start gap-3.5">
-                  <div className="mt-0.5 flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-[#0f7771]/10 text-[#0f7771]">
-                    <HiOutlineShieldCheck size={19} />
-                  </div>
-                  <div>
-                    <h4 className="font-brand-body text-sm sm:text-base font-bold text-slate-900">
-                      {data.strengths?.[3]?.title || "Client Commitment"}
-                    </h4>
-                    <p className="font-brand-body mt-1 text-xs sm:text-sm leading-relaxed text-slate-500 font-light">
-                      {data.strengths?.[3]?.text || "We focus on trust, transparent communication, and real estate solutions that fit buyer needs."}
-                    </p>
-                  </div>
+                <p className="mt-4 max-w-xl text-sm leading-7 text-white/72">
+                  {mediaGallery[0]?.subtitle}
+                </p>
+
+                <div className="mt-6 inline-flex items-center gap-2 text-[8px] font-bold uppercase tracking-[0.18em] text-white/82 sm:text-[9px]">
+                  View Full Image
+                  <FaArrowRight className="text-[9px] transition-transform group-hover:translate-x-1" />
                 </div>
               </div>
+            </button>
 
-              {/* Signature Group Ventures Chips */}
-              <div className="flex flex-wrap gap-2 pt-2">
-                {signatureVentures.map((venture) => (
-                  <span
-                    key={venture}
-                    className="font-brand-body border border-[#0f7771]/30 bg-[#0f7771]/5 px-3 py-1 text-xs font-semibold text-[#0f7771] rounded-full"
-                  >
-                    {venture}
-                  </span>
-                ))}
-              </div>
+            {/* Right editorial stack */}
+            <div className="grid gap-4">
+              {/* Front Desk */}
+              <button
+                type="button"
+                onClick={() => setSelectedGalleryItem(mediaGallery[1])}
+                className="group relative min-h-[300px] overflow-hidden rounded-[26px] bg-emerald-950 text-left shadow-[0_20px_55px_rgba(15,76,58,0.10)] sm:min-h-[320px]"
+              >
+                <img
+                  src={mediaGallery[1]?.img}
+                  alt={mediaGallery[1]?.title || "Daily Adin Front Desk"}
+                  className="absolute inset-0 h-full w-full object-cover transition duration-[900ms] group-hover:scale-[1.035]"
+                />
+
+                <div className="absolute inset-0 bg-gradient-to-t from-emerald-950/84 via-transparent to-transparent" />
+
+                <div className="absolute inset-x-0 bottom-0 p-5 sm:p-6">
+                  <p className="text-[8px] font-extrabold uppercase tracking-[0.18em] text-emerald-200">
+                    Front Desk
+                  </p>
+                  <h4 className="mt-2 font-about-display text-2xl font-semibold text-white sm:text-3xl">
+                    {mediaGallery[1]?.title}
+                  </h4>
+                  <p className="mt-2 text-xs leading-5 text-white/70">
+                    {mediaGallery[1]?.subtitle}
+                  </p>
+                </div>
+              </button>
+
+              {/* Print Edition */}
+              <button
+                type="button"
+                onClick={() => setSelectedGalleryItem(mediaGallery[2])}
+                className="group relative min-h-[300px] overflow-hidden rounded-[26px] border border-emerald-100 bg-[#F4F9F5] text-left shadow-[0_18px_50px_rgba(15,76,58,0.08)] sm:min-h-[314px]"
+              >
+                <img
+                  src={mediaGallery[2]?.img}
+                  alt={mediaGallery[2]?.title || "Daily Adin Print Edition"}
+                  className="absolute inset-0 h-full w-full object-cover transition duration-[900ms] group-hover:scale-[1.04]"
+                />
+
+                <div className="absolute inset-0 bg-gradient-to-t from-emerald-950/82 via-emerald-950/3 to-transparent" />
+
+                <div className="absolute inset-x-0 bottom-0 p-5 sm:p-6">
+                  <p className="text-[8px] font-extrabold uppercase tracking-[0.18em] text-emerald-200">
+                    Print Edition
+                  </p>
+                  <h4 className="mt-2 font-about-display text-2xl font-semibold text-white sm:text-3xl">
+                    {mediaGallery[2]?.title}
+                  </h4>
+                  <p className="mt-2 text-xs leading-5 text-white/70">
+                    {mediaGallery[2]?.subtitle}
+                  </p>
+                </div>
+              </button>
             </div>
           </div>
 
+          {/* Distribution / readership strip */}
+          <div className="mt-5 rounded-[28px] border border-emerald-100 bg-[#F7FAF7] p-3 sm:p-4 lg:p-5">
+            <div className="mb-4 flex flex-col gap-2 px-1 sm:flex-row sm:items-end sm:justify-between">
+              <div>
+                <p className="text-[8px] font-extrabold uppercase tracking-[0.20em] text-emerald-700">
+                  Print Presence
+                </p>
+                <h3 className="mt-1 font-about-display text-2xl font-semibold text-slate-950">
+                  From publication to the reader.
+                </h3>
+              </div>
+
+              <p className="max-w-md text-xs leading-5 text-slate-500">
+                Newspaper display, circulation and community reach captured through Daily Adin's print presence.
+              </p>
+            </div>
+
+            <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-5">
+              {mediaGallery.slice(3, 8).map((item, index) => (
+                <button
+                  key={item?.id || index}
+                  type="button"
+                  onClick={() => setSelectedGalleryItem(item)}
+                  className="group relative h-[190px] overflow-hidden rounded-[18px] bg-emerald-50 text-left shadow-[0_10px_28px_rgba(15,76,58,0.06)] sm:h-[220px] lg:h-[235px]"
+                >
+                  <img
+                    src={item?.img}
+                    alt={item?.title}
+                    className="h-full w-full object-cover transition duration-700 group-hover:scale-105"
+                  />
+
+                  <div className="absolute inset-0 bg-gradient-to-t from-emerald-950/78 via-transparent to-transparent" />
+
+                  <div className="absolute inset-x-0 bottom-0 p-3 sm:p-4">
+                    <p className="text-[6px] font-extrabold uppercase tracking-[0.15em] text-emerald-200 sm:text-[7px]">
+                      {item?.type === "paper" ? "Print Media" : "Circulation"}
+                    </p>
+                    <h4 className="mt-1 font-about-display text-sm font-semibold leading-tight text-white sm:text-base">
+                      {item?.title}
+                    </h4>
+                  </div>
+
+                  <div className="pointer-events-none absolute inset-2 rounded-[13px] border border-white/15 opacity-0 transition duration-500 group-hover:opacity-100" />
+                </button>
+              ))}
+            </div>
+          </div>
         </div>
       </section>
 
-      <section className="bg-[#082b28] py-24 md:py-32">
-        <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-          <div className="mb-14 flex flex-col justify-between gap-6 border-b border-[#0d3b38] pb-8 md:flex-row md:items-end">
-            <div className="max-w-2xl">
-              <p className="about-body text-xs font-extrabold uppercase tracking-[0.28em] text-[#f3b128]">
-                Institutional Capabilities
-              </p>
-              <h2 className="about-display mt-4 text-4xl font-semibold uppercase leading-tight text-[#ffffff] sm:text-5xl">
-                Core Pillars of Excellence
-              </h2>
+      {/* ================================================================ STORY */}
+      <section id="story" className="bg-[#F6FAF7] py-16 sm:py-20 lg:py-28">
+        <div className="mx-auto grid max-w-[1540px] items-center gap-10 px-4 sm:px-6 lg:grid-cols-[0.92fr_1.08fr] lg:gap-16 lg:px-10 xl:px-14">
+          <div>
+            <SectionEyebrow>{data.overviewEyebrow || "Our Story"}</SectionEyebrow>
+
+            <PremiumHeading className="max-w-2xl">{data.overviewTitle}</PremiumHeading>
+
+            <p className="mt-5 text-sm leading-7 text-slate-600 sm:text-base sm:leading-8">
+              {data.overviewText}
+            </p>
+
+            <div className="mt-7 space-y-4 border-t border-emerald-100 pt-6">
+              {data.overviewParagraphs?.slice(0, 2).map((paragraph, index) => (
+                <p key={index} className="text-sm leading-7 text-slate-500">
+                  {paragraph}
+                </p>
+              ))}
             </div>
-            <p className="about-body max-w-md text-sm leading-7 text-[#cdece7]">
-              Disciplined planning, client trust, and long-term community value guide every concern of the group.
+
+            <div className="mt-8 grid gap-3 sm:grid-cols-2">
+              <div className="rounded-[20px] border border-emerald-100 bg-white p-5">
+                <HiOutlineClock className="text-2xl text-emerald-700" />
+                <p className="mt-4 text-sm font-bold text-slate-900">
+                  {data.strengths?.[0]?.title || "Planned Development"}
+                </p>
+                <p className="mt-1.5 text-xs leading-5 text-slate-500">
+                  {data.strengths?.[0]?.text}
+                </p>
+              </div>
+
+              <div className="rounded-[20px] border border-emerald-100 bg-white p-5">
+                <HiOutlineChartBar className="text-2xl text-emerald-700" />
+                <p className="mt-4 text-sm font-bold text-slate-900">
+                  {data.strengths?.[1]?.title || "Sustainable Growth"}
+                </p>
+                <p className="mt-1.5 text-xs leading-5 text-slate-500">
+                  {data.strengths?.[1]?.text}
+                </p>
+              </div>
+            </div>
+          </div>
+
+          <div className="relative min-h-[560px] sm:min-h-[660px]">
+            <div className="absolute left-0 top-0 h-[74%] w-[72%] overflow-hidden rounded-[30px] bg-emerald-50 shadow-[0_28px_70px_rgba(15,76,58,0.11)]">
+              <img
+                src={overviewImage}
+                alt={data.overviewTitle}
+                className="h-full w-full object-cover"
+              />
+            </div>
+
+            <div className="absolute bottom-0 right-0 h-[58%] w-[54%] overflow-hidden rounded-[26px] border-[8px] border-[#F6FAF7] bg-emerald-50 shadow-[0_24px_60px_rgba(15,76,58,0.12)]">
+              <img
+                src={secondOverviewImage}
+                alt="North South Group development"
+                className="h-full w-full object-cover"
+              />
+            </div>
+
+            <div className="absolute bottom-[8%] left-[7%] z-10 max-w-[270px] rounded-[22px] bg-emerald-950 p-5 text-white shadow-[0_24px_60px_rgba(6,78,59,0.20)] sm:p-6">
+              <p className="text-[8px] font-extrabold uppercase tracking-[0.20em] text-emerald-200">
+                Group Vision
+              </p>
+              <p className="mt-3 font-about-display text-xl font-semibold leading-snug">
+                {data.overviewHighlightTitle}
+              </p>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* ================================================================ OFFICE / WORKSPACES */}
+      {/* <section className="bg-white py-16 sm:py-20 lg:py-28">
+        <div className="mx-auto max-w-[1540px] px-4 sm:px-6 lg:px-10 xl:px-14">
+          <div className="mb-10 grid gap-6 lg:grid-cols-[1fr_0.8fr] lg:items-end">
+            <div>
+              <SectionEyebrow>Our Workspaces</SectionEyebrow>
+              <PremiumHeading className="max-w-3xl">
+                From project sites to management spaces, our work is built around coordination and service.
+              </PremiumHeading>
+            </div>
+
+            <p className="max-w-xl text-sm leading-7 text-slate-500 lg:justify-self-end">
+              Replace these temporary previews with your actual Site Office and corporate office
+              photographs when available.
             </p>
           </div>
 
-          <div className="grid gap-px overflow-hidden border border-[#0d3b38] bg-[#0d3b38] sm:grid-cols-2 lg:grid-cols-4">
-            {data.strengths.map((item, idx) => {
-              const IconComp =
-                strengthIcons[item.iconKey] || defaultStrengthIconList[idx % defaultStrengthIconList.length];
-              return (
-                <div key={item.title} className="group bg-[#06211f] p-8 transition hover:bg-[#0b3a36]">
-                  <div className="mb-10 flex items-center justify-between">
-                    <span className="about-display text-sm text-[#7bc1b8]">
-                      {String(idx + 1).padStart(2, "0")}
-                    </span>
-                    <span className="flex h-12 w-12 items-center justify-center border border-[#f3b128]/35 text-xl text-[#f3b128] transition group-hover:bg-[#f3b128] group-hover:text-[#0a2a66]">
-                      <IconComp />
-                    </span>
-                  </div>
-                  <h3 className="about-display text-2xl text-[#ffffff]">{item.title}</h3>
-                  <p className="about-body mt-4 text-sm leading-7 text-[#cdece7]">{item.text}</p>
+          <div className="grid auto-rows-[220px] grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
+            {officeGallery.map((item, index) => (
+              <button
+                key={item.id || index}
+                type="button"
+                onClick={() => setSelectedGalleryItem(item)}
+                className={`group relative overflow-hidden rounded-[24px] bg-emerald-50 text-left shadow-[0_16px_44px_rgba(15,76,58,0.07)] ${
+                  index === 0 ? "sm:col-span-2 sm:row-span-2" : ""
+                } ${index === 3 ? "lg:col-span-2" : ""}`}
+              >
+                <img
+                  src={item.img}
+                  alt={item.title}
+                  className="h-full w-full object-cover transition duration-700 group-hover:scale-105"
+                />
+                <div className="absolute inset-0 bg-gradient-to-t from-emerald-950/78 via-emerald-950/4 to-transparent" />
+
+                {item.isPlaceholder && (
+                  <span className="absolute right-3 top-3 rounded-full border border-white/35 bg-white/82 px-2.5 py-1 text-[7px] font-bold uppercase tracking-[0.14em] text-emerald-800 backdrop-blur-md">
+                    Preview
+                  </span>
+                )}
+
+                <div className="absolute inset-x-0 bottom-0 p-4 sm:p-5">
+                  <p className="text-[8px] font-extrabold uppercase tracking-[0.18em] text-emerald-200">
+                    Workspace
+                  </p>
+                  <h3 className="mt-1 font-about-display text-xl font-semibold text-white sm:text-2xl">
+                    {item.title}
+                  </h3>
+                  <p className="mt-1 text-[11px] text-white/72">{item.subtitle}</p>
                 </div>
+              </button>
+            ))}
+          </div>
+        </div>
+      </section> */}
+
+      {/* ================================================================ STRENGTHS */}
+      <section className="bg-emerald-950 py-16 text-white sm:py-20 lg:py-24">
+        <div className="mx-auto max-w-[1540px] px-4 sm:px-6 lg:px-10 xl:px-14">
+          <div className="mb-10 grid gap-6 lg:grid-cols-[0.9fr_1.1fr] lg:items-end">
+            <div>
+              <SectionEyebrow light>Institutional Capabilities</SectionEyebrow>
+              <h2 className="font-about-display text-3xl font-medium tracking-[-0.04em] text-white sm:text-4xl lg:text-5xl">
+                Core pillars behind the group.
+              </h2>
+            </div>
+
+            <p className="max-w-2xl text-sm leading-7 text-emerald-100/68 lg:justify-self-end">
+              Disciplined planning, client confidence, sustainable thinking and long-term value
+              guide every concern of the group.
+            </p>
+          </div>
+
+          <div className="grid gap-3 sm:grid-cols-2 xl:grid-cols-4">
+            {data.strengths.map((item, index) => {
+              const IconComp =
+                strengthIcons[item.iconKey] ||
+                defaultStrengthIconList[index % defaultStrengthIconList.length];
+              return (
+                <MotionDiv
+                  key={item.title}
+                  initial={{ opacity: 0, y: 28 }}
+                  whileInView={{ opacity: 1, y: 0 }}
+                  viewport={{ once: true, margin: "-60px" }}
+                  transition={{ duration: 0.6, delay: index * 0.11 }}
+                >
+                  <article className="group border border-white/10 bg-white/[0.045] p-5 backdrop-blur-sm transition hover:-translate-y-1 hover:border-emerald-300/50 hover:bg-white/[0.07] sm:p-6 h-full">
+                    <div className="flex items-center justify-between">
+                      <span className="grid h-11 w-11 place-items-center rounded-full border border-emerald-300/25 bg-emerald-300/10 text-lg text-emerald-200 transition group-hover:bg-emerald-300 group-hover:text-emerald-950">
+                        <IconComp />
+                      </span>
+                      <span className="font-mono text-[10px] tracking-[0.16em] text-white/25">
+                        {String(index + 1).padStart(2, "0")}
+                      </span>
+                    </div>
+                    <h3 className="mt-8 font-about-display text-2xl font-semibold text-white">{item.title}</h3>
+                    <p className="mt-3 text-sm leading-7 text-emerald-100/65">{item.text}</p>
+                  </article>
+                </MotionDiv>
               );
             })}
           </div>
         </div>
       </section>
 
-      <section id="leadership" className="bg-[#f4fbf9] py-24 text-[#0a2a66] md:py-32">
-        <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-          <div className="mb-12 flex flex-col justify-between gap-6 md:flex-row md:items-end">
-            <div className="max-w-3xl">
-              <p className="about-body text-xs font-extrabold uppercase tracking-[0.28em] text-[#0f7771]">
-                {data.leadershipEyebrow}
-              </p>
-              <h2 className="about-display mt-4 text-4xl font-semibold uppercase leading-tight sm:text-5xl">
-                {data.leadershipTitle}
+      {/* ================================================================ MANAGEMENT */}
+      <section id="leadership" className="relative overflow-hidden bg-[#F6FAF7] py-16 sm:py-20 lg:py-24">
+        <div className="pointer-events-none absolute -left-28 top-24 h-72 w-72 rounded-full bg-emerald-100/55 blur-3xl" />
+        <div className="pointer-events-none absolute -right-28 bottom-12 h-80 w-80 rounded-full bg-green-100/45 blur-3xl" />
+
+        <div className="relative mx-auto max-w-[1560px] px-4 sm:px-6 lg:px-10 xl:px-14">
+          <div className="mb-9 grid gap-6 lg:grid-cols-[1fr_0.82fr] lg:items-end">
+            <div>
+              {/* Eyebrow slide-in */}
+              <MotionDiv
+                initial={{ opacity: 0, x: -20 }}
+                whileInView={{ opacity: 1, x: 0 }}
+                viewport={{ once: true }}
+                transition={{ duration: 0.5 }}
+              >
+                <SectionEyebrow>{data.leadershipEyebrow || "Leadership"}</SectionEyebrow>
+              </MotionDiv>
+
+              {/* Typewriter word-by-word heading */}
+              <h2 className="font-about-display mt-3 max-w-3xl text-3xl font-medium tracking-[-0.04em] text-slate-950 sm:text-4xl lg:text-5xl">
+                {(data.leadershipTitle || "Board of Directors").split(" ").map((word, wi) => (
+                  <MotionDiv
+                    key={wi}
+                    initial={{ opacity: 0, y: 18, filter: "blur(4px)" }}
+                    whileInView={{ opacity: 1, y: 0, filter: "blur(0px)" }}
+                    viewport={{ once: true }}
+                    transition={{ duration: 0.45, delay: 0.15 + wi * 0.1 }}
+                    className="inline-block mr-[0.25em]"
+                  >
+                    {word}
+                  </MotionDiv>
+                ))}
               </h2>
-              <p className="about-body mt-4 max-w-2xl leading-8 text-[#315b67]">{data.leadershipText}</p>
             </div>
-            <div className="flex gap-3">
-              <button
-                ref={prevRef}
-                type="button"
-                aria-label="Previous leader"
-                className="flex h-12 w-12 items-center justify-center border border-[#0f7771] bg-transparent text-[#0a2a66] transition hover:bg-[#0a2a66] hover:text-[#f4fbf9]"
-              >
-                <IoIosArrowBack size={20} />
-              </button>
-              <button
-                ref={nextRef}
-                type="button"
-                aria-label="Next leader"
-                className="flex h-12 w-12 items-center justify-center border border-[#0f7771] bg-transparent text-[#0a2a66] transition hover:bg-[#0a2a66] hover:text-[#f4fbf9]"
-              >
-                <IoIosArrowForward size={20} />
-              </button>
-            </div>
+
+            {/* Description fade-up */}
+            <MotionDiv
+              initial={{ opacity: 0, y: 16 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true }}
+              transition={{ duration: 0.55, delay: 0.4 }}
+            >
+              <p className="max-w-xl text-sm leading-7 text-slate-500 lg:justify-self-end">
+                {data.leadershipText}
+              </p>
+            </MotionDiv>
           </div>
 
-          <Swiper
-            modules={[Navigation, Autoplay]}
-            slidesPerView={1}
-            spaceBetween={18}
-            loop
-            autoplay={{ delay: 4500, disableOnInteraction: false }}
-            onSwiper={(swiper) => {
-              swiperRef.current = swiper;
-              setSwiperReady(true);
-            }}
-            breakpoints={{
-              700: { slidesPerView: 2 },
-              1100: { slidesPerView: 3 },
-            }}
-            className="!pb-2 [&_.swiper-wrapper]:!items-stretch [&_.swiper-slide]:!h-auto [&_.swiper-slide]:flex"
-          >
-            {sortedLeaders.map((leader) => (
-              <SwiperSlide key={leader.id || leader.name} className="!h-auto flex">
+          {/* Clean luxury portrait cards */}
+          <div className="grid grid-cols-2 gap-4 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5">
+            {managementTeam.map((leader, index) => (
+              <MotionDiv
+                key={leader.id || `${leader.name}-${index}`}
+                initial={{ opacity: 0, y: 30, scale: 0.97 }}
+                whileInView={{ opacity: 1, y: 0, scale: 1 }}
+                viewport={{ once: true, margin: "-50px" }}
+                transition={{ duration: 0.55, delay: index * 0.08 }}
+              >
                 <button
                   type="button"
                   onClick={() => setSelectedLeader(leader)}
-                  className="group flex h-full w-full flex-col justify-between border border-[#b7dad4] bg-[#ffffff] text-left transition hover:-translate-y-1 hover:border-[#0f7771] hover:shadow-[0_20px_50px_rgba(15,119,113,0.16)]"
+                  className="group relative h-[340px] w-full overflow-hidden rounded-[20px] bg-[#E9F3EC] text-left shadow-[0_16px_36px_rgba(15,76,58,0.08)] ring-1 ring-emerald-100 transition-all duration-500 hover:-translate-y-1.5 hover:shadow-[0_28px_60px_rgba(15,76,58,0.14)] hover:ring-emerald-300 sm:h-[380px] lg:h-[410px] xl:h-[430px]"
+                  aria-label={`View profile of ${leader.name}`}
                 >
-                  <div className="relative flex h-[280px] sm:h-[300px] shrink-0 items-center justify-center overflow-hidden bg-[#e8f5f2]">
-                    <img
-                      src={leader.img}
-                      alt={leader.name}
-                      className="h-full w-full object-contain object-center transition duration-700 group-hover:scale-[1.03]"
-                    />
+                  <img
+                    src={leader.img}
+                    alt={leader.name}
+                    className="absolute inset-0 h-full w-full object-cover object-top scale-[0.93] transition duration-[1000ms] ease-out group-hover:scale-[1.0]"
+                  />
+                  <div className="absolute inset-0 bg-gradient-to-t from-emerald-950/76 via-emerald-950/8 to-transparent" />
+                  <div className="pointer-events-none absolute inset-3 rounded-[15px] border border-white/18 opacity-65 transition-all duration-500 group-hover:inset-3.5 group-hover:border-emerald-200/90 group-hover:opacity-100 sm:inset-4 sm:rounded-[16px]" />
+                  <div className="absolute inset-x-0 bottom-0 z-20 p-4 sm:p-5">
+                    <p className="text-[7px] font-extrabold uppercase tracking-[0.18em] text-emerald-200 sm:text-[8px]">{leader.role}</p>
+                    <h3 className="mt-1.5 font-about-display text-lg font-semibold leading-tight text-white drop-shadow-sm sm:text-xl lg:text-[22px]">{leader.name}</h3>
+                    <div className="mt-3 flex items-center gap-2">
+                      <span className="h-px w-7 bg-emerald-300/90 transition-all duration-500 group-hover:w-11" />
+                      <span className="text-[6px] font-bold uppercase tracking-[0.15em] text-white/72 sm:text-[7px]">View Profile</span>
+                    </div>
                   </div>
-                  <div className="flex flex-1 flex-col justify-center p-5">
-                    <p className="about-body text-[11px] font-extrabold uppercase tracking-[0.18em] text-[#0f7771]">
-                      {leader.role}
-                    </p>
-                    <h3 className="about-display mt-1.5 min-h-[3.2rem] text-xl sm:text-2xl font-semibold leading-tight text-[#0a2a66] flex items-start">
-                      {leader.name}
-                    </h3>
-                  </div>
+                  <div className="pointer-events-none absolute inset-x-0 bottom-0 h-[2px] origin-left scale-x-0 bg-emerald-300 transition-transform duration-500 group-hover:scale-x-100" />
                 </button>
-              </SwiperSlide>
+              </MotionDiv>
             ))}
-          </Swiper>
+          </div>
         </div>
       </section>
 
+      {/* ================================================================ VIDEO */}
       {embedUrl && (
-        <section className="bg-[#0a2a66] py-24 md:py-32">
-          <div className="mx-auto grid max-w-7xl items-center gap-10 px-4 sm:px-6 lg:grid-cols-[0.65fr_1.35fr] lg:px-8">
+        <section className="bg-white py-16 sm:py-20 lg:py-28">
+          <div className="mx-auto grid max-w-[1540px] items-center gap-8 px-4 sm:px-6 lg:grid-cols-[0.72fr_1.28fr] lg:gap-12 lg:px-10 xl:px-14">
             <div>
-              <p className="about-body inline-flex items-center gap-2 text-xs font-extrabold uppercase tracking-[0.28em] text-[#f3b128]">
-                <FaPlay className="text-[10px]" /> {data.videoEyebrow}
+              <SectionEyebrow>
+                <span className="inline-flex items-center gap-2">
+                  <FaPlay className="text-[8px]" />
+                  {data.videoEyebrow}
+                </span>
+              </SectionEyebrow>
+
+              <PremiumHeading>{data.videoTitle}</PremiumHeading>
+
+              <p className="mt-5 text-sm leading-7 text-slate-500 sm:text-base sm:leading-8">
+                {data.videoText}
               </p>
-              <h2 className="about-display mt-4 text-4xl font-semibold uppercase leading-tight text-[#ffffff] sm:text-5xl">
-                {data.videoTitle}
-              </h2>
-              <p className="about-body mt-5 leading-8 text-[#cdece7]">{data.videoText}</p>
             </div>
-            <div className="border border-[#12504a] bg-[#06211f] p-3 shadow-[0_30px_90px_rgba(0,0,0,0.45)]">
-              <div className="aspect-video overflow-hidden bg-black">
+
+            <div className="overflow-hidden rounded-[26px] border border-emerald-100 bg-[#F6FAF7] p-2.5 shadow-[0_24px_70px_rgba(15,76,58,0.10)] sm:rounded-[32px] sm:p-3">
+              <div className="aspect-video overflow-hidden rounded-[20px] bg-black sm:rounded-[26px]">
                 <iframe
                   className="h-full w-full"
                   src={embedUrl}
@@ -596,113 +973,343 @@ export default function AboutUs() {
         </section>
       )}
 
-      <section className="bg-[#f4fbf9] py-24 text-[#0a2a66] md:py-32">
-        <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-          <div className="mb-12 grid gap-6 lg:grid-cols-[0.8fr_1fr]">
-            <div>
-              <p className="about-body text-xs font-extrabold uppercase tracking-[0.28em] text-[#0f7771]">
-                {data.csrEyebrow}
-              </p>
-              <h2 className="about-display mt-4 text-4xl font-semibold uppercase leading-tight sm:text-5xl">
-                {data.csrTitle}
-              </h2>
-            </div>
-            <p className="about-body max-w-2xl text-lg leading-9 text-[#315b67] lg:justify-self-end">
-              {data.csrText}
-            </p>
-          </div>
+      {/* ================================================================ COMMUNITY */}
+      {Array.isArray(data.csrImages) && data.csrImages.length > 0 && (
+        <section className="relative overflow-hidden bg-[#0a1628] py-20 sm:py-28 lg:py-32">
+          <div className="pointer-events-none absolute -left-40 top-1/3 h-[500px] w-[500px] rounded-full bg-emerald-900/20 blur-[100px]" />
+          <div className="pointer-events-none absolute -right-40 bottom-1/4 h-[400px] w-[400px] rounded-full bg-[#f3b128]/8 blur-[100px]" />
+          <div className="absolute inset-x-0 top-0 h-[1px] bg-gradient-to-r from-transparent via-[#f3b128]/50 to-transparent" />
 
-          <div className="grid auto-rows-[190px] grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
-            {data.csrImages.slice(0, 8).map((item, idx) => (
-              <button
-                key={item.id || idx}
-                type="button"
-                onClick={() => setSelectedCsrImage(item)}
-                className={`group relative overflow-hidden bg-[#0a2a66] text-left ${
-                  idx === 0 ? "sm:col-span-2 sm:row-span-2" : ""
-                } ${idx === 5 ? "lg:col-span-2" : ""}`}
-              >
-                <img
-                  src={item.img}
-                  alt={item.title}
-                  className="h-full w-full object-cover transition duration-700 group-hover:scale-105"
-                />
-                <div className="absolute inset-0 bg-gradient-to-t from-[#06211f]/90 via-[#06211f]/12 to-transparent" />
-                <div className="absolute bottom-0 left-0 right-0 p-5">
-                  <p className="about-body text-[10px] font-extrabold uppercase tracking-[0.22em] text-[#f3b128]">
-                    Community
-                  </p>
-                  <h3 className="about-display mt-1 text-xl leading-tight text-[#ffffff]">
-                    {item.title}
-                  </h3>
+          <div className="relative mx-auto max-w-[1540px] px-4 sm:px-6 lg:px-10 xl:px-14">
+            <MotionDiv
+              initial={{ opacity: 0, y: 30 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true, margin: "-80px" }}
+              transition={{ duration: 0.7 }}
+              className="mb-14 grid gap-8 lg:grid-cols-[1fr_0.75fr] lg:items-end"
+            >
+              <div>
+                <div className="mb-4 flex items-center gap-3">
+                  <span className="inline-flex items-center rounded-full border border-[#f3b128]/30 bg-[#f3b128]/10 px-4 py-1.5 text-[10px] font-bold uppercase tracking-[0.28em] text-[#f3b128]">
+                    {data.csrEyebrow}
+                  </span>
                 </div>
-              </button>
-            ))}
-          </div>
-        </div>
-      </section>
+                <h2 className="font-about-display text-4xl font-bold leading-tight text-white sm:text-5xl lg:text-6xl">
+                  {data.csrTitle}
+                </h2>
+                <div className="mt-5 flex items-center gap-3">
+                  <div className="h-0.5 w-14 rounded-full bg-gradient-to-r from-[#f3b128] to-[#ffd26d]" />
+                  <div className="h-0.5 w-4 rounded-full bg-[#f3b128]/40" />
+                </div>
+              </div>
+              <p className="max-w-sm text-sm font-light leading-7 text-white/50 lg:pb-2">{data.csrText}</p>
+            </MotionDiv>
 
-      <section className="bg-[#06211f] py-24 md:py-32">
-        <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-          <div className="grid gap-px overflow-hidden border border-[#0d3b38] bg-[#0d3b38] md:grid-cols-3">
+            {/* Magazine masonry grid */}
+            <div className="grid grid-cols-12 gap-3" style={{ gridTemplateRows: "220px 220px 220px" }}>
+
+              {/* Hero — 7 cols × 2 rows */}
+              {data.csrImages[0] && (
+                <MotionDiv
+                  initial={{ opacity: 0, scale: 0.96 }}
+                  whileInView={{ opacity: 1, scale: 1 }}
+                  viewport={{ once: true, margin: "-60px" }}
+                  transition={{ duration: 0.7 }}
+                  className="col-span-12 row-span-2 overflow-hidden rounded-[24px] sm:col-span-7"
+                >
+                  <button type="button" onClick={() => setSelectedGalleryItem(data.csrImages[0])}
+                    className="group relative h-full w-full text-left">
+                    <img src={data.csrImages[0].img} alt={data.csrImages[0].title}
+                      className="h-full w-full object-cover transition duration-[1100ms] ease-out group-hover:scale-[1.05]" />
+                    <div className="absolute inset-0 bg-gradient-to-t from-[#0a1628]/92 via-[#0a1628]/15 to-transparent" />
+                    <div className="absolute left-5 top-5 flex items-center gap-2 rounded-full border border-[#f3b128]/40 bg-[#0a1628]/70 px-3 py-1.5 backdrop-blur-md">
+                      <span className="h-1.5 w-1.5 animate-pulse rounded-full bg-[#f3b128]" />
+                      <span className="text-[8px] font-bold uppercase tracking-[0.22em] text-[#f3b128]">Community</span>
+                    </div>
+                    <div className="absolute inset-x-0 bottom-0 p-6 sm:p-8">
+                      <p className="text-[9px] font-bold uppercase tracking-[0.28em] text-[#f3b128]">Featured Initiative</p>
+                      <h3 className="font-about-display mt-3 text-3xl font-bold leading-tight text-white sm:text-4xl">
+                        {data.csrImages[0].title}
+                      </h3>
+                      <div className="mt-5 flex items-center gap-3">
+                        <div className="h-0.5 w-8 rounded-full bg-[#f3b128] transition-all duration-500 group-hover:w-14" />
+                        <span className="text-[8px] font-bold uppercase tracking-[0.2em] text-white/55">View Photo</span>
+                      </div>
+                    </div>
+                    <div className="absolute inset-x-0 bottom-0 h-0.5 origin-left scale-x-0 bg-gradient-to-r from-[#f3b128] to-[#ffd26d] transition-transform duration-500 group-hover:scale-x-100" />
+                  </button>
+                </MotionDiv>
+              )}
+
+              {/* Right top + bottom — 5 cols each */}
+              {[1, 2].map((idx) => data.csrImages[idx] && (
+                <MotionDiv key={data.csrImages[idx].id || idx}
+                  initial={{ opacity: 0, x: 30 }}
+                  whileInView={{ opacity: 1, x: 0 }}
+                  viewport={{ once: true, margin: "-60px" }}
+                  transition={{ duration: 0.6, delay: idx * 0.12 }}
+                  className="col-span-12 row-span-1 overflow-hidden rounded-[20px] sm:col-span-5"
+                >
+                  <button type="button" onClick={() => setSelectedGalleryItem(data.csrImages[idx])}
+                    className="group relative h-full w-full text-left">
+                    <img src={data.csrImages[idx].img} alt={data.csrImages[idx].title}
+                      className="h-full w-full object-cover transition duration-[900ms] group-hover:scale-[1.055]" />
+                    <div className="absolute inset-0 bg-gradient-to-t from-[#0a1628]/90 via-[#0a1628]/10 to-transparent" />
+                    <div className="absolute inset-x-0 bottom-0 p-4 sm:p-5">
+                      <p className="text-[7px] font-bold uppercase tracking-[0.22em] text-[#f3b128]">Community</p>
+                      <h4 className="font-about-display mt-1 text-lg font-bold text-white sm:text-xl">{data.csrImages[idx].title}</h4>
+                    </div>
+                    <div className="absolute inset-x-0 bottom-0 h-0.5 origin-left scale-x-0 bg-[#f3b128] transition-transform duration-500 group-hover:scale-x-100" />
+                  </button>
+                </MotionDiv>
+              ))}
+
+              {/* Bottom row — 3 equal */}
+              {[3, 4, 5].map((idx) => data.csrImages[idx] && (
+                <MotionDiv key={data.csrImages[idx].id || idx}
+                  initial={{ opacity: 0, y: 30 }}
+                  whileInView={{ opacity: 1, y: 0 }}
+                  viewport={{ once: true, margin: "-60px" }}
+                  transition={{ duration: 0.6, delay: (idx - 3) * 0.1 }}
+                  className="col-span-12 row-span-1 overflow-hidden rounded-[20px] sm:col-span-4"
+                >
+                  <button type="button" onClick={() => setSelectedGalleryItem(data.csrImages[idx])}
+                    className="group relative h-full w-full text-left">
+                    <img src={data.csrImages[idx].img} alt={data.csrImages[idx].title}
+                      className="h-full w-full object-cover transition duration-700 group-hover:scale-[1.06]" />
+                    <div className="absolute inset-0 bg-gradient-to-t from-[#0a1628]/90 via-transparent to-transparent" />
+                    <div className="pointer-events-none absolute left-3 top-3 h-6 w-6 border-l-2 border-t-2 border-[#f3b128]/0 transition-all duration-500 group-hover:border-[#f3b128]/60" />
+                    <div className="pointer-events-none absolute bottom-12 right-3 h-6 w-6 border-b-2 border-r-2 border-[#f3b128]/0 transition-all duration-500 group-hover:border-[#f3b128]/60" />
+                    <div className="absolute inset-x-0 bottom-0 p-4">
+                      <p className="text-[7px] font-bold uppercase tracking-[0.22em] text-[#f3b128]">NSG Initiative</p>
+                      <h4 className="font-about-display mt-1 text-base font-bold text-white sm:text-lg">{data.csrImages[idx].title}</h4>
+                    </div>
+                    <div className="absolute inset-x-0 bottom-0 h-0.5 origin-left scale-x-0 bg-gradient-to-r from-[#f3b128] to-[#ffd26d] transition-transform duration-500 group-hover:scale-x-100" />
+                  </button>
+                </MotionDiv>
+              ))}
+            </div>
+          </div>
+          <div className="absolute inset-x-0 bottom-0 h-[1px] bg-gradient-to-r from-transparent via-[#f3b128]/30 to-transparent" />
+        </section>
+      )}
+
+      {/* ================================================================ MISSION */}
+      <section className="bg-white py-16 sm:py-20 lg:py-24">
+        <div className="mx-auto max-w-[1540px] px-4 sm:px-6 lg:px-10 xl:px-14">
+          <div className="mb-10">
+            <SectionEyebrow>Purpose & Direction</SectionEyebrow>
+            <PremiumHeading className="max-w-3xl">Built around a clear purpose.</PremiumHeading>
+          </div>
+
+          <div className="grid gap-4 md:grid-cols-3">
             {data.missionCards.map((card, index) => (
-              <div key={card.title} className="bg-[#082b28] p-8 md:p-10">
-                <div className="mb-10 flex items-start justify-between">
-                  <FaCheckCircle className="text-2xl text-[#0f7771]" />
-                  <span className="about-display text-sm text-[#7bc1b8]">
+              <article
+                key={card.title}
+                className="group rounded-[24px] border border-emerald-100 bg-[#F8FBF8] p-5 transition hover:border-emerald-300 hover:bg-white hover:shadow-[0_18px_50px_rgba(15,76,58,0.09)] sm:p-6 lg:p-7"
+              >
+                <div className="flex items-center justify-between">
+                  <span className="grid h-10 w-10 place-items-center rounded-full bg-emerald-800 text-white">
+                    <FaCheckCircle className="text-sm" />
+                  </span>
+                  <span className="font-mono text-[10px] tracking-[0.16em] text-slate-300">
                     {String(index + 1).padStart(2, "0")}
                   </span>
                 </div>
-                <h3 className="about-display text-3xl font-semibold text-[#ffffff]">{card.title}</h3>
-                <p className="about-body mt-5 text-sm leading-8 text-[#cdece7]">{card.text}</p>
-              </div>
+
+                <h3 className="mt-7 font-about-display text-2xl font-semibold text-slate-950">
+                  {card.title}
+                </h3>
+                <p className="mt-4 text-sm leading-7 text-slate-500">{card.text}</p>
+              </article>
             ))}
           </div>
         </div>
       </section>
 
+      {/* ================================================================ CTA */}
+      <section className="bg-white px-4 pb-14 sm:px-6 sm:pb-18 lg:px-10 lg:pb-20 xl:px-14">
+        <div className="mx-auto flex max-w-[1540px] flex-col gap-6 rounded-[28px] bg-emerald-950 px-5 py-9 text-white shadow-[0_30px_90px_rgba(6,78,59,0.18)] sm:rounded-[34px] sm:px-8 sm:py-11 md:flex-row md:items-center md:justify-between lg:px-10">
+          <div>
+            <p className="text-[9px] font-extrabold uppercase tracking-[0.22em] text-emerald-200">
+              North South Group
+            </p>
+            <h2 className="mt-2 max-w-3xl font-about-display text-3xl font-semibold tracking-[-0.03em] sm:text-4xl">
+              Building confidence through thoughtful development, service and communication.
+            </h2>
+          </div>
+
+          <a
+            href="#story"
+            className="inline-flex h-11 items-center justify-center gap-2 rounded-full bg-white px-6 text-[10px] font-extrabold uppercase tracking-[0.18em] text-emerald-950 transition hover:bg-emerald-100"
+          >
+            Explore More
+            <FaArrowRight className="text-[9px]" />
+          </a>
+        </div>
+      </section>
+
+      {/* ================================================================ LEADER MODAL */}
       <AnimatePresence>
         {selectedLeader && (
           <MotionDiv
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
-            className="fixed inset-0 z-50 flex items-center justify-center bg-black/85 p-4 backdrop-blur-md"
+            className="fixed inset-0 z-50 flex items-center justify-center bg-emerald-950/88 p-3 backdrop-blur-md sm:p-5 lg:p-8"
             onClick={() => setSelectedLeader(null)}
           >
             <MotionDiv
-              initial={{ opacity: 0, y: 18 }}
-              animate={{ opacity: 1, y: 0 }}
-              exit={{ opacity: 0, y: 18 }}
-              className="relative grid w-full max-w-4xl overflow-hidden bg-[#f4fbf9] text-[#0a2a66] shadow-2xl sm:grid-cols-[0.85fr_1.15fr]"
+              initial={{ opacity: 0, y: 22, scale: 0.975 }}
+              animate={{ opacity: 1, y: 0, scale: 1 }}
+              exit={{ opacity: 0, y: 22, scale: 0.975 }}
+              transition={{ duration: 0.28 }}
+              className="relative grid max-h-[94vh] w-full max-w-6xl overflow-y-auto rounded-[26px] bg-white shadow-[0_40px_120px_rgba(0,0,0,0.35)] md:grid-cols-[0.92fr_1.08fr] md:overflow-hidden lg:rounded-[34px]"
               onClick={(event) => event.stopPropagation()}
             >
               <button
                 type="button"
                 onClick={() => setSelectedLeader(null)}
                 aria-label="Close leader profile"
-                className="absolute right-4 top-4 z-10 flex h-10 w-10 items-center justify-center bg-[#0a2a66] text-[#f4fbf9] transition hover:bg-[#f3b128] hover:text-[#0a2a66]"
+                className="absolute right-4 top-4 z-30 grid h-10 w-10 place-items-center rounded-full border border-emerald-100 bg-white/92 text-emerald-950 shadow-md backdrop-blur-md transition hover:bg-emerald-800 hover:text-white sm:right-5 sm:top-5 sm:h-11 sm:w-11"
               >
                 <FaTimes />
               </button>
-              <div className="min-h-[320px] bg-[#0a2a66]">
+
+              {/* LEFT: PORTRAIT */}
+              <div className="relative min-h-[420px] bg-[#E8F3EB] md:min-h-[680px]">
                 <img
                   src={selectedLeader.img}
                   alt={selectedLeader.name}
-                  className="h-full max-h-[560px] w-full object-cover object-top"
+                  className="absolute inset-0 h-full w-full object-cover object-top"
                 />
+
+                <div className="absolute inset-0 bg-gradient-to-t from-emerald-950/68 via-transparent to-transparent" />
+
+                <div className="absolute bottom-0 left-0 right-0 p-5 text-white sm:p-7 lg:p-8">
+                  <p className="text-[8px] font-extrabold uppercase tracking-[0.20em] text-emerald-200">
+                    Leadership · North South Group
+                  </p>
+                  <p className="mt-2 font-about-display text-2xl font-semibold sm:text-3xl">
+                    {selectedLeader.name}
+                  </p>
+                </div>
               </div>
-              <div className="flex flex-col justify-center p-8 sm:p-10">
-                <FaQuoteLeft className="mb-7 text-3xl text-[#0f7771]" />
-                <p className="about-body text-xs font-extrabold uppercase tracking-[0.2em] text-[#0f7771]">
-                  {selectedLeader.role}
-                </p>
-                <h3 className="about-display mt-3 text-4xl font-semibold leading-tight">
-                  {selectedLeader.name}
-                </h3>
-                {(selectedLeader.description || selectedLeader.text) && (
-                  <p className="about-body mt-6 leading-8 text-[#315b67]">
-                    {selectedLeader.description || selectedLeader.text}
+
+              {/* RIGHT: DETAILS */}
+              <div className="flex min-h-[520px] flex-col justify-center p-6 sm:p-8 md:p-10 lg:p-12">
+                <div className="max-w-xl">
+                  <SectionEyebrow>Management Profile</SectionEyebrow>
+
+                  <p className="text-[9px] font-extrabold uppercase tracking-[0.21em] text-emerald-700">
+                    {selectedLeader.role}
+                  </p>
+
+                  <h3 className="mt-3 font-about-display text-4xl font-semibold leading-[1.02] tracking-[-0.035em] text-slate-950 sm:text-5xl">
+                    {selectedLeader.name}
+                  </h3>
+
+                  <div className="mt-6 h-px w-16 bg-emerald-500" />
+
+                  <FaQuoteLeft className="mt-7 text-2xl text-emerald-100 sm:text-3xl" />
+
+                  <p className="mt-4 text-sm leading-7 text-slate-600 sm:text-base sm:leading-8">
+                    {selectedLeader.description ||
+                      selectedLeader.text ||
+                      "Leadership profile details will be added here."}
+                  </p>
+
+                  {!selectedLeader.isPlaceholder && (
+                    <div className="mt-8 grid gap-3 sm:grid-cols-2">
+                      <div className="rounded-[18px] border border-emerald-100 bg-[#F6FAF7] p-4">
+                        <p className="text-[7px] font-bold uppercase tracking-[0.17em] text-slate-400">
+                          Organization
+                        </p>
+                        <p className="mt-1.5 text-sm font-semibold text-slate-900">
+                          North South Group
+                        </p>
+                      </div>
+
+                      <div className="rounded-[18px] border border-emerald-100 bg-[#F6FAF7] p-4">
+                        <p className="text-[7px] font-bold uppercase tracking-[0.17em] text-slate-400">
+                          Position
+                        </p>
+                        <p className="mt-1.5 text-sm font-semibold text-emerald-800">
+                          {selectedLeader.role}
+                        </p>
+                      </div>
+                    </div>
+                  )}
+
+                  {selectedLeader.isPlaceholder && (
+                    <div className="mt-7 rounded-[18px] border border-emerald-100 bg-[#F5FAF6] p-4">
+                      <p className="text-xs leading-6 text-slate-500">
+                        This is a temporary management profile. Replace the name, designation,
+                        photograph and description with the official information when available.
+                      </p>
+                    </div>
+                  )}
+
+                  <button
+                    type="button"
+                    onClick={() => setSelectedLeader(null)}
+                    className="mt-8 inline-flex h-11 items-center justify-center rounded-full bg-emerald-800 px-6 text-[9px] font-extrabold uppercase tracking-[0.18em] text-white transition hover:bg-emerald-950"
+                  >
+                    Close Profile
+                  </button>
+                </div>
+              </div>
+            </MotionDiv>
+          </MotionDiv>
+        )}
+      </AnimatePresence>
+
+      {/* ================================================================ IMAGE MODAL */}
+      <AnimatePresence>
+        {selectedGalleryItem && (
+          <MotionDiv
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            className="fixed inset-0 z-50 flex items-center justify-center bg-emerald-950/90 p-3 backdrop-blur-md sm:p-5"
+            onClick={() => setSelectedGalleryItem(null)}
+          >
+            <MotionDiv
+              initial={{ opacity: 0, y: 16, scale: 0.98 }}
+              animate={{ opacity: 1, y: 0, scale: 1 }}
+              exit={{ opacity: 0, y: 16, scale: 0.98 }}
+              className="relative w-full max-w-5xl overflow-hidden rounded-[24px] bg-white p-2.5 shadow-2xl sm:rounded-[30px] sm:p-3"
+              onClick={(event) => event.stopPropagation()}
+            >
+              <button
+                type="button"
+                onClick={() => setSelectedGalleryItem(null)}
+                aria-label="Close image"
+                className="absolute right-4 top-4 z-10 grid h-9 w-9 place-items-center rounded-full bg-white/90 text-emerald-900 shadow-md backdrop-blur-md transition hover:bg-emerald-800 hover:text-white"
+              >
+                <FaTimes />
+              </button>
+
+              <img
+                src={selectedGalleryItem.img}
+                alt={selectedGalleryItem.title}
+                className="max-h-[76vh] w-full rounded-[18px] object-contain sm:rounded-[24px]"
+              />
+
+              <div className="px-3 py-4 text-center sm:px-4 sm:py-5">
+                <h4 className="font-about-display text-xl font-semibold text-slate-950 sm:text-2xl">
+                  {selectedGalleryItem.title}
+                </h4>
+
+                {selectedGalleryItem.subtitle && (
+                  <p className="mt-1.5 text-xs text-slate-500">
+                    {selectedGalleryItem.subtitle}
+                  </p>
+                )}
+
+                {selectedGalleryItem.isPlaceholder && (
+                  <p className="mt-2 text-[9px] font-bold uppercase tracking-[0.16em] text-emerald-700">
+                    Temporary preview image
                   </p>
                 )}
               </div>
@@ -710,44 +1317,6 @@ export default function AboutUs() {
           </MotionDiv>
         )}
       </AnimatePresence>
-
-      <AnimatePresence>
-        {selectedCsrImage && (
-          <MotionDiv
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
-            className="fixed inset-0 z-50 flex items-center justify-center bg-black/90 p-4 backdrop-blur-md"
-            onClick={() => setSelectedCsrImage(null)}
-          >
-            <MotionDiv
-              initial={{ opacity: 0, y: 16 }}
-              animate={{ opacity: 1, y: 0 }}
-              exit={{ opacity: 0, y: 16 }}
-              className="relative max-h-[90vh] w-full max-w-5xl overflow-hidden bg-[#06211f] p-3"
-              onClick={(event) => event.stopPropagation()}
-            >
-              <button
-                type="button"
-                onClick={() => setSelectedCsrImage(null)}
-                aria-label="Close image"
-                className="absolute right-5 top-5 z-10 flex h-10 w-10 items-center justify-center bg-[#f4fbf9] text-[#0a2a66] transition hover:bg-[#f3b128]"
-              >
-                <FaTimes />
-              </button>
-              <img
-                src={selectedCsrImage.img}
-                alt={selectedCsrImage.title}
-                className="max-h-[78vh] w-full object-contain"
-              />
-              <div className="px-4 py-5 text-center">
-                <h4 className="about-display text-2xl text-[#ffffff]">{selectedCsrImage.title}</h4>
-              </div>
-            </MotionDiv>
-          </MotionDiv>
-        )}
-      </AnimatePresence>
-    </div>
+    </main>
   );
 }
-

@@ -18,6 +18,7 @@ import marketingImg from "../../assets/images/MahbububullHossain.jpg";
 import hrImg from "../../assets/images/OUMARFARUKPhoto.jpg";
 import directorImg from "../../assets/images/01.jpg";
 import ceoImg from "../../assets/images/CEOsir.jpg";
+import mojamelHokImg from "../../assets/images/MojamelHok.jpg";
 
 export const defaultAboutContent = {
   heroEyebrow: "About North South Group",
@@ -101,6 +102,14 @@ export const defaultAboutContent = {
     { id: "hr-director", name: "Oumar Faruk", role: "Director, HR & Admin", img: hrImg },
     { id: "director", name: "Mst. Shajeratul Yiaken", role: "Director", img: directorImg },
     { id: "ceo", name: "Brig. Gen. Md. Mahfuzur Rahman", role: "CEO", img: ceoImg },
+    {
+      id: "daily-adin-editor",
+      name: "Khandoker Mojammel Hoque",
+      role: "Executive Editor",
+      img: mojamelHokImg,
+      description:
+        "Executive Editor of North South Daily Adin Pressmedia Ltd., leading editorial operations, journalism standards and media outreach across Bangladesh.",
+    },
   ],
   csrEyebrow: "Corporate Social Responsibility",
   csrTitle: "Growing with the community",
