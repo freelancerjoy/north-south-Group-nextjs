@@ -4,7 +4,7 @@ import { API_BASE_URL } from './env';
 const apiInstance = axios.create({
     baseURL: API_BASE_URL,
     timeout: 0,
-    headers: { 'Access-Control-Allow-Origin': '*', 'Content-Type': 'application/json' },
+    headers: { 'Content-Type': 'application/json' },
     withCredentials: true,
 });
 
@@ -27,7 +27,7 @@ apiInstance.interceptors.request.use((config) => {
                 config.headers['Authorization'] = `Bearer ${token}`;
             }
         }
-    } catch (_) {}
+    } catch {}
     return config;
 });
 

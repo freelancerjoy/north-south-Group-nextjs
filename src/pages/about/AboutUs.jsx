@@ -49,15 +49,6 @@ const strengthIcons = {
 const defaultStrengthIconList = [FaBuilding, FaLeaf, FaShieldAlt, FaHandshake];
 const statIcons = [FaAward, FaCity, FaBuilding, FaCompass];
 
-const signatureVentures = [
-  "Green City Ltd.",
-  "Industrial City",
-  "Nirapad Valley",
-  "Duplex Home",
-  "Auto Rice Mill",
-  "Agro Farm",
-];
-
 /*
  * DAILY ADIN MEDIA ARCHIVE
  * Real newsroom, front-desk, print-edition and circulation images.
@@ -211,13 +202,6 @@ export default function AboutUs() {
   const [selectedLeader, setSelectedLeader] = useState(null);
   const [selectedGalleryItem, setSelectedGalleryItem] = useState(null);
   const leadershipScrollRef = useRef(null);
-
-  const scrollLeadership = (direction) => {
-    if (leadershipScrollRef.current) {
-      const amount = direction === "left" ? -380 : 380;
-      leadershipScrollRef.current.scrollBy({ left: amount, behavior: "smooth" });
-    }
-  };
 
   const handleLeadershipWheel = (e) => {
     if (leadershipScrollRef.current) {
@@ -422,10 +406,9 @@ export default function AboutUs() {
     return [...withHok, shajeratulPlaceholder];
   }, [sortedLeaders]);
 
-  const officeGallery =
-    Array.isArray(data.officeImages) && data.officeImages.length > 0
-      ? data.officeImages.slice(0, 4)
-      : TEMPORARY_OFFICE_IMAGES;
+  const officeGallery = Array.isArray(data.officeImages) && data.officeImages.length > 0
+    ? data.officeImages.slice(0, 4)
+    : TEMPORARY_OFFICE_IMAGES;
 
   // Use the supplied Daily Adin archive images directly so the real
   // newsroom / front-desk / newspaper photos always appear on this page.
@@ -443,7 +426,7 @@ export default function AboutUs() {
 
   return (
     <main
-      className="min-h-screen overflow-x-hidden bg-white text-slate-900 selection:bg-emerald-200 selection:text-emerald-950"
+      className="min-h-screen min-w-0 overflow-x-hidden bg-white text-slate-900 selection:bg-emerald-200 selection:text-emerald-950"
       style={{ fontFamily: '"Manrope", "Inter", ui-sans-serif, system-ui, sans-serif' }}
     >
       <style>{`
@@ -465,20 +448,20 @@ export default function AboutUs() {
       `}</style>
 
       {/* ================================================================ HERO */}
-      <section className="relative w-full overflow-hidden bg-gradient-to-b from-[#F3F9F5] via-[#FAFCFA] to-white pt-24 pb-14 sm:pt-28 sm:pb-18 lg:pt-32 lg:pb-24">
+      <section className="relative w-full overflow-hidden bg-gradient-to-b from-[#F3F9F5] via-[#FAFCFA] to-white pt-20 pb-10 sm:pt-28 sm:pb-18 lg:pt-32 lg:pb-24">
         {/* Ambient atmospheric lighting */}
         <div className="pointer-events-none absolute -left-32 -top-20 h-[500px] w-[500px] rounded-full bg-emerald-200/40 blur-[130px]" />
         <div className="pointer-events-none absolute -right-32 top-1/4 h-[550px] w-[550px] rounded-full bg-green-100/50 blur-[140px]" />
         <div className="pointer-events-none absolute left-1/3 bottom-0 h-[350px] w-[350px] rounded-full bg-amber-100/40 blur-[110px]" />
 
         {/* Full-width responsive container */}
-        <div className="relative w-full px-4 sm:px-8 md:px-12 lg:px-16 xl:px-20 2xl:px-24">
-          <div className="grid min-h-[calc(100svh-9rem)] items-center gap-12 lg:grid-cols-[1fr_1.18fr] xl:gap-16">
+        <div className="relative w-full min-w-0 px-4 sm:px-8 md:px-12 lg:px-16 xl:px-20 2xl:px-24">
+          <div className="grid min-w-0 items-center gap-8 sm:gap-12 lg:min-h-[calc(100svh-9rem)] lg:grid-cols-[1fr_1.18fr] xl:gap-16">
             <MotionDiv
               initial={{ opacity: 0, y: 26 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.8, ease: "easeOut" }}
-              className="max-w-2xl"
+              className="min-w-0 max-w-2xl"
             >
               {/* Luxury Eyebrow Badge */}
               <div className="mb-5 inline-flex items-center gap-2.5 rounded-full border border-emerald-200/90 bg-white/80 px-4 py-1.5 shadow-sm backdrop-blur-md">
@@ -492,7 +475,7 @@ export default function AboutUs() {
               </div>
 
               {/* Grand Luxury Heading */}
-              <h1 className="font-about-display text-[40px] sm:text-6xl md:text-7xl xl:text-[80px] font-medium leading-[1.02] tracking-[-0.035em] text-slate-950">
+              <h1 className="max-w-full break-words font-about-display text-[38px] font-medium leading-[1.03] tracking-normal text-slate-950 [overflow-wrap:anywhere] sm:text-6xl sm:tracking-[-0.035em] md:text-7xl xl:text-[80px]">
                 {data.heroTitle && data.heroTitle.trim().length > 0 ? (
                   data.heroTitle
                 ) : (
@@ -504,16 +487,16 @@ export default function AboutUs() {
               </h1>
 
               {/* Subtitle with refined typography */}
-              <p className="mt-6 max-w-xl text-base sm:text-lg leading-relaxed text-slate-600">
+              <p className="mt-6 max-w-xl break-words text-base leading-relaxed text-slate-600 [overflow-wrap:anywhere] sm:text-lg">
                 {data.heroSubtitle ||
                   "Building exceptional spaces with innovative design, uncompromising quality, and a commitment to creating lasting value for our communities and customers."}
               </p>
 
               {/* Action Buttons */}
-              <div className="mt-8 sm:mt-10 flex flex-wrap items-center gap-3.5 sm:gap-4">
+              <div className="mt-8 flex w-full min-w-0 flex-col items-stretch gap-3 sm:mt-10 sm:flex-row sm:flex-wrap sm:items-center sm:gap-4">
                 <a
                   href="#story"
-                  className="group inline-flex h-12 sm:h-14 items-center justify-center gap-3 rounded-full bg-emerald-800 px-7 sm:px-8 text-xs font-bold uppercase tracking-[0.16em] text-white shadow-[0_16px_36px_rgba(6,78,59,0.24)] transition-all duration-300 hover:bg-emerald-950 hover:shadow-[0_20px_44px_rgba(6,78,59,0.32)] hover:-translate-y-0.5 active:translate-y-0"
+                  className="group inline-flex h-12 w-full min-w-0 items-center justify-center gap-3 rounded-full bg-emerald-800 px-4 text-[10px] font-bold uppercase tracking-[0.1em] text-white shadow-[0_16px_36px_rgba(6,78,59,0.24)] transition-all duration-300 hover:bg-emerald-950 hover:shadow-[0_20px_44px_rgba(6,78,59,0.32)] hover:-translate-y-0.5 active:translate-y-0 sm:h-14 sm:w-auto sm:px-8 sm:text-xs sm:tracking-[0.16em]"
                 >
                   <span>Discover Our Story</span>
                   <FaArrowRight className="text-[11px] transition-transform duration-300 group-hover:translate-x-1" />
@@ -521,7 +504,7 @@ export default function AboutUs() {
 
                 <a
                   href="#leadership"
-                  className="inline-flex h-12 sm:h-14 items-center justify-center rounded-full border border-emerald-200/90 bg-white/90 px-7 sm:px-8 text-xs font-bold uppercase tracking-[0.16em] text-emerald-900 shadow-sm backdrop-blur-md transition-all duration-300 hover:border-emerald-600 hover:bg-emerald-50/80 hover:-translate-y-0.5"
+                  className="inline-flex h-12 w-full min-w-0 items-center justify-center rounded-full border border-emerald-200/90 bg-white/90 px-4 text-[10px] font-bold uppercase tracking-[0.1em] text-emerald-900 shadow-sm backdrop-blur-md transition-all duration-300 hover:border-emerald-600 hover:bg-emerald-50/80 hover:-translate-y-0.5 sm:h-14 sm:w-auto sm:px-8 sm:text-xs sm:tracking-[0.16em]"
                 >
                   Management Team
                 </a>
@@ -657,7 +640,7 @@ export default function AboutUs() {
               <button
                 type="button"
                 onClick={() => setSelectedGalleryItem(mediaGallery[2] || mediaGallery[0])}
-                className="group absolute -bottom-6 -left-4 sm:-bottom-8 sm:-left-6 z-30 flex items-center gap-3.5 rounded-2xl border border-white bg-white/95 p-3 sm:p-3.5 shadow-[0_20px_50px_rgba(15,76,58,0.22)] backdrop-blur-xl transition hover:-translate-y-1 hover:shadow-[0_26px_60px_rgba(15,76,58,0.28)]"
+                className="group relative z-30 mt-4 flex w-full items-center gap-3.5 rounded-2xl border border-white bg-white/95 p-3 shadow-[0_20px_50px_rgba(15,76,58,0.16)] backdrop-blur-xl transition hover:-translate-y-1 hover:shadow-[0_26px_60px_rgba(15,76,58,0.22)] sm:absolute sm:-bottom-8 sm:-left-6 sm:mt-0 sm:w-auto sm:p-3.5"
               >
                 <div className="h-14 w-14 sm:h-16 sm:w-16 overflow-hidden rounded-xl bg-emerald-100 shrink-0">
                   <img
@@ -684,7 +667,7 @@ export default function AboutUs() {
       {/* ================================================================ STATS */}
       <section className="relative z-20 bg-white">
         <div className="mx-auto max-w-[1540px] px-4 sm:px-6 lg:px-10 xl:px-14">
-          <div className="-mt-3 grid overflow-hidden rounded-[24px] border border-emerald-100 bg-white shadow-[0_24px_70px_rgba(15,76,58,0.09)] sm:grid-cols-2 lg:-mt-8 lg:grid-cols-4">
+          <div className="mt-8 grid overflow-hidden rounded-[24px] border border-emerald-100 bg-white shadow-[0_24px_70px_rgba(15,76,58,0.09)] sm:grid-cols-2 lg:-mt-8 lg:grid-cols-4">
             {data.stats.map((stat, index) => {
               const Icon = statIcons[index % statIcons.length];
               return (
@@ -860,7 +843,7 @@ export default function AboutUs() {
               </p>
             </div>
 
-            <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-5">
+            <div className="grid grid-cols-1 gap-3 min-[420px]:grid-cols-2 sm:grid-cols-3 lg:grid-cols-5">
               {mediaGallery.slice(3, 8).map((item, index) => (
                 <button
                   key={item?.id || index}
@@ -894,7 +877,7 @@ export default function AboutUs() {
       </section>
 
       {/* ================================================================ STORY / COMPANY OVERVIEW */}
-      <section id="story" className="relative w-full overflow-hidden bg-gradient-to-b from-[#F7FAF8] via-white to-[#F2F8F4] py-18 sm:py-24 lg:py-32">
+      <section id="story" className="relative w-full overflow-hidden bg-gradient-to-b from-[#F7FAF8] via-white to-[#F2F8F4] py-16 sm:py-24 lg:py-32">
         {/* Soft background ambient blurs */}
         <div className="pointer-events-none absolute -left-36 top-1/4 h-[480px] w-[480px] rounded-full bg-emerald-100/50 blur-[130px]" />
         <div className="pointer-events-none absolute -right-36 bottom-10 h-[500px] w-[500px] rounded-full bg-green-100/40 blur-[140px]" />
@@ -964,7 +947,7 @@ export default function AboutUs() {
             </div>
 
             {/* Visual Composition - Refined layered architectural and workspace photos */}
-            <div className="relative min-h-[540px] sm:min-h-[640px] lg:min-h-[680px]">
+            <div className="relative min-h-[430px] sm:min-h-[640px] lg:min-h-[680px]">
               {/* Ambient Glow */}
               <div className="absolute inset-0 rounded-[44px] bg-gradient-to-tr from-emerald-500/10 via-transparent to-amber-500/10 blur-xl" />
 
@@ -1015,7 +998,7 @@ export default function AboutUs() {
       </section>
 
       {/* ================================================================ OFFICE / WORKSPACES */}
-      {/* <section className="bg-white py-16 sm:py-20 lg:py-28">
+      <section className="bg-white py-16 sm:py-20 lg:py-28">
         <div className="mx-auto max-w-[1540px] px-4 sm:px-6 lg:px-10 xl:px-14">
           <div className="mb-10 grid gap-6 lg:grid-cols-[1fr_0.8fr] lg:items-end">
             <div>
@@ -1067,7 +1050,7 @@ export default function AboutUs() {
             ))}
           </div>
         </div>
-      </section> */}
+      </section> 
 
       {/* ================================================================ STRENGTHS */}
       <section className="bg-emerald-950 py-16 text-white sm:py-20 lg:py-24">
@@ -1399,28 +1382,6 @@ export default function AboutUs() {
         </div>
       </section>
 
-      {/* ================================================================ CTA */}
-      <section className="bg-white px-4 pb-14 sm:px-6 sm:pb-18 lg:px-10 lg:pb-20 xl:px-14">
-        <div className="mx-auto flex max-w-[1540px] flex-col gap-6 rounded-[28px] bg-emerald-950 px-5 py-9 text-white shadow-[0_30px_90px_rgba(6,78,59,0.18)] sm:rounded-[34px] sm:px-8 sm:py-11 md:flex-row md:items-center md:justify-between lg:px-10">
-          <div>
-            <p className="text-[9px] font-extrabold uppercase tracking-[0.22em] text-emerald-200">
-              North South Group
-            </p>
-            <h2 className="mt-2 max-w-3xl font-about-display text-3xl font-semibold tracking-[-0.03em] sm:text-4xl">
-              Building confidence through thoughtful development, service and communication.
-            </h2>
-          </div>
-
-          <a
-            href="#story"
-            className="inline-flex h-11 items-center justify-center gap-2 rounded-full bg-white px-6 text-[10px] font-extrabold uppercase tracking-[0.18em] text-emerald-950 transition hover:bg-emerald-100"
-          >
-            Explore More
-            <FaArrowRight className="text-[9px]" />
-          </a>
-        </div>
-      </section>
-
       {/* ================================================================ LEADER MODAL */}
       <AnimatePresence>
         {selectedLeader && (
@@ -1477,7 +1438,7 @@ export default function AboutUs() {
                     {selectedLeader.role}
                   </p>
 
-                  <h3 className="mt-3 font-about-display text-4xl font-semibold leading-[1.02] tracking-[-0.035em] text-slate-950 sm:text-5xl">
+                  <h3 className="mt-3 font-about-display text-3xl font-semibold leading-[1.06] tracking-normal text-slate-950 sm:text-5xl sm:tracking-[-0.035em]">
                     {selectedLeader.name}
                   </h3>
 
