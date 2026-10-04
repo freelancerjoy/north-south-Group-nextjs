@@ -18,6 +18,7 @@ import {
   MdManageAccounts,
   MdChevronRight,
   MdViewCarousel,
+  MdWeb,
 } from "react-icons/md";
 import { FaLeaf, FaCity, FaIndustry } from "react-icons/fa";
 
@@ -109,6 +110,12 @@ const navSections = [
         to: "aboutPageSettings",
         icon: <MdBusiness size={20} />,
         match: ["aboutPageSettings"],
+      },
+      {
+        label: "Footer",
+        to: "footerSettings",
+        icon: <MdWeb size={20} />,
+        match: ["footerSettings"],
       },
     ],
   },
@@ -275,6 +282,10 @@ export default function AdminDashboard() {
     aboutPageSettings: {
       title: "About Page Settings",
       description: "Update the public About Us page content, leadership section, CSR gallery, and key company messaging.",
+    },
+    footerSettings: {
+      title: "Footer Settings",
+      description: "Manage the public footer content, links, social profiles, contact display, and bottom bar.",
     },
     viewPlotBooking: {
       title: "Plot Bookings",

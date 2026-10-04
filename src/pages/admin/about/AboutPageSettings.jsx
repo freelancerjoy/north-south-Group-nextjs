@@ -20,6 +20,8 @@ const pageSections = [
   "Stats & Strengths",
   "Video",
   "Leadership",
+  "Office / Workspaces",
+  "Daily Adin Media",
   "CSR Gallery",
   "Mission Cards",
 ];
@@ -347,6 +349,39 @@ const CardListField = ({ label, note, values, onChange, withIcon = false, withIm
   );
 };
 
+const GalleryListField = ({ label, note, values, onChange, includeType = false }) => {
+  const update = (index, field, value) => onChange(values.map((item, i) => (i === index ? { ...item, [field]: value } : item)));
+  const remove = (index) => onChange(values.filter((_, i) => i !== index));
+  const updateImage = (index, file) => {
+    if (!file) return;
+    onChange(values.map((item, i) => i === index ? { ...item, file, preview: URL.createObjectURL(file) } : item));
+  };
+
+  return <div>
+    <label className={lbl}>{label}</label>
+    {note ? <p className="-mt-1 mb-3 text-xs leading-5 text-slate-500">{note}</p> : null}
+    <div className="space-y-4">
+      {values.map((item, index) => <div key={item.id || index} className="rounded-[24px] border border-slate-200 bg-slate-50/80 p-4 shadow-sm">
+        <div className="grid gap-3 md:grid-cols-2">
+          <TextField label="Image title" value={item.title || ""} onChange={(event) => update(index, "title", event.target.value)} />
+          <TextField label="Image subtitle" value={item.subtitle || ""} onChange={(event) => update(index, "subtitle", event.target.value)} />
+          {includeType ? <TextField label="Category" value={item.type || ""} onChange={(event) => update(index, "type", event.target.value)} /> : null}
+          <div className={includeType ? "md:col-span-2" : "md:col-span-2"}>
+            {(item.preview || item.img) ? <div className="relative mb-3 h-44 overflow-hidden rounded-2xl border border-slate-200 bg-slate-100"><img src={item.preview || item.img} alt={item.title || "About image"} className="h-full w-full object-cover" /></div> : null}
+            <label className="flex cursor-pointer items-center gap-3 rounded-2xl border border-dashed border-cyan-200 bg-cyan-50/70 px-4 py-4 hover:border-cyan-400 hover:bg-cyan-50">
+              <MdCloudUpload className="text-cyan-600" size={22} /><span className="text-sm font-semibold text-slate-700">Upload image</span>
+              <input type="file" accept="image/*" className="hidden" onChange={(event) => { updateImage(index, event.target.files?.[0]); event.target.value = ""; }} />
+            </label>
+            <input className={`${inp} mt-3`} value={item.img || ""} onChange={(event) => update(index, "img", event.target.value)} placeholder="Or paste image URL" />
+          </div>
+        </div>
+        <button type="button" onClick={() => remove(index)} className="mt-3 inline-flex items-center gap-2 rounded-2xl bg-rose-50 px-3 py-2 text-sm font-semibold text-rose-600 transition hover:bg-rose-100"><FaTrash size={13} /> Remove</button>
+      </div>)}
+    </div>
+    <button type="button" onClick={() => onChange([...values, { id: `about-image-${Date.now()}`, title: "", subtitle: "", img: "", type: includeType ? "office" : "", file: null, preview: null }])} className="mt-3 inline-flex items-center gap-2 rounded-2xl border border-cyan-200 bg-cyan-50 px-4 py-2.5 text-sm font-semibold text-cyan-700 transition hover:border-cyan-300 hover:bg-cyan-100"><FaPlus size={12} /> Add image</button>
+  </div>;
+};
+
 const LeaderListField = ({ values, onChange }) => {
   const update = (index, field, value) =>
     onChange(values.map((item, i) => (i === index ? { ...item, [field]: value } : item)));
@@ -495,6 +530,8 @@ const AboutPageSettings = () => {
         file: null,
         preview: null,
       })),
+      officeImages: (merged.officeImages || []).map((item) => ({ ...item, file: null, preview: null })),
+      mediaImages: (merged.mediaImages || []).map((item) => ({ ...item, file: null, preview: null })),
     });
   }, [aboutContent]);
 
@@ -515,8 +552,10 @@ const AboutPageSettings = () => {
           URL.revokeObjectURL(item.preview);
         }
       });
+      (form.officeImages || []).forEach((item) => { if (item?.preview) URL.revokeObjectURL(item.preview); });
+      (form.mediaImages || []).forEach((item) => { if (item?.preview) URL.revokeObjectURL(item.preview); });
     },
-    [heroSlides, form.leaders, form.csrImages]
+    [heroSlides, form.leaders, form.csrImages, form.officeImages, form.mediaImages]
   );
 
   const setField = (field, value) => setForm((prev) => ({ ...prev, [field]: value }));
@@ -551,6 +590,16 @@ const AboutPageSettings = () => {
           }))
         )
       ).filter((item) => item.title || item.img);
+      const uploadGallery = async (items, folder) => (
+        await Promise.all((items || []).map(async (item) => ({
+          ...item,
+          img: item.file ? await uploadSingle(item.file, folder) : item.img || "",
+          file: undefined,
+          preview: undefined,
+        })))
+      ).filter((item) => item.title || item.subtitle || item.img);
+      const officePayload = await uploadGallery(form.officeImages, "about/office");
+      const mediaPayload = await uploadGallery(form.mediaImages, "about/media");
 
       const payload = {
         ...form,
@@ -561,6 +610,8 @@ const AboutPageSettings = () => {
         strengths: (form.strengths || []).filter((item) => item.title || item.text),
         leaders: leaderPayload,
         csrImages: csrPayload,
+        officeImages: officePayload,
+        mediaImages: mediaPayload,
         missionCards: (form.missionCards || []).filter((item) => item.title || item.text),
       };
 
@@ -597,7 +648,7 @@ const AboutPageSettings = () => {
               <p className="mt-1 text-lg font-bold text-white">{pageSections.length} frontend sections</p>
             </div>
             <p className="text-sm leading-6 text-slate-200">
-              Hero, overview, strengths, leadership, CSR, and mission cards can all be updated from here.
+              Hero, overview, leadership, office/workspace images, media gallery, CSR, and mission cards can all be updated from here.
             </p>
           </div>
         </div>
@@ -752,6 +803,37 @@ const AboutPageSettings = () => {
         <section className={sectionCard}>
           <SectionIntro
             step="06"
+            eyebrow="Office / Workspaces"
+            title="Office and workspace gallery"
+            note="These cards control the Office / Workspaces section that appears on the public About Us page."
+          />
+          <GalleryListField
+            label="Office / Workspace Images"
+            note="Upload the actual site office, corporate office, meeting room, or client space images."
+            values={form.officeImages || []}
+            onChange={(value) => setField("officeImages", value)}
+            includeType
+          />
+        </section>
+
+        <section className={sectionCard}>
+          <SectionIntro
+            step="07"
+            eyebrow="Daily Adin Media"
+            title="Media and publication gallery"
+            note="Manage the newsroom, print, distribution, and publication images used in the media section."
+          />
+          <GalleryListField
+            label="Media Gallery Images"
+            values={form.mediaImages || []}
+            onChange={(value) => setField("mediaImages", value)}
+            includeType
+          />
+        </section>
+
+        <section className={sectionCard}>
+          <SectionIntro
+            step="08"
             eyebrow="CSR Gallery"
             title="CSR headline and showcase cards"
             note="Use this section to update the community impact gallery content."

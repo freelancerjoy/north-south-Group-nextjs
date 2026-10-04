@@ -71,7 +71,8 @@ const UpdateContact = lazy(() => import("./pages/admin/contact/UpdateContact.jsx
 const ContactInfoSettings = lazy(() => import("./pages/admin/contact/ContactInfoSettings.jsx"));
 const ContactDetails = lazy(() => import("./pages/admin/contact/ContactDetails.jsx"));
 const ViewPlotBooking = lazy(() => import("./pages/admin/plotBooking/viewPlotBooking.jsx"));
-const AboutPageSettings = lazy(() => import("./pages/admin/about/AboutPageSettings.jsx"));
+const AboutPageSettings = lazy(() => import("./pages/admin/about/ElementorAboutEditor.jsx"));
+const FooterSettings = lazy(() => import("./pages/admin/FooterSettings.jsx"));
 
 const ConcernRoute = () => {
   const { slug } = useParams();
@@ -332,6 +333,7 @@ function App({ scaling }) {
                   path="aboutPageSettings"
                   element={<AboutPageSettings />}
                 />
+                <Route path="footerSettings" element={<FooterSettings />} />
                 <Route
                   path="updateContact/:id"
                   element={<UpdateContact />}

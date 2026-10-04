@@ -15,6 +15,7 @@ import logo from "../assets/images/logo.png";
 import { useEffect } from "react";
 import { useContactInfoStore } from "../store/contactInfo/contactInfoStore";
 import { useMenuStore } from "../store/menu/menuStore";
+import { useFooterStore } from "../store/footer/footerStore";
 
 const fallbackConcerns = [
   { label: "North South Consortium Ltd.", to: "/northSouthConsortiumLtd" },
@@ -32,10 +33,11 @@ const fallbackConcerns = [
 ];
 
 const normalizeConcernLabel = (label = "") => {
-  const key = label.trim().toLowerCase();
+  const normalizedLabel = String(label || "").trim().replace(/\s+/g, " ");
+  const key = normalizedLabel.toLowerCase();
   if (key === "purbachal nirapad valley") return "Nirapad Valley Condominium Project";
   if (key === "dailyadin" || key === "daily adin") return "Daily Adin Press Media Ltd.";
-  return label.replace(/\bltd\b/gi, "Ltd.");
+  return normalizedLabel.replace(/\bltd\b\s*\.*$/i, "Ltd.");
 };
 
 const buildConcernItems = (menuItems = []) => {
@@ -61,11 +63,16 @@ const Footer = () => {
   const currentYear = new Date().getFullYear();
   const { contactInfo, loadContactInfo } = useContactInfoStore();
   const { concernMenuItems, loadConcernMenuItems } = useMenuStore();
+  const { footer: footerContent, loadFooter } = useFooterStore();
 
   useEffect(() => {
     loadContactInfo();
     loadConcernMenuItems();
-  }, [loadContactInfo, loadConcernMenuItems]);
+    loadFooter();
+  }, [loadContactInfo, loadConcernMenuItems, loadFooter]);
+
+  const footer = footerContent || {};
+  const accentColor = footer.accentColor || "#0f7771";
 
   const socialLinks = [
     {
@@ -100,6 +107,19 @@ const Footer = () => {
     },
   ];
 
+  const socialIcon = (platform) => {
+    const key = String(platform || "").toLowerCase();
+    if (key.includes("facebook")) return <FaFacebookF size={15} />;
+    if (key.includes("linkedin")) return <FaLinkedinIn size={15} />;
+    if (key.includes("instagram")) return <FaInstagram size={15} />;
+    if (key.includes("youtube")) return <FaYoutube size={15} />;
+    if (key === "x" || key.includes("twitter")) return <FaXTwitter size={15} />;
+    return <FaGlobe size={15} />;
+  };
+  const activeSocialLinks = footer.socialLinks?.length
+    ? footer.socialLinks.filter((item) => item.isVisible !== false).map((item) => ({ label: item.platform, href: item.url, icon: socialIcon(item.platform), hoverColor: "hover:bg-teal-700 hover:border-teal-700" }))
+    : socialLinks;
+
   const quickLinks = [
     { label: "Home", to: "/" },
     { label: "About Us", to: "/aboutUs" },
@@ -110,13 +130,16 @@ const Footer = () => {
     { label: "Career", to: "/career" },
     { label: "Privacy Policy", to: "/privacyPolicy" },
   ];
+  const activeQuickLinks = footer.quickLinks?.length
+    ? footer.quickLinks.filter((item) => item.isVisible !== false)
+    : quickLinks;
 
   const concerns = buildConcernItems(concernMenuItems);
 
   return (
-    <footer
+    (!footerContent || footer.isVisible !== false) && (<footer
       className="text-white"
-      style={{ background: "linear-gradient(180deg, #0a0f1e 0%, #040811 100%)" }}
+      style={{ background: `linear-gradient(180deg, #0a0f1e 0%, ${footer.backgroundColor || "#040811"} 100%)` }}
     >
       {/* ─── TOP ACCENT BAR ─── */}
       <div
@@ -133,17 +156,15 @@ const Footer = () => {
           {/* ── COLUMN 1 : Brand ── */}
           <div className="flex flex-col gap-6">
             <Link to="/">
-              <img src={logo} alt="North South Group" className="h-12 w-auto" />
+              <img src={footer.logoUrl || logo} alt={footer.brandName || "North South Group"} className="h-12 w-auto" />
             </Link>
             <p className="text-gray-400 text-sm leading-relaxed">
-              A pioneering housing &amp; real estate company in Bangladesh,
-              dedicated to transforming lives through exceptional living spaces
-              since 2019.
+              {footer.brandDescription || "A pioneering housing & real estate company in Bangladesh, dedicated to transforming lives through exceptional living spaces since 2019."}
             </p>
 
             {/* Social Icons */}
-            <div className="flex flex-wrap gap-3 mt-1">
-              {socialLinks.map((item) => (
+            {footer.showSocialLinks !== false && <div className="flex flex-wrap gap-3 mt-1">
+              {activeSocialLinks.map((item) => (
                 <a
                   key={item.label}
                   href={item.href}
@@ -155,28 +176,29 @@ const Footer = () => {
                   {item.icon}
                 </a>
               ))}
-            </div>
+            </div>}
           </div>
 
           {/* ── COLUMN 2 : Quick Links ── */}
           <div>
             <h3
               className="text-base font-bold uppercase tracking-widest mb-6 pb-3 border-b"
-              style={{ color: "#0f7771", borderColor: "#0f7771" }}
+              style={{ color: accentColor, borderColor: accentColor }}
             >
-              Quick Links
+              {footer.quickLinksTitle || "Quick Links"}
             </h3>
             <ul className="flex flex-col gap-3">
-              {quickLinks.map((link) => (
+              {activeQuickLinks.map((link) => (
                 <li key={link.label}>
                   <Link
-                    to={link.to}
+                    to={link.external || link.href?.startsWith("http") ? "/" : link.to}
+                    onClick={link.external || link.href?.startsWith("http") ? (event) => { event.preventDefault(); window.open(link.href, "_blank", "noopener,noreferrer"); } : undefined}
                     className="flex items-center gap-2 text-gray-400 text-sm transition-colors duration-200 hover:text-white group"
                   >
                     <FaChevronRight
                       size={10}
                       className="transition-transform duration-200 group-hover:translate-x-1"
-                      style={{ color: "#0f7771" }}
+                      style={{ color: accentColor }}
                     />
                     {link.label}
                   </Link>
@@ -191,9 +213,9 @@ const Footer = () => {
               className="text-base font-bold uppercase tracking-widest mb-6 pb-3 border-b"
               style={{ color: "#0f7771", borderColor: "#0f7771" }}
             >
-              Our Concern
+              {footer.concernsTitle || "Our Concern"}
             </h3>
-            <ul className="flex flex-col gap-3">
+            <ul className="list-none flex flex-col gap-3">
               {concerns.map((item) => (
                 <li key={item.label}>
                   {item.external || item.href?.startsWith("http") ? (
@@ -229,12 +251,12 @@ const Footer = () => {
           </div>
 
           {/* ── COLUMN 4 : Contact Info ── */}
-          <div>
+          {footer.showContact !== false && <div>
             <h3
               className="text-base font-bold uppercase tracking-widest mb-6 pb-3 border-b"
               style={{ color: "#0f7771", borderColor: "#0f7771" }}
             >
-              Contact Us
+              {footer.contactTitle || "Contact Us"}
             </h3>
             <ul className="flex flex-col gap-5 text-sm text-gray-400">
               <li className="flex items-start gap-3">
@@ -306,7 +328,7 @@ const Footer = () => {
                 </div>
               </li>
             </ul>
-          </div>
+          </div>}
         </div>
       </div>
 
@@ -320,9 +342,9 @@ const Footer = () => {
         <p>
           © {currentYear}{" "}
           <Link to="/" className="font-semibold hover:text-white transition-colors" style={{ color: "#0f7771" }}>
-            North South Group
+            {footer.brandName || "North South Group"}
           </Link>
-          . All Rights Reserved.
+          . {footer.copyrightText || "All Rights Reserved."}
         </p>
         <p>
           Designed &amp; Developed with{" "}
@@ -331,7 +353,7 @@ const Footer = () => {
           <span className="font-semibold text-gray-400">NS Tech Team</span>
         </p>
       </div>
-    </footer>
+    </footer>)
   );
 };
 

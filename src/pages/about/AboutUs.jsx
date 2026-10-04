@@ -26,10 +26,6 @@ import {
 import { getYouTubeEmbedUrl } from "../../components/VideoUtility";
 import { defaultAboutContent } from "./defaultAboutContent";
 import { useAboutStore } from "../../store/about/aboutStore";
-import mojamelHokImg from "../../assets/images/MojamelHok.jpg";
-import avatarPlaceholderImg from "../../assets/images/avatarPlaceholder.png";
-import mahfuzurRahmanImg from "../../assets/images/MahfuzurRahman.jpg";
-import shafiulAlamImg from "../../assets/images/ShafiulAlam.jpg";
 import logo from "../../assets/images/logo.png";
 import greenCityLogo from "../../assets/images/greenCity.png";
 import squareCityLogo from "../../assets/images/squareCityLogo.png";
@@ -197,10 +193,12 @@ function PremiumHeading({ children, className = "" }) {
   );
 }
 
-export default function AboutUs() {
+export default function AboutUs({ previewData = null }) {
   const [currentSlide, setCurrentSlide] = useState(0);
+  const [workspaceSlide, setWorkspaceSlide] = useState(0);
   const [selectedLeader, setSelectedLeader] = useState(null);
   const [selectedGalleryItem, setSelectedGalleryItem] = useState(null);
+  const [selectedGalleryItems, setSelectedGalleryItems] = useState([]);
   const leadershipScrollRef = useRef(null);
 
   const handleLeadershipWheel = (e) => {
@@ -215,9 +213,14 @@ export default function AboutUs() {
   const { partners, loadPartners } = usePartnerStore();
 
   useEffect(() => {
-    loadAboutContent().catch(() => {});
+    if (!previewData) loadAboutContent().catch(() => {});
+  }, [loadAboutContent, previewData]);
+
+  useEffect(() => {
     loadPartners().catch(() => {});
-  }, [loadAboutContent, loadPartners]);
+  }, [loadPartners]);
+
+  const sourceContent = previewData || aboutContent;
 
   const concernLogos = useMemo(() => {
     const dynamic = Array.isArray(partners) && partners.length > 0
@@ -243,48 +246,60 @@ export default function AboutUs() {
   }, [partners]);
 
   const data = useMemo(
-    () => ({
+    () => {
+      const merged = {
       ...defaultAboutContent,
-      ...(aboutContent || {}),
+      ...(sourceContent || {}),
       heroSlides:
-        Array.isArray(aboutContent?.heroSlides) && aboutContent.heroSlides.length > 0
-          ? aboutContent.heroSlides
+        Array.isArray(sourceContent?.heroSlides) && sourceContent.heroSlides.length > 0
+          ? sourceContent.heroSlides
           : defaultAboutContent.heroSlides,
       stats:
-        Array.isArray(aboutContent?.stats) && aboutContent.stats.length > 0
-          ? aboutContent.stats
+        Array.isArray(sourceContent?.stats) && sourceContent.stats.length > 0
+          ? sourceContent.stats
           : defaultAboutContent.stats,
       strengths:
-        Array.isArray(aboutContent?.strengths) && aboutContent.strengths.length > 0
-          ? aboutContent.strengths
+        Array.isArray(sourceContent?.strengths) && sourceContent.strengths.length > 0
+          ? sourceContent.strengths
           : defaultAboutContent.strengths,
       leaders:
-        Array.isArray(aboutContent?.leaders) && aboutContent.leaders.length > 0
-          ? aboutContent.leaders
+        Array.isArray(sourceContent?.leaders) && sourceContent.leaders.length > 0
+          ? sourceContent.leaders
           : defaultAboutContent.leaders,
       csrImages:
-        Array.isArray(aboutContent?.csrImages) && aboutContent.csrImages.length > 0
-          ? aboutContent.csrImages
+        Array.isArray(sourceContent?.csrImages) && sourceContent.csrImages.length > 0
+          ? sourceContent.csrImages
           : defaultAboutContent.csrImages,
       missionCards:
-        Array.isArray(aboutContent?.missionCards) && aboutContent.missionCards.length > 0
-          ? aboutContent.missionCards
+        Array.isArray(sourceContent?.missionCards) && sourceContent.missionCards.length > 0
+          ? sourceContent.missionCards
           : defaultAboutContent.missionCards,
       overviewParagraphs:
-        Array.isArray(aboutContent?.overviewParagraphs) &&
-        aboutContent.overviewParagraphs.length > 0
-          ? aboutContent.overviewParagraphs
+        Array.isArray(sourceContent?.overviewParagraphs) &&
+        sourceContent.overviewParagraphs.length > 0
+          ? sourceContent.overviewParagraphs
           : defaultAboutContent.overviewParagraphs,
       officeImages:
-        Array.isArray(aboutContent?.officeImages) && aboutContent.officeImages.length > 0
-          ? aboutContent.officeImages
+        Array.isArray(sourceContent?.officeImages) && sourceContent.officeImages.length > 0
+          ? sourceContent.officeImages
           : TEMPORARY_OFFICE_IMAGES,
+      officeGalleryImages:
+        Array.isArray(sourceContent?.officeGalleryImages) && sourceContent.officeGalleryImages.length > 0
+          ? sourceContent.officeGalleryImages
+          : Array.isArray(sourceContent?.officeImages) && sourceContent.officeImages.length > 0
+            ? sourceContent.officeImages
+            : defaultAboutContent.officeGalleryImages,
       mediaImages:
-        Array.isArray(aboutContent?.mediaImages) && aboutContent.mediaImages.length > 0
-          ? aboutContent.mediaImages
+        Array.isArray(sourceContent?.mediaImages) && sourceContent.mediaImages.length > 0
+          ? sourceContent.mediaImages
           : DAILY_ADIN_MEDIA,
-    }),
-    [aboutContent]
+      };
+      Object.entries(defaultAboutContent).forEach(([key, fallback]) => {
+        if (typeof fallback === "string" && !String(merged[key] || "").trim()) merged[key] = fallback;
+      });
+      return merged;
+    },
+    [sourceContent]
   );
 
   const heroSlides =
@@ -321,98 +336,44 @@ export default function AboutUs() {
   }, [data.leaders]);
 
 
-  const managementTeam = useMemo(() => {
-    // Step 1: patch known backend members
-    const actualLeaders = sortedLeaders.map((leader) => {
-      const id = String(leader.id || "").toLowerCase();
-      const role = String(leader.role || "").toLowerCase();
+  const managementTeam = sortedLeaders;
 
-      if (id === "ceo" || /\bceo\b|chief executive officer/.test(role)) {
-        return { ...leader, name: "Brig. Gen. Md. Mahfuzur Rahman (Retd.)", role: "CEO", img: mahfuzurRahmanImg, isPlaceholder: false };
-      }
-      if (/managing-director/.test(id) || /^managing director$/i.test(leader.role || "")) {
-        return { ...leader, name: "K.M Usuf Ali", isPlaceholder: false };
-      }
-      return { ...leader, isPlaceholder: false };
-    });
+  const workspaceGallery = Array.isArray(data.officeGalleryImages) && data.officeGalleryImages.length > 0
+    ? data.officeGalleryImages
+    : Array.isArray(data.officeImages) && data.officeImages.length > 0
+      ? data.officeImages
+      : TEMPORARY_OFFICE_IMAGES;
+  const workspacePageCount = Math.max(1, Math.ceil(workspaceGallery.length / 4));
+  const activeWorkspaceSlide = workspaceSlide % workspacePageCount;
+  const workspaceSlotCount = Math.min(4, workspaceGallery.length);
+  const officeGallery = Array.from({ length: workspaceSlotCount }, (_, index) => (
+    workspaceGallery[(activeWorkspaceSlide * 4 + index) % workspaceGallery.length]
+  ));
 
-    // Step 2: inject Col. Shafiul Alam (Director Admin) — sorted position 4
-    const shafiulAlam = {
-      id: "director-admin",
-      name: "Col. Md. Shafiul Alam Khan (Retd.)",
-      role: "Director Admin",
-      img: shafiulAlamImg,
-      description: "Director Administration of North South Group, overseeing administrative operations and institutional governance.",
-      isPlaceholder: false,
-    };
-    const hasShaful = actualLeaders.some((l) => l.id === "director-admin");
-    const withShaful = hasShaful ? actualLeaders : [...actualLeaders, shafiulAlam];
+  const openGallery = (item, items) => {
+    setSelectedGalleryItems(items || []);
+    setSelectedGalleryItem(item);
+  };
 
-    // Always inject CEO (Brig. Gen. Md. Mahfuzur Rahman) if not already present
-    const ceoEntry = {
-      id: "ceo",
-      name: "Brig. Gen. Md. Mahfuzur Rahman (Retd.)",
-      role: "CEO",
-      img: mahfuzurRahmanImg,
-      description: "Chief Executive Officer of North South Group, providing strategic leadership and executive oversight across all group operations.",
-      isPlaceholder: false,
-    };
-    const hasCeo = withShaful.some((l) => /\bceo\b/.test(String(l.role || "").toLowerCase()) || l.id === "ceo");
-    const withCeo = hasCeo ? withShaful : [...withShaful, ceoEntry];
+  const closeGallery = () => {
+    setSelectedGalleryItem(null);
+    setSelectedGalleryItems([]);
+  };
 
-    // Step 3: re-sort by priority
-    //   0=Chairman, 1=MD, 2=Deputy MD, 3=CEO, 4=Director Admin, 5=Director, 6=HR
-    const sortPriority = (l = {}) => {
-      const id = String(l.id || "").toLowerCase();
-      const role = String(l.role || "").toLowerCase();
-      const v = `${id} ${role}`;
-      if (id === "daily-adin-editor" || /executive editor/.test(v)) return 99; // Always last
-      if (/chairman/.test(v)) return 0;
-      if (/managing-director/.test(id) || /^managing director$/i.test(l.role || "")) return 1;
-      if (/deputy.*managing.*director/.test(v)) return 2;
-      if (/\bceo\b/.test(v)) return 3;
-      if (/director.*admin|admin.*director|col\./.test(v)) return 4;
-      if (/^director$/.test(role)) return 5;
-      if (/hr/.test(v)) return 6;
-      return 10;
-    };
-    const sorted = [...withCeo].sort((a, b) => sortPriority(a) - sortPriority(b));
-
-    // Step 4: Khandoker Mojammel Hoque — always position 7 (second to last)
-    const mojamelHok = {
-      id: "daily-adin-editor",
-      name: "Khandoker Mojammel Hoque",
-      role: "Executive Editor",
-      img: mojamelHokImg,
-      description: "Executive Editor of North South Daily Adin Pressmedia Ltd., leading editorial operations, journalism standards and media outreach across Bangladesh.",
-      isPlaceholder: false,
-    };
-    // Remove any backend version of Mojammel Hok, then re-append at position 7
-    const sortedWithoutHok = sorted.filter(
-      (l) => l.id !== "daily-adin-editor" && !/mojammel|mojamel/i.test(l.name || "")
+  const moveGallery = (direction) => {
+    if (selectedGalleryItems.length < 2) return;
+    const currentIndex = selectedGalleryItems.findIndex(
+      (item) => item.id === selectedGalleryItem?.id || item.img === selectedGalleryItem?.img
     );
-    const withHok = [...sortedWithoutHok, mojamelHok];
-
-    // Step 5: Mst. Shajeratul Yiaken placeholder — very last
-    const shajeratulPlaceholder = {
-      id: "mst-shajerat-placeholder",
-      name: "Mst. Shajeratul Yiaken",
-      role: "Management Team",
-      img: avatarPlaceholderImg,
-      description: "Profile details will be updated when available.",
-      isPlaceholder: true,
-    };
-
-    return [...withHok, shajeratulPlaceholder];
-  }, [sortedLeaders]);
-
-  const officeGallery = Array.isArray(data.officeImages) && data.officeImages.length > 0
-    ? data.officeImages.slice(0, 4)
-    : TEMPORARY_OFFICE_IMAGES;
+    const nextIndex = (Math.max(0, currentIndex) + direction + selectedGalleryItems.length) % selectedGalleryItems.length;
+    setSelectedGalleryItem(selectedGalleryItems[nextIndex]);
+  };
 
   // Use the supplied Daily Adin archive images directly so the real
   // newsroom / front-desk / newspaper photos always appear on this page.
-  const mediaGallery = DAILY_ADIN_MEDIA;
+  const mediaGallery = Array.isArray(data.mediaImages) && data.mediaImages.length > 0
+    ? data.mediaImages
+    : DAILY_ADIN_MEDIA;
 
   useEffect(() => {
     if (heroSlides.length <= 1) return undefined;
@@ -423,6 +384,14 @@ export default function AboutUs() {
 
     return () => clearInterval(interval);
   }, [heroSlides.length]);
+
+  useEffect(() => {
+    if (workspacePageCount <= 1) return undefined;
+    const interval = setInterval(() => {
+      setWorkspaceSlide((current) => (current + 1) % workspacePageCount);
+    }, 5000);
+    return () => clearInterval(interval);
+  }, [workspacePageCount]);
 
   return (
     <main
@@ -448,7 +417,7 @@ export default function AboutUs() {
       `}</style>
 
       {/* ================================================================ HERO */}
-      <section className="relative w-full overflow-hidden bg-gradient-to-b from-[#F3F9F5] via-[#FAFCFA] to-white pt-20 pb-10 sm:pt-28 sm:pb-18 lg:pt-32 lg:pb-24">
+      <section id="about-hero" className="relative w-full overflow-hidden bg-gradient-to-b from-[#F3F9F5] via-[#FAFCFA] to-white pt-20 pb-10 sm:pt-28 sm:pb-18 lg:pt-32 lg:pb-24">
         {/* Ambient atmospheric lighting */}
         <div className="pointer-events-none absolute -left-32 -top-20 h-[500px] w-[500px] rounded-full bg-emerald-200/40 blur-[130px]" />
         <div className="pointer-events-none absolute -right-32 top-1/4 h-[550px] w-[550px] rounded-full bg-green-100/50 blur-[140px]" />
@@ -498,7 +467,7 @@ export default function AboutUs() {
                   href="#story"
                   className="group inline-flex h-12 w-full min-w-0 items-center justify-center gap-3 rounded-full bg-emerald-800 px-4 text-[10px] font-bold uppercase tracking-[0.1em] text-white shadow-[0_16px_36px_rgba(6,78,59,0.24)] transition-all duration-300 hover:bg-emerald-950 hover:shadow-[0_20px_44px_rgba(6,78,59,0.32)] hover:-translate-y-0.5 active:translate-y-0 sm:h-14 sm:w-auto sm:px-8 sm:text-xs sm:tracking-[0.16em]"
                 >
-                  <span>Discover Our Story</span>
+                  <span>{data.heroPrimaryButtonLabel}</span>
                   <FaArrowRight className="text-[11px] transition-transform duration-300 group-hover:translate-x-1" />
                 </a>
 
@@ -506,7 +475,7 @@ export default function AboutUs() {
                   href="#leadership"
                   className="inline-flex h-12 w-full min-w-0 items-center justify-center rounded-full border border-emerald-200/90 bg-white/90 px-4 text-[10px] font-bold uppercase tracking-[0.1em] text-emerald-900 shadow-sm backdrop-blur-md transition-all duration-300 hover:border-emerald-600 hover:bg-emerald-50/80 hover:-translate-y-0.5 sm:h-14 sm:w-auto sm:px-8 sm:text-xs sm:tracking-[0.16em]"
                 >
-                  Management Team
+                  {data.heroSecondaryButtonLabel}
                 </a>
               </div>
 
@@ -517,11 +486,11 @@ export default function AboutUs() {
                     <div className="flex items-center gap-2">
                       <span className="h-1.5 w-1.5 rounded-full bg-emerald-600" />
                       <p className="text-[10px] sm:text-[11px] font-extrabold uppercase tracking-[0.22em] text-emerald-800">
-                        OUR CONCERNS
+                        {data.concernsEyebrow}
                       </p>
                     </div>
                     <span className="text-[10px] font-mono font-medium text-slate-400 uppercase tracking-wider">
-                      Sister Concerns
+                      {data.concernsLabel}
                     </span>
                   </div>
 
@@ -639,7 +608,7 @@ export default function AboutUs() {
               {/* Floating Media / Daily Adin Card - bottom left overlap with clean card design */}
               <button
                 type="button"
-                onClick={() => setSelectedGalleryItem(mediaGallery[2] || mediaGallery[0])}
+                onClick={() => openGallery(mediaGallery[2] || mediaGallery[0], mediaGallery)}
                 className="group relative z-30 mt-4 flex w-full items-center gap-3.5 rounded-2xl border border-white bg-white/95 p-3 shadow-[0_20px_50px_rgba(15,76,58,0.16)] backdrop-blur-xl transition hover:-translate-y-1 hover:shadow-[0_26px_60px_rgba(15,76,58,0.22)] sm:absolute sm:-bottom-8 sm:-left-6 sm:mt-0 sm:w-auto sm:p-3.5"
               >
                 <div className="h-14 w-14 sm:h-16 sm:w-16 overflow-hidden rounded-xl bg-emerald-100 shrink-0">
@@ -698,30 +667,29 @@ export default function AboutUs() {
       </section>
 
       {/* ================================================================ DAILY ADIN FEATURE */}
-      <section className="relative overflow-hidden bg-white py-16 sm:py-20 lg:py-28">
+      <section id="about-media" className="relative overflow-hidden bg-white py-16 sm:py-20 lg:py-28">
         <div className="pointer-events-none absolute -left-40 bottom-0 h-[380px] w-[380px] rounded-full bg-green-100/45 blur-3xl" />
         <div className="pointer-events-none absolute right-[-180px] top-16 h-[460px] w-[460px] rounded-full bg-emerald-100/55 blur-3xl" />
 
         <div className="relative mx-auto max-w-[1540px] px-4 sm:px-6 lg:px-10 xl:px-14">
           <div className="mb-10 grid gap-6 lg:grid-cols-[1fr_0.78fr] lg:items-end">
             <div>
-              <SectionEyebrow>Media & Publication</SectionEyebrow>
+              <SectionEyebrow>{data.mediaEyebrow}</SectionEyebrow>
 
               <PremiumHeading className="max-w-4xl">
-                Daily Adin — newsroom, print journalism and circulation in one media ecosystem.
+                {data.mediaTitle}
               </PremiumHeading>
             </div>
 
             <div className="lg:justify-self-end">
               <p className="max-w-xl text-sm leading-7 text-slate-500">
-                A closer look at Daily Adin's newsroom operations, front desk, print editions
-                and real-world newspaper distribution.
+                {data.mediaText}
               </p>
 
               <div className="mt-4 inline-flex items-center gap-2 rounded-full border border-emerald-100 bg-[#F6FAF7] px-3.5 py-2">
                 <FaRegNewspaper className="text-sm text-emerald-700" />
                 <span className="text-[8px] font-extrabold uppercase tracking-[0.17em] text-emerald-800">
-                  Daily Adin · Media Wing
+                  {data.mediaBadge}
                 </span>
               </div>
             </div>
@@ -732,7 +700,7 @@ export default function AboutUs() {
             {/* News Desk — strongest office image */}
             <button
               type="button"
-              onClick={() => setSelectedGalleryItem(mediaGallery[0])}
+              onClick={() => openGallery(mediaGallery[0], mediaGallery)}
               className="group relative min-h-[440px] overflow-hidden rounded-[28px] bg-emerald-950 text-left shadow-[0_30px_85px_rgba(15,76,58,0.14)] sm:min-h-[520px] lg:min-h-[650px]"
             >
               <img
@@ -773,7 +741,7 @@ export default function AboutUs() {
               {/* Front Desk */}
               <button
                 type="button"
-                onClick={() => setSelectedGalleryItem(mediaGallery[1])}
+                onClick={() => openGallery(mediaGallery[1], mediaGallery)}
                 className="group relative min-h-[300px] overflow-hidden rounded-[26px] bg-emerald-950 text-left shadow-[0_20px_55px_rgba(15,76,58,0.10)] sm:min-h-[320px]"
               >
                 <img
@@ -800,7 +768,7 @@ export default function AboutUs() {
               {/* Print Edition */}
               <button
                 type="button"
-                onClick={() => setSelectedGalleryItem(mediaGallery[2])}
+                onClick={() => openGallery(mediaGallery[2], mediaGallery)}
                 className="group relative min-h-[300px] overflow-hidden rounded-[26px] border border-emerald-100 bg-[#F4F9F5] text-left shadow-[0_18px_50px_rgba(15,76,58,0.08)] sm:min-h-[314px]"
               >
                 <img
@@ -831,15 +799,15 @@ export default function AboutUs() {
             <div className="mb-4 flex flex-col gap-2 px-1 sm:flex-row sm:items-end sm:justify-between">
               <div>
                 <p className="text-[8px] font-extrabold uppercase tracking-[0.20em] text-emerald-700">
-                  Print Presence
+                  {data.mediaStripEyebrow}
                 </p>
                 <h3 className="mt-1 font-about-display text-2xl font-semibold text-slate-950">
-                  From publication to the reader.
+                  {data.mediaStripTitle}
                 </h3>
               </div>
 
               <p className="max-w-md text-xs leading-5 text-slate-500">
-                Newspaper display, circulation and community reach captured through Daily Adin's print presence.
+                {data.mediaStripText}
               </p>
             </div>
 
@@ -848,7 +816,7 @@ export default function AboutUs() {
                 <button
                   key={item?.id || index}
                   type="button"
-                  onClick={() => setSelectedGalleryItem(item)}
+                  onClick={() => openGallery(item, mediaGallery)}
                   className="group relative h-[190px] overflow-hidden rounded-[18px] bg-emerald-50 text-left shadow-[0_10px_28px_rgba(15,76,58,0.06)] sm:h-[220px] lg:h-[235px]"
                 >
                   <img
@@ -998,74 +966,91 @@ export default function AboutUs() {
       </section>
 
       {/* ================================================================ OFFICE / WORKSPACES */}
-      <section className="bg-white py-16 sm:py-20 lg:py-28">
+      <section id="about-office" className="bg-white py-16 sm:py-20 lg:py-28">
         <div className="mx-auto max-w-[1540px] px-4 sm:px-6 lg:px-10 xl:px-14">
           <div className="mb-10 grid gap-6 lg:grid-cols-[1fr_0.8fr] lg:items-end">
             <div>
-              <SectionEyebrow>Our Workspaces</SectionEyebrow>
+              <SectionEyebrow>{data.officeEyebrow}</SectionEyebrow>
               <PremiumHeading className="max-w-3xl">
-                From project sites to management spaces, our work is built around coordination and service.
+                {data.officeTitle}
               </PremiumHeading>
             </div>
 
             <p className="max-w-xl text-sm leading-7 text-slate-500 lg:justify-self-end">
-              Replace these temporary previews with your actual Site Office and corporate office
-              photographs when available.
+              {data.officeText}
             </p>
           </div>
 
           <div className="grid auto-rows-[220px] grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
             {officeGallery.map((item, index) => (
               <button
-                key={item.id || index}
+                key={index}
                 type="button"
-                onClick={() => setSelectedGalleryItem(item)}
+                onClick={() => openGallery(item, workspaceGallery)}
                 className={`group relative overflow-hidden rounded-[24px] bg-emerald-50 text-left shadow-[0_16px_44px_rgba(15,76,58,0.07)] ${
                   index === 0 ? "sm:col-span-2 sm:row-span-2" : ""
                 } ${index === 3 ? "lg:col-span-2" : ""}`}
               >
-                <img
-                  src={item.img}
-                  alt={item.title}
-                  className="h-full w-full object-cover transition duration-700 group-hover:scale-105"
-                />
+                <AnimatePresence initial={false} mode="sync">
+                  <MotionImg
+                    key={item.id || item.img}
+                    src={item.img}
+                    alt={item.title}
+                    initial={{ opacity: 0, x: 36, scale: 1.02 }}
+                    animate={{ opacity: 1, x: 0, scale: 1 }}
+                    exit={{ opacity: 0, x: -36, scale: 1.02 }}
+                    transition={{ duration: 0.55, ease: "easeInOut", delay: index * 0.06 }}
+                    className="absolute inset-0 h-full w-full object-cover group-hover:scale-105"
+                  />
+                </AnimatePresence>
                 <div className="absolute inset-0 bg-gradient-to-t from-emerald-950/78 via-emerald-950/4 to-transparent" />
 
-                {item.isPlaceholder && (
-                  <span className="absolute right-3 top-3 rounded-full border border-white/35 bg-white/82 px-2.5 py-1 text-[7px] font-bold uppercase tracking-[0.14em] text-emerald-800 backdrop-blur-md">
-                    Preview
-                  </span>
-                )}
+                <AnimatePresence initial={false} mode="wait">
+                  <MotionDiv
+                    key={`content-${item.id || item.img}`}
+                    initial={{ opacity: 0, y: 10 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    exit={{ opacity: 0, y: -8 }}
+                    transition={{ duration: 0.3, delay: index * 0.06 }}
+                    className="absolute inset-0"
+                  >
+                    {item.isPlaceholder && (
+                      <span className="absolute right-3 top-3 rounded-full border border-white/35 bg-white/82 px-2.5 py-1 text-[7px] font-bold uppercase tracking-[0.14em] text-emerald-800 backdrop-blur-md">
+                        Preview
+                      </span>
+                    )}
 
-                <div className="absolute inset-x-0 bottom-0 p-4 sm:p-5">
-                  <p className="text-[8px] font-extrabold uppercase tracking-[0.18em] text-emerald-200">
-                    Workspace
-                  </p>
-                  <h3 className="mt-1 font-about-display text-xl font-semibold text-white sm:text-2xl">
-                    {item.title}
-                  </h3>
-                  <p className="mt-1 text-[11px] text-white/72">{item.subtitle}</p>
-                </div>
+                    <div className="absolute inset-x-0 bottom-0 p-4 sm:p-5">
+                      <p className="text-[8px] font-extrabold uppercase tracking-[0.18em] text-emerald-200">
+                        Workspace
+                      </p>
+                      <h3 className="mt-1 font-about-display text-xl font-semibold text-white sm:text-2xl">
+                        {item.title}
+                      </h3>
+                      <p className="mt-1 text-[11px] text-white/72">{item.subtitle}</p>
+                    </div>
+                  </MotionDiv>
+                </AnimatePresence>
               </button>
             ))}
           </div>
+
         </div>
       </section> 
 
       {/* ================================================================ STRENGTHS */}
-      <section className="bg-emerald-950 py-16 text-white sm:py-20 lg:py-24">
+      <section id="about-strengths" className="bg-emerald-950 py-16 text-white sm:py-20 lg:py-24">
         <div className="mx-auto max-w-[1540px] px-4 sm:px-6 lg:px-10 xl:px-14">
           <div className="mb-10 grid gap-6 lg:grid-cols-[0.9fr_1.1fr] lg:items-end">
             <div>
-              <SectionEyebrow light>Institutional Capabilities</SectionEyebrow>
+              <SectionEyebrow light>{data.strengthsEyebrow}</SectionEyebrow>
               <h2 className="font-about-display text-3xl font-medium tracking-[-0.04em] text-white sm:text-4xl lg:text-5xl">
-                Core pillars behind the group.
+                {data.strengthsTitle}
               </h2>
             </div>
 
             <p className="max-w-2xl text-sm leading-7 text-emerald-100/68 lg:justify-self-end">
-              Disciplined planning, client confidence, sustainable thinking and long-term value
-              guide every concern of the group.
+              {data.strengthsText}
             </p>
           </div>
 
@@ -1195,7 +1180,7 @@ export default function AboutUs() {
 
       {/* ================================================================ VIDEO */}
       {embedUrl && (
-        <section className="bg-white py-16 sm:py-20 lg:py-28">
+        <section id="about-video" className="bg-white py-16 sm:py-20 lg:py-28">
           <div className="mx-auto grid max-w-[1540px] items-center gap-8 px-4 sm:px-6 lg:grid-cols-[0.72fr_1.28fr] lg:gap-12 lg:px-10 xl:px-14">
             <div>
               <SectionEyebrow>
@@ -1230,7 +1215,7 @@ export default function AboutUs() {
 
       {/* ================================================================ COMMUNITY */}
       {Array.isArray(data.csrImages) && data.csrImages.length > 0 && (
-        <section className="relative overflow-hidden bg-[#0a1628] py-20 sm:py-28 lg:py-32">
+        <section id="about-csr" className="relative overflow-hidden bg-[#0a1628] py-20 sm:py-28 lg:py-32">
           <div className="pointer-events-none absolute -left-40 top-1/3 h-[500px] w-[500px] rounded-full bg-emerald-900/20 blur-[100px]" />
           <div className="pointer-events-none absolute -right-40 bottom-1/4 h-[400px] w-[400px] rounded-full bg-[#f3b128]/8 blur-[100px]" />
           <div className="absolute inset-x-0 top-0 h-[1px] bg-gradient-to-r from-transparent via-[#f3b128]/50 to-transparent" />
@@ -1272,7 +1257,7 @@ export default function AboutUs() {
                   transition={{ duration: 0.7 }}
                   className="col-span-1 sm:col-span-7 sm:row-span-2 min-h-[260px] sm:min-h-0 overflow-hidden rounded-[24px]"
                 >
-                  <button type="button" onClick={() => setSelectedGalleryItem(data.csrImages[0])}
+                  <button type="button" onClick={() => openGallery(data.csrImages[0], data.csrImages)}
                     className="group relative h-full w-full text-left min-h-[260px] sm:min-h-full">
                     <img src={data.csrImages[0].img} alt={data.csrImages[0].title}
                       className="h-full w-full object-cover transition duration-[1100ms] ease-out group-hover:scale-[1.05]" />
@@ -1305,7 +1290,7 @@ export default function AboutUs() {
                   transition={{ duration: 0.6, delay: idx * 0.12 }}
                   className="col-span-1 sm:col-span-5 sm:row-span-1 min-h-[200px] sm:min-h-0 overflow-hidden rounded-[20px]"
                 >
-                  <button type="button" onClick={() => setSelectedGalleryItem(data.csrImages[idx])}
+                  <button type="button" onClick={() => openGallery(data.csrImages[idx], data.csrImages)}
                     className="group relative h-full w-full text-left min-h-[200px] sm:min-h-full">
                     <img src={data.csrImages[idx].img} alt={data.csrImages[idx].title}
                       className="h-full w-full object-cover transition duration-[900ms] group-hover:scale-[1.055]" />
@@ -1328,7 +1313,7 @@ export default function AboutUs() {
                   transition={{ duration: 0.6, delay: (idx - 3) * 0.1 }}
                   className="col-span-1 sm:col-span-4 sm:row-span-1 min-h-[190px] sm:min-h-0 overflow-hidden rounded-[20px]"
                 >
-                  <button type="button" onClick={() => setSelectedGalleryItem(data.csrImages[idx])}
+                  <button type="button" onClick={() => openGallery(data.csrImages[idx], data.csrImages)}
                     className="group relative h-full w-full text-left min-h-[190px] sm:min-h-full">
                     <img src={data.csrImages[idx].img} alt={data.csrImages[idx].title}
                       className="h-full w-full object-cover transition duration-700 group-hover:scale-[1.06]" />
@@ -1350,11 +1335,11 @@ export default function AboutUs() {
       )}
 
       {/* ================================================================ MISSION */}
-      <section className="bg-white py-16 sm:py-20 lg:py-24">
+      <section id="about-mission" className="bg-white py-16 sm:py-20 lg:py-24">
         <div className="mx-auto max-w-[1540px] px-4 sm:px-6 lg:px-10 xl:px-14">
           <div className="mb-10">
-            <SectionEyebrow>Purpose & Direction</SectionEyebrow>
-            <PremiumHeading className="max-w-3xl">Built around a clear purpose.</PremiumHeading>
+            <SectionEyebrow>{data.missionEyebrow}</SectionEyebrow>
+            <PremiumHeading className="max-w-3xl">{data.missionTitle}</PremiumHeading>
           </div>
 
           <div className="grid gap-4 md:grid-cols-3">
@@ -1505,7 +1490,7 @@ export default function AboutUs() {
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
             className="fixed inset-0 z-50 flex items-center justify-center bg-emerald-950/90 p-3 backdrop-blur-md sm:p-5"
-            onClick={() => setSelectedGalleryItem(null)}
+            onClick={closeGallery}
           >
             <MotionDiv
               initial={{ opacity: 0, y: 16, scale: 0.98 }}
@@ -1516,12 +1501,33 @@ export default function AboutUs() {
             >
               <button
                 type="button"
-                onClick={() => setSelectedGalleryItem(null)}
+                onClick={closeGallery}
                 aria-label="Close image"
                 className="absolute right-4 top-4 z-10 grid h-9 w-9 place-items-center rounded-full bg-white/90 text-emerald-900 shadow-md backdrop-blur-md transition hover:bg-emerald-800 hover:text-white"
               >
                 <FaTimes />
               </button>
+
+              {selectedGalleryItems.length > 1 && (
+                <>
+                  <button
+                    type="button"
+                    onClick={() => moveGallery(-1)}
+                    aria-label="Previous image"
+                    className="absolute left-4 top-1/2 z-10 grid h-11 w-11 -translate-y-1/2 place-items-center rounded-full bg-white/90 text-emerald-900 shadow-md transition hover:bg-emerald-800 hover:text-white"
+                  >
+                    <FaChevronLeft />
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => moveGallery(1)}
+                    aria-label="Next image"
+                    className="absolute right-4 top-1/2 z-10 grid h-11 w-11 -translate-y-1/2 place-items-center rounded-full bg-white/90 text-emerald-900 shadow-md transition hover:bg-emerald-800 hover:text-white"
+                  >
+                    <FaChevronRight />
+                  </button>
+                </>
+              )}
 
               <img
                 src={selectedGalleryItem.img}
