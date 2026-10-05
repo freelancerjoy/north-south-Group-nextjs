@@ -12,7 +12,6 @@ const sectionNames = {
   media: "Daily Adin media",
   overview: "Company overview",
   office: "Office / workspaces",
-  strengths: "Strengths & stats",
   leadership: "Leadership",
   video: "Video",
   csr: "CSR gallery",
@@ -141,9 +140,8 @@ export default function ElementorAboutEditor() {
   let controls;
   if (active === "hero") controls = <div className="space-y-4">{field("Eyebrow", "heroEyebrow")}{field("Title", "heroTitle", true)}{field("Subtitle", "heroSubtitle", true)}{field("Primary button", "heroPrimaryButtonLabel")}{field("Secondary button", "heroSecondaryButtonLabel")}{field("Concerns eyebrow", "concernsEyebrow")}{field("Concerns label", "concernsLabel")}{imageList("Hero slider images", "heroSlides")}</div>;
   if (active === "media") controls = <div className="space-y-4">{field("Eyebrow", "mediaEyebrow")}{field("Title", "mediaTitle", true)}{field("Description", "mediaText", true)}{field("Badge", "mediaBadge")}{field("Strip eyebrow", "mediaStripEyebrow")}{field("Strip title", "mediaStripTitle")}{field("Strip text", "mediaStripText", true)}{galleryCards("Media images", "mediaImages")}</div>;
-  if (active === "overview") controls = <div className="space-y-4">{field("Eyebrow", "overviewEyebrow")}{field("Title", "overviewTitle", true)}{field("Intro", "overviewText", true)}{field("Badge", "overviewBadge")}{field("Highlight eyebrow", "overviewHighlightEyebrow")}{field("Highlight title", "overviewHighlightTitle", true)}{stringList("Paragraphs", "overviewParagraphs")}</div>;
+  if (active === "overview") controls = <div className="space-y-4">{field("Eyebrow", "overviewEyebrow")}{field("Title", "overviewTitle", true)}{field("Intro", "overviewText", true)}{field("Badge", "overviewBadge")}{field("Highlight eyebrow", "overviewHighlightEyebrow")}{field("Highlight title", "overviewHighlightTitle", true)}{stringList("Paragraphs", "overviewParagraphs")}<MediaField label="Main overview image" value={form.overviewImage || ""} folder="about/overview" onChange={(value) => setField("overviewImage", value)} /><MediaField label="Second overview image" value={form.overviewSecondImage || ""} folder="about/overview" onChange={(value) => setField("overviewSecondImage", value)} />{textCards("Stats", "stats", true)}{textCards("Overview cards", "strengths")}</div>;
   if (active === "office") controls = <div className="space-y-4">{field("Eyebrow", "officeEyebrow")}{field("Title", "officeTitle", true)}{field("Description", "officeText", true)}{galleryCards("Featured workspace images", "officeImages")}{galleryCards("Full workspace gallery", "officeGalleryImages", false, true)}</div>;
-  if (active === "strengths") controls = <div className="space-y-4">{field("Eyebrow", "strengthsEyebrow")}{field("Title", "strengthsTitle")}{field("Description", "strengthsText", true)}{textCards("Stats", "stats", true)}{textCards("Strength cards", "strengths")}</div>;
   if (active === "leadership") controls = <div className="space-y-4">{field("Eyebrow", "leadershipEyebrow")}{field("Title", "leadershipTitle")}{field("Description", "leadershipText", true)}{galleryCards("Leadership team", "leaders", true)}</div>;
   if (active === "video") controls = <div className="space-y-4">{field("Eyebrow", "videoEyebrow")}{field("Title", "videoTitle")}{field("Description", "videoText", true)}{field("YouTube URL", "videoUrl")}</div>;
   if (active === "csr") controls = <div className="space-y-4">{field("Eyebrow", "csrEyebrow")}{field("Title", "csrTitle")}{field("Description", "csrText", true)}{galleryCards("CSR images", "csrImages")}</div>;

@@ -730,6 +730,44 @@ const AboutPageSettings = () => {
             values={form.overviewParagraphs || [""]}
             onChange={(value) => setField("overviewParagraphs", value)}
           />
+          <div className="grid gap-4 md:grid-cols-2">
+            {[
+              ["overviewImage", "Main Overview Image"],
+              ["overviewSecondImage", "Second Overview Image"],
+            ].map(([key, label]) => (
+              <div key={key} className="space-y-2">
+                <label className="block text-sm font-semibold text-slate-700">{label}</label>
+                {form[key] ? (
+                  <img src={form[key]} alt={label} className="h-40 w-full rounded-2xl border border-slate-200 object-cover" />
+                ) : (
+                  <div className="flex h-40 w-full items-center justify-center rounded-2xl border border-dashed border-slate-300 text-xs text-slate-400">No image selected</div>
+                )}
+                <div className="flex gap-2">
+                  <label className="cursor-pointer rounded-xl bg-teal-50 px-3 py-2 text-xs font-bold text-teal-700 hover:bg-teal-100">
+                    {form[key] ? "Replace image" : "Upload image"}
+                    <input
+                      type="file"
+                      accept="image/*"
+                      className="hidden"
+                      onChange={async (event) => {
+                        const file = event.target.files?.[0];
+                        event.target.value = "";
+                        if (!file) return;
+                        try {
+                          setField(key, await uploadSingle(file, "about/overview"));
+                        } catch (error) {
+                          toast.error(error?.message || "Image upload failed");
+                        }
+                      }}
+                    />
+                  </label>
+                  {form[key] ? (
+                    <button type="button" onClick={() => setField(key, "")} className="rounded-xl bg-rose-50 px-3 py-2 text-xs font-bold text-rose-600 hover:bg-rose-100">Remove</button>
+                  ) : null}
+                </div>
+              </div>
+            ))}
+          </div>
         </section>
 
         <section className={sectionCard}>

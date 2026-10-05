@@ -308,9 +308,10 @@ export default function AboutUs({ previewData = null }) {
       : TEMPORARY_OFFICE_IMAGES.map((item) => item.img);
 
   const heroImage = heroSlides[currentSlide] || heroSlides[0];
-  const overviewImage = heroSlides[1] || heroSlides[0] || TEMPORARY_OFFICE_IMAGES[0].img;
+  const overviewImage =
+    data.overviewImage || heroSlides[1] || heroSlides[0] || TEMPORARY_OFFICE_IMAGES[0].img;
   const secondOverviewImage =
-    heroSlides[2] || data.csrImages?.[0]?.img || TEMPORARY_OFFICE_IMAGES[1].img;
+    data.overviewSecondImage || heroSlides[2] || data.csrImages?.[0]?.img || TEMPORARY_OFFICE_IMAGES[1].img;
 
   const embedUrl = getYouTubeEmbedUrl(data.videoUrl);
 
@@ -1037,54 +1038,6 @@ export default function AboutUs({ previewData = null }) {
 
         </div>
       </section> 
-
-      {/* ================================================================ STRENGTHS */}
-      <section id="about-strengths" className="bg-emerald-950 py-16 text-white sm:py-20 lg:py-24">
-        <div className="mx-auto max-w-[1540px] px-4 sm:px-6 lg:px-10 xl:px-14">
-          <div className="mb-10 grid gap-6 lg:grid-cols-[0.9fr_1.1fr] lg:items-end">
-            <div>
-              <SectionEyebrow light>{data.strengthsEyebrow}</SectionEyebrow>
-              <h2 className="font-about-display text-3xl font-medium tracking-[-0.04em] text-white sm:text-4xl lg:text-5xl">
-                {data.strengthsTitle}
-              </h2>
-            </div>
-
-            <p className="max-w-2xl text-sm leading-7 text-emerald-100/68 lg:justify-self-end">
-              {data.strengthsText}
-            </p>
-          </div>
-
-          <div className="grid gap-3 sm:grid-cols-2 xl:grid-cols-4">
-            {data.strengths.map((item, index) => {
-              const IconComp =
-                strengthIcons[item.iconKey] ||
-                defaultStrengthIconList[index % defaultStrengthIconList.length];
-              return (
-                <MotionDiv
-                  key={item.title}
-                  initial={{ opacity: 0, y: 28 }}
-                  whileInView={{ opacity: 1, y: 0 }}
-                  viewport={{ once: true, margin: "-60px" }}
-                  transition={{ duration: 0.6, delay: index * 0.11 }}
-                >
-                  <article className="group border border-white/10 bg-white/[0.045] p-5 backdrop-blur-sm transition hover:-translate-y-1 hover:border-emerald-300/50 hover:bg-white/[0.07] sm:p-6 h-full">
-                    <div className="flex items-center justify-between">
-                      <span className="grid h-11 w-11 place-items-center rounded-full border border-emerald-300/25 bg-emerald-300/10 text-lg text-emerald-200 transition group-hover:bg-emerald-300 group-hover:text-emerald-950">
-                        <IconComp />
-                      </span>
-                      <span className="font-mono text-[10px] tracking-[0.16em] text-white/25">
-                        {String(index + 1).padStart(2, "0")}
-                      </span>
-                    </div>
-                    <h3 className="mt-8 font-about-display text-2xl font-semibold text-white">{item.title}</h3>
-                    <p className="mt-3 text-sm leading-7 text-emerald-100/65">{item.text}</p>
-                  </article>
-                </MotionDiv>
-              );
-            })}
-          </div>
-        </div>
-      </section>
 
       {/* ================================================================ MANAGEMENT */}
       <section id="leadership" className="relative bg-[#F6FAF7] py-16 sm:py-20 lg:py-24">
