@@ -76,6 +76,12 @@ const navSections = [
         match: ["viewHomeSlider", "createHomeSlider", "updateHomeSlider"],
       },
       {
+        label: "Home Page",
+        to: "homePageSettings",
+        icon: <MdWeb size={20} />,
+        match: ["homePageSettings"],
+      },
+      {
         label: "Commercial Project",
         to: "viewCommercialProject",
         icon: <MdApartment size={18} />,
@@ -282,6 +288,10 @@ export default function AdminDashboard() {
     aboutPageSettings: {
       title: "About Page Settings",
       description: "Update the public About Us page content, leadership section, CSR gallery, and key company messaging.",
+    },
+    homePageSettings: {
+      title: "Home Page Settings",
+      description: "Manage the home-page text, media, buttons, and section content without changing its layout.",
     },
     footerSettings: {
       title: "Footer Settings",

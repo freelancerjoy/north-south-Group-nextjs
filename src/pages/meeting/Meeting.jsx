@@ -7,7 +7,7 @@ import { useContactStore } from "../../store/contact/contactStore";
 
 AOS.init();
 
-const Meeting = ({ className = "" }) => {
+const Meeting = ({ className = "", content }) => {
   const ref = useReveal();
   const { addContact, isLoading } = useContactStore();
 
@@ -49,7 +49,7 @@ const Meeting = ({ className = "" }) => {
           data-aos-duration="1000"
         >
           <img
-            src={meeting}
+            src={content.imageUrl || meeting}
             alt="duplex"
             className="shadow-lg w-full h-auto mg:h-90 lg:h-110 object-cover transition-transform duration-500 hover:scale-105"
           />
@@ -65,18 +65,18 @@ const Meeting = ({ className = "" }) => {
             ref={ref}
             className={`slide-title ${className} text-center sm:text-left text-lg sm:text-2xl md:text-3xl lg:text-4xl uppercase font-bold text-green-700 mb-6`}
           >
-            Schedule a Meeting
+            {content.title}
           </h1>
 
           <form onSubmit={handleSubmit} className="flex flex-col gap-4">
             <div>
               <label className="block text-gray-500 font-medium mb-1">
-                Full Name*
+                {content.fullNameLabel}
               </label>
               <input
                 type="text"
                 name="fullName"
-                placeholder="Enter your full name"
+                placeholder={content.fullNamePlaceholder}
                 value={fullName}
                 onChange={(e) => setFullName(e.target.value)}
                 required
@@ -86,12 +86,12 @@ const Meeting = ({ className = "" }) => {
 
             <div>
               <label className="block text-gray-500 font-medium mb-1">
-                Phone Number*
+                {content.phoneLabel}
               </label>
               <input
                 type="tel"
                 name="phone"
-                placeholder="Enter your phone number"
+                placeholder={content.phonePlaceholder}
                 value={phone}
                 onChange={(e) => setPhone(e.target.value)}
                 required
@@ -101,12 +101,12 @@ const Meeting = ({ className = "" }) => {
 
             <div>
               <label className="block text-gray-500 font-medium mb-1">
-                Address*
+                {content.addressLabel}
               </label>
               <input
                 type="text"
                 name="address"
-                placeholder="Enter your address"
+                placeholder={content.addressPlaceholder}
                 value={address}
                 onChange={(e) => setAddress(e.target.value)}
                 required
@@ -120,7 +120,7 @@ const Meeting = ({ className = "" }) => {
                 disabled={isLoading}
                 className="slide-hover mt-4 px-12 py-3 font-semibold text-green-700 border-2 border-green-700 hover:text-white hover:bg-green-700 transition-colors"
               >
-                {isLoading ? "Sending..." : "Submit"}
+                {isLoading ? content.sendingLabel : content.submitLabel}
               </button>
             </div>
           </form>

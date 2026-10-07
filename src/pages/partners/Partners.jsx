@@ -97,7 +97,7 @@ import { FaSpinner } from "react-icons/fa";
 //   partner7,
 // ];
 
-const Partners = () => {
+const Partners = ({ title = "Our Concern" }) => {
 
   const { partners,loadPartners,isLoading } = usePartnerStore();
        useEffect(() => {
@@ -118,7 +118,7 @@ const Partners = () => {
         id="partner"
         className="text-center text-sm md:text-2xl lg:text-4xl uppercase font-bold text-[#0f7771] mb-8"
       >
-        Our Concern
+        {title}
       </h2>
 
       {/* Marquee wrapper */}

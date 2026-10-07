@@ -2,6 +2,10 @@ import { dirname } from "node:path";
 import { fileURLToPath } from "node:url";
 
 const projectRoot = dirname(fileURLToPath(import.meta.url));
+const apiOrigin = process.env.API_PROXY_ORIGIN ||
+  (process.env.NODE_ENV === "development"
+    ? "http://localhost:8000"
+    : "https://northsoutbackend.expertitsolutionsbd.com");
 
 /** @type {import('next').NextConfig} */
 const nextConfig = {
@@ -49,7 +53,7 @@ const nextConfig = {
     return [
       {
         source: "/api/v1/:path*",
-        destination: "https://northsoutbackend.expertitsolutionsbd.com/api/v1/:path*",
+        destination: `${apiOrigin}/api/v1/:path*`,
       },
     ];
   },

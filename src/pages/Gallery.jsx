@@ -107,7 +107,7 @@ const albums = [
   },
 ];
 
-const Gallery = () => {
+const Gallery = ({ homeContent }) => {
   const [activeAlbumId, setActiveAlbumId] = useState(albums[0].id);
   const [selectedIndex, setSelectedIndex] = useState(null);
   const [homeSlideIndex, setHomeSlideIndex] = useState(0);
@@ -187,17 +187,17 @@ const Gallery = () => {
             <div className="mb-10 flex flex-col justify-between gap-6 md:flex-row md:items-end">
               <div>
                 <p className="mb-3 text-xs font-black uppercase tracking-[0.32em] text-green-300">
-                  North South Visual Diary
+                  {homeContent?.eyebrow || "North South Visual Diary"}
                 </p>
                 <h2 className="max-w-4xl text-3xl font-black uppercase leading-tight text-white md:text-5xl">
-                  Company stories in motion
+                  {homeContent?.title || "Company stories in motion"}
                 </h2>
               </div>
               <Link
                 to="/gallery"
                 className="inline-flex w-fit items-center justify-center bg-white px-6 py-4 text-xs font-black uppercase tracking-[0.2em] text-gray-950 shadow-lg shadow-black/25 transition hover:bg-green-500 hover:text-white"
               >
-                View Albums
+                {homeContent?.buttonLabel || "View Albums"}
               </Link>
             </div>
 
@@ -214,7 +214,7 @@ const Gallery = () => {
                     {activeHomeSlide.title}
                   </h3>
                   <p className="mt-5 max-w-md text-sm leading-7 text-white/68">
-                    Explore our corporate activities, press coverage, and event memories through a refined album experience.
+                    {homeContent?.description || "Explore our corporate activities, press coverage, and event memories through a refined album experience."}
                   </p>
                 </div>
 
@@ -280,20 +280,20 @@ const Gallery = () => {
                 <span className="absolute inset-0 bg-linear-to-t from-black/85 via-black/18 to-transparent" />
                 <span className="absolute inset-y-0 left-0 w-1/2 bg-linear-to-r from-black/65 to-transparent" />
                 <div className="absolute left-5 top-5 border border-white/20 bg-black/25 px-4 py-3 text-xs font-black uppercase tracking-[0.24em] text-white backdrop-blur-md">
-                  Auto Changing Gallery
+                  {homeContent?.badge || "Auto Changing Gallery"}
                 </div>
                 <div className="absolute bottom-0 left-0 right-0 p-6 md:p-10">
                   <div className="flex flex-col gap-5 md:flex-row md:items-end md:justify-between">
                     <div>
                       <p className="text-xs font-black uppercase tracking-[0.28em] text-green-200">
-                        Tap to open full album
+                        {homeContent?.openEyebrow || "Tap to open full album"}
                       </p>
                       <h4 className="mt-3 max-w-2xl text-3xl font-black uppercase leading-none text-white md:text-5xl">
-                        North South Gallery
+                        {homeContent?.openTitle || "North South Gallery"}
                       </h4>
                     </div>
                     <span className="inline-flex w-fit items-center gap-2 bg-white px-5 py-3 text-xs font-black uppercase tracking-[0.18em] text-gray-950 transition group-hover:bg-green-400">
-                      Explore
+                      {homeContent?.exploreLabel || "Explore"}
                       <FiArrowRight />
                     </span>
                   </div>
@@ -359,7 +359,7 @@ const Gallery = () => {
                         {album.description}
                       </p>
                       <span className="mt-5 inline-flex w-fit items-center gap-2 text-xs font-black uppercase tracking-[0.18em] text-white/80 group-hover:text-green-800">
-                        Open Gallery
+                        {homeContent?.albumLabel || "Open Gallery"}
                         <FiArrowRight />
                       </span>
                     </div>

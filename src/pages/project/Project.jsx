@@ -22,24 +22,26 @@ const projectOverviews = [
   },
 ];
 
-const Project = () => {
+const iconMap = { hotel: FaHotel, land: FaMapMarkedAlt, flat: FaBuilding };
+
+const Project = ({ content }) => {
   return (
     <section
       className="need_img w-full bg-gray-50 py-16"
       style={{
-        backgroundImage: `linear-gradient(rgba(4, 8, 17, 0.56), rgba(4, 8, 17, 0.56)), url(${overviewBg})`,
+        backgroundImage: `linear-gradient(rgba(4, 8, 17, 0.56), rgba(4, 8, 17, 0.56)), url(${content.backgroundUrl || overviewBg})`,
       }}
     >
       <div className="mx-auto max-w-6xl px-4 text-center">
         <h1 className="mb-12 animate-fadeIn text-sm font-bold uppercase text-white md:text-2xl lg:text-4xl">
-          Our Projects Overview
+          {content.title}
         </h1>
 
         <div className="flex w-full items-center justify-center py-12">
           <div className="w-full max-w-5xl px-4">
             <div className="grid gap-6 md:grid-cols-3">
-              {projectOverviews.map((item, index) => {
-                const Icon = item.icon;
+              {(content.cards || projectOverviews).map((item, index) => {
+                const Icon = iconMap[item.icon] || item.icon || FaBuilding;
                 return (
                   <div key={item.title} data-aos="fade-up" data-aos-delay={index * 150}>
                     <div className="h-full rounded-lg bg-white p-8 text-left shadow-lg transition-transform duration-500 hover:-translate-y-1">

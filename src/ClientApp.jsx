@@ -2,6 +2,7 @@ import { useEffect } from "react";
 import { BrowserRouter } from "react-router-dom";
 import { ToastContainer } from "react-toastify";
 import App from "./App.jsx";
+import SEO from "./components/SEO.jsx";
 
 export default function ClientApp() {
   useEffect(() => {
@@ -20,6 +21,7 @@ export default function ClientApp() {
 
   return (
     <BrowserRouter>
+      <SEO />
       <ToastContainer
         position="top-center"
         pauseOnFocusLoss={false}

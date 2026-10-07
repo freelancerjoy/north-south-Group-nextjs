@@ -9,7 +9,7 @@ import { entityId, projectDetailsPath } from "../../utils/entity";
 import { useProjectStore } from "../../store/project/projectStore";
 import { FaSpinner } from "react-icons/fa";
 
-const Consortium = ({ className = "" }) => {
+const Consortium = ({ className = "", content }) => {
   const prevRef = useRef(null);
   const nextRef = useRef(null);
   const [swiperInstance, setSwiperInstance] = useState(null);
@@ -54,15 +54,15 @@ if (isLoading) {
           {/* Section Title */}
           <div className="py-8">
             <p className="uppercase tracking-widest text-gray-500 font-bold text-base leading-relaxed p-2">
-              Featured projects
+              {content.eyebrow}
             </p>
             <h2
               ref={ref}
               className={`slide-title ${className} text-sm md:text-2xl lg:text-4xl uppercase font-bold text-[#0f7771] p-2`}
             >
-              Bespoke Enclaves with finesse
+              {content.titleLineOne}
               <br />
-              in architecture and design
+              {content.titleLineTwo}
             </h2>
           </div>
           {/* Arrow Buttons (Top Right) */}
@@ -147,7 +147,7 @@ if (isLoading) {
                   {/* Button */}
                   
                     <button className="slide-hover mt-3 py-2 px-6 border-2 border-white font-bold hover:bg-white hover:text-black transition">
-                      <span>View Project</span>
+                      <span>{content.buttonLabel}</span>
                     </button>
                  
                 </div>

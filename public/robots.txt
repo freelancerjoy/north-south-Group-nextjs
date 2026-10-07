@@ -1,0 +1,13 @@
+User-agent: *
+Allow: /
+Disallow: /adminDashboard
+Disallow: /adminDashboard/
+Disallow: /login
+Disallow: /api/
+
+# Polite crawl rate
+Crawl-delay: 1
+
+# Sitemap
+Sitemap: https://northsouthgroup.com/sitemap.xml
+

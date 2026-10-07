@@ -10,8 +10,12 @@ export default function CatchAllPage() {
   return (
     <>
       <Head>
-        <title>North South Group - Real Estate & Construction</title>
+        <title>North South Group | Leading Real Estate & Township Developer in Bangladesh</title>
         <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <meta
+          name="google-site-verification"
+          content="FuywbTv4q4kaMhYh6YFI4ZvtVyN2jUfnh7FMCYhacKY"
+        />
       </Head>
       <Script id="disable-scroll-restoration" strategy="beforeInteractive">
         {`

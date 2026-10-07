@@ -19,7 +19,7 @@ const concerns = [
   { name: "Northsouth Foundation", logo },
 ];
 
-export default function About({ className = "" }) {
+export default function About({ className = "", content }) {
   const ref = useReveal();
   const [expanded, setExpanded] = useState(false);
   const { partners, loadPartners } = usePartnerStore();
@@ -47,19 +47,19 @@ export default function About({ className = "" }) {
       <div className="container mx-auto flex flex-col items-center gap-12 px-5 lg:flex-row">
         <div className="lg:w-1/2" data-aos="fade-right" data-aos-duration="1000">
           <p className="p-2 text-base font-bold uppercase leading-relaxed tracking-widest text-gray-500">
-            About Us
+            {content.eyebrow}
           </p>
           <h2 ref={ref} className={`slide-title ${className} py-4 text-sm font-bold uppercase md:text-2xl lg:text-4xl`}>
-            Overview of North South
+            {content.title}
           </h2>
 
           <div className="space-y-4 text-base text-gray-300">
             <p className={`text-justify leading-relaxed transition-all duration-300 ${expanded ? "" : "line-clamp-10"}`}>
-              North South Group is a pioneering housing and real estate company in Bangladesh, dedicated to addressing the accommodation challenges faced by the residents of Dhaka City and its surrounding regions. With a vision to transform lives through exceptional living spaces, our company takes pride in offering a diverse range of residential, land, industrial, and hospitality projects. The group continues to grow through planned communities, trusted project delivery, and sister concerns that support long-term value for clients and investors.
+              {content.text}
             </p>
 
             <button className="font-semibold text-blue-500 hover:underline" onClick={() => setExpanded(!expanded)}>
-              {expanded ? "See Less" : "See More"}
+              {expanded ? content.lessLabel : content.moreLabel}
             </button>
           </div>
         </div>
@@ -70,10 +70,10 @@ export default function About({ className = "" }) {
           data-aos-duration="1000"
         >
           <p className="mb-3 text-xs font-bold uppercase tracking-[0.25em] text-green-300">
-            Our Concerns
+            {content.concernsEyebrow}
           </p>
           <h3 className="mb-6 text-2xl font-bold text-white">
-            A diversified group built around trust and long-term value
+            {content.concernsTitle}
           </h3>
           <div className="relative -mx-2 overflow-hidden py-2">
             <div className="pointer-events-none absolute inset-y-0 left-0 z-10 w-12 bg-gradient-to-r from-gray-900 to-transparent" />

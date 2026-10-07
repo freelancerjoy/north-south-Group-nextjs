@@ -1,7 +1,7 @@
 import useReveal from "../../components/useReveal";
 import greenCityImg5 from "../../assets/images/greenCityImg5.jpg";
 
-const Testimonials = ({ className = "" }) => {
+const Testimonials = ({ className = "", content }) => {
   const ref = useReveal();
 
   return (
@@ -9,38 +9,38 @@ const Testimonials = ({ className = "" }) => {
       <div className="container mx-auto">
         <div className="px-4 py-8">
           <p className="p-2 text-base font-bold uppercase leading-relaxed tracking-widest text-gray-500">
-            Investment Insight
+            {content.eyebrow}
           </p>
           <h2 ref={ref} className={`slide-title ${className} p-2 text-sm font-bold uppercase text-[#0f7771] md:text-2xl lg:text-4xl`}>
-            Why Should You Invest
+            {content.titleLineOne}
             <br />
-            in North South Group?
+            {content.titleLineTwo}
           </h2>
         </div>
 
         <div className="container mx-auto flex flex-col items-start justify-center gap-12 px-5 lg:flex-row lg:justify-between">
           <div className="w-full overflow-hidden rounded-lg shadow-xl lg:w-1/2">
             <video
-              src="/videos/projectVideo.mp4"
+              src={content.videoUrl}
               controls
               preload="metadata"
-              poster={greenCityImg5}
+              poster={content.posterUrl || greenCityImg5}
               className="h-60 w-full object-cover md:h-72 lg:h-80"
             />
           </div>
 
           <div className="lg:w-1/2">
             <h2 className="text-md mb-6 font-bold text-black md:text-xl lg:text-2xl">
-              Invest with a trusted, diversified development group
+              {content.heading}
             </h2>
 
             <p className="mb-4 text-black">
-              North South Group presents planned real estate, land, industrial, and hospitality opportunities with a focus on strategic locations, disciplined development, and long-term value.
+              {content.text}
             </p>
 
             <div className="py-2">
-              <p className="text-md font-bold text-gray-900">North South Group</p>
-              <p className="text-md text-gray-900">Project & Investment Team</p>
+              <p className="text-md font-bold text-gray-900">{content.author}</p>
+              <p className="text-md text-gray-900">{content.authorRole}</p>
             </div>
           </div>
         </div>

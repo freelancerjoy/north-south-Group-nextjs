@@ -12,6 +12,7 @@ import Project from "./project/Project";
 import Testimonials from "./testimonials/Testimonials";
 
 import { useHomeSliderStore } from "../store/homeSlider/homeSliderStore";
+import { useHomeContentStore } from "../store/homeContent/homeContentStore";
 
 const fallbackSlides = [
   {
@@ -40,13 +41,15 @@ const fallbackSlides = [
   },
 ];
 
-const Home = () => {
+const Home = ({ previewContent }) => {
   const { slides, loadSlides } = useHomeSliderStore();
+  const { content, loadHomeContent } = useHomeContentStore();
 
   useEffect(() => {
     AOS.init({ duration: 800 });
     loadSlides();
-  }, [loadSlides]);
+    loadHomeContent();
+  }, [loadSlides, loadHomeContent]);
 
   const activeSlides = slides && slides.length > 0 
     ? slides.map(s => ({
@@ -56,25 +59,22 @@ const Home = () => {
         subtitle: s.subtitle
       }))
     : fallbackSlides;
+  const pageContent = previewContent || content;
 
   return (
     <Box overflow="hidden">
-      <Banner
+      <div id="home-hero"><Banner
         slides={activeSlides}
-        buttons={[
-          { text: "REAL ESTATE", link: "/realEstate" },
-          { text: "PROJECT", link: "/projects" },
-          { text: "LAND WANTED", link: "/landWanted" },
-        ]}
-      />
-      <About />
-      <Consortium />
-      <Testimonials />
-      <Project />
-      <Gallery />
-      <Meeting />
-      <Partners />
-      <Contact />
+        buttons={pageContent.heroButtons}
+      /></div>
+      <About content={pageContent.about} />
+      <Consortium content={pageContent.featured} />
+      <div id="home-investment"><Testimonials content={pageContent.investment} /></div>
+      <div id="home-project-overview"><Project content={pageContent.projectOverview} /></div>
+      <div id="home-gallery"><Gallery homeContent={pageContent.gallery} /></div>
+      <div id="home-meeting"><Meeting content={pageContent.meeting} /></div>
+      <Partners title={pageContent.partnersTitle} />
+      <Contact content={pageContent.contact} />
     </Box>
   );
 };

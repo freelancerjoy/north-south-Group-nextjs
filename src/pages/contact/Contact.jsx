@@ -5,7 +5,7 @@ import { toast } from "react-toastify";
 import { useContactStore } from "../../store/contact/contactStore";
 import { useContactInfoStore } from "../../store/contactInfo/contactInfoStore";
 
-export default function Contact() {
+export default function Contact({ content }) {
   const { addContact, isLoading } = useContactStore();
   const { contactInfo, loadContactInfo } = useContactInfoStore();
 
@@ -92,15 +92,14 @@ export default function Contact() {
             className="uppercase tracking-widest text-xs font-bold mb-3"
             style={{ color: "#0f7771" }}
           >
-            Contact Us
+            {content.eyebrow}
           </p>
           <h2 className="text-3xl md:text-4xl lg:text-5xl font-bold text-white mb-4">
-            Let&apos;s Start a{" "}
-            <span style={{ color: "#0f7771" }}>Conversation</span>
+            {content.titleBeforeAccent}{" "}
+            <span style={{ color: "#0f7771" }}>{content.titleAccent}</span>
           </h2>
           <p className="text-gray-400 text-sm max-w-md mx-auto leading-relaxed">
-            We&apos;re open for any suggestion or just to have a chat. Reach out and
-            we&apos;ll get back to you as soon as possible.
+            {content.description}
           </p>
         </div>
 
@@ -113,7 +112,7 @@ export default function Contact() {
             className="rounded-2xl border border-white/10 p-8 backdrop-blur-sm"
             style={{ background: "rgba(255,255,255,0.03)" }}
           >
-            <h3 className="text-white text-xl font-semibold mb-6">Schedule a Meeting</h3>
+            <h3 className="text-white text-xl font-semibold mb-6">{content.formTitle}</h3>
             <form onSubmit={handleSubmit} className="flex flex-col gap-4">
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <div className="flex flex-col gap-1.5">
@@ -184,7 +183,7 @@ export default function Contact() {
                   background: "linear-gradient(135deg, #0f7771 0%, #0a2a66 100%)",
                 }}
               >
-                {isLoading ? "Sending..." : "Send Message →"}
+                {isLoading ? content.sendingLabel : content.submitLabel}
               </button>
             </form>
           </div>
