@@ -521,7 +521,19 @@ export default function ProjectsPage() {
     return ["Location", ...Array.from(new Set(locations))];
   }, [allProjects]);
 
-  const heroSlides = LUXURY_SHOWCASE_SLIDES;
+  const heroSlides = useMemo(() => {
+    const projectList = Array.isArray(projects) ? projects : [];
+
+    if (!projectList.length) return LUXURY_SHOWCASE_SLIDES;
+
+    return projectList.map((project) => ({
+      title: project?.title || "North South Project",
+      subtitle: project?.status || "North South Group",
+      caption: getDescription(project),
+      image: getProjectImage(project),
+      source: "project",
+    }));
+  }, [projects]);
 
   useEffect(() => {
     if (currentHero >= heroSlides.length) setCurrentHero(0);
@@ -606,7 +618,7 @@ export default function ProjectsPage() {
                 {heroSlides[currentHero]?.subtitle}
               </p>
 
-              <h1 className="max-w-4xl text-[34px] font-semibold leading-[0.98] tracking-[-0.04em] text-white sm:text-5xl md:text-6xl lg:text-7xl xl:text-[82px] 2xl:text-[90px]">
+              <h1 className="max-w-4xl text-[30px] font-semibold leading-[1.02] tracking-[-0.035em] text-white sm:text-[42px] md:text-5xl lg:text-6xl xl:text-[70px] 2xl:text-[76px]">
                 {heroSlides[currentHero]?.title}
               </h1>
 
