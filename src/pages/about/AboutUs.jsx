@@ -34,6 +34,7 @@ import { usePartnerStore } from "../../store/partners/partnersStore";
 
 const MotionDiv = motion.div;
 const MotionImg = motion.img;
+const MotionSpan = motion.span;
 
 const strengthIcons = {
   FaBuilding,
@@ -44,6 +45,7 @@ const strengthIcons = {
 
 const defaultStrengthIconList = [FaBuilding, FaLeaf, FaShieldAlt, FaHandshake];
 const statIcons = [FaAward, FaCity, FaBuilding, FaCompass];
+const purposeIcons = [FaCompass, HiOutlineChartBar, HiOutlineShieldCheck];
 
 /*
  * DAILY ADIN MEDIA ARCHIVE
@@ -199,15 +201,12 @@ export default function AboutUs({ previewData = null }) {
   const [selectedLeader, setSelectedLeader] = useState(null);
   const [selectedGalleryItem, setSelectedGalleryItem] = useState(null);
   const [selectedGalleryItems, setSelectedGalleryItems] = useState([]);
+  const leadershipSectionRef = useRef(null);
   const leadershipScrollRef = useRef(null);
-
-  const handleLeadershipWheel = (e) => {
-    if (leadershipScrollRef.current) {
-      if (Math.abs(e.deltaY) > Math.abs(e.deltaX)) {
-        leadershipScrollRef.current.scrollLeft += e.deltaY;
-      }
-    }
-  };
+  const leadershipTrackRef = useRef(null);
+  const [leadershipOffset, setLeadershipOffset] = useState(0);
+  const [leadershipScrollDistance, setLeadershipScrollDistance] = useState(0);
+  const [isMobileLeadership, setIsMobileLeadership] = useState(false);
 
   const { aboutContent, loadAboutContent } = useAboutStore();
   const { partners, loadPartners } = usePartnerStore();
@@ -338,6 +337,48 @@ export default function AboutUs({ previewData = null }) {
 
 
   const managementTeam = sortedLeaders;
+
+  useEffect(() => {
+    let frameId = null;
+
+    const updateLeadershipScroll = () => {
+      if (frameId) cancelAnimationFrame(frameId);
+      frameId = requestAnimationFrame(() => {
+        const section = leadershipSectionRef.current;
+        const viewport = leadershipScrollRef.current;
+        const track = leadershipTrackRef.current;
+        if (!section || !viewport || !track) return;
+
+        const isMobile = window.innerWidth < 640;
+        setIsMobileLeadership(isMobile);
+
+        if (isMobile) {
+          setLeadershipScrollDistance(0);
+          setLeadershipOffset(0);
+          return;
+        }
+
+        const maxOffset = Math.max(0, track.scrollWidth - viewport.clientWidth + 28);
+        const scrollDistance = maxOffset;
+        const scrollRange = Math.max(1, scrollDistance);
+        const progress = Math.min(1, Math.max(0, -section.getBoundingClientRect().top / scrollRange));
+        setLeadershipScrollDistance((current) =>
+          Math.abs(current - scrollDistance) > 1 ? scrollDistance : current
+        );
+        setLeadershipOffset(progress * maxOffset);
+      });
+    };
+
+    updateLeadershipScroll();
+    window.addEventListener("scroll", updateLeadershipScroll, { passive: true });
+    window.addEventListener("resize", updateLeadershipScroll);
+
+    return () => {
+      if (frameId) cancelAnimationFrame(frameId);
+      window.removeEventListener("scroll", updateLeadershipScroll);
+      window.removeEventListener("resize", updateLeadershipScroll);
+    };
+  }, [managementTeam.length]);
 
   const workspaceGallery = Array.isArray(data.officeGalleryImages) && data.officeGalleryImages.length > 0
     ? data.officeGalleryImages
@@ -1040,9 +1081,25 @@ export default function AboutUs({ previewData = null }) {
       </section> 
 
       {/* ================================================================ MANAGEMENT */}
-      <section id="leadership" className="relative bg-[#F6FAF7] py-16 sm:py-20 lg:py-24">
-        <div className="pointer-events-none absolute -left-28 top-24 h-72 w-72 rounded-full bg-emerald-100/55 blur-3xl" />
-        <div className="pointer-events-none absolute -right-28 bottom-12 h-80 w-80 rounded-full bg-green-100/45 blur-3xl" />
+      <section
+        id="leadership"
+        ref={leadershipSectionRef}
+        className="relative bg-[#F6FAF7]"
+        style={{
+          minHeight: isMobileLeadership
+            ? "auto"
+            : `calc(100svh + ${leadershipScrollDistance}px)`,
+        }}
+      >
+        <div
+          className={`${
+            isMobileLeadership
+              ? "relative min-h-0"
+              : "sticky top-0 min-h-[100svh] justify-center overflow-hidden"
+          } flex flex-col py-10 sm:py-16 lg:py-20`}
+        >
+          <div className="pointer-events-none absolute -left-28 top-24 h-72 w-72 rounded-full bg-emerald-100/55 blur-3xl" />
+          <div className="pointer-events-none absolute -right-28 bottom-12 h-80 w-80 rounded-full bg-green-100/45 blur-3xl" />
 
         {/* Header — padded container aligned to match cards */}
         <div className="relative px-4 sm:px-6 lg:px-10 xl:px-14">
@@ -1059,16 +1116,16 @@ export default function AboutUs({ previewData = null }) {
 
               <h2 className="font-about-display mt-3 max-w-3xl text-3xl font-medium tracking-[-0.04em] text-slate-950 sm:text-4xl lg:text-5xl">
                 {(data.leadershipTitle || "Board of Directors").split(" ").map((word, wi) => (
-                  <MotionDiv
+                  <MotionSpan
                     key={wi}
                     initial={{ opacity: 0, y: 18, filter: "blur(4px)" }}
                     whileInView={{ opacity: 1, y: 0, filter: "blur(0px)" }}
-                    viewport={{ once: true }}
+                    viewport={{ once: false, amount: 0.6 }}
                     transition={{ duration: 0.45, delay: 0.15 + wi * 0.1 }}
                     className="inline-block mr-[0.25em]"
                   >
                     {word}
-                  </MotionDiv>
+                  </MotionSpan>
                 ))}
               </h2>
             </div>
@@ -1089,10 +1146,21 @@ export default function AboutUs({ previewData = null }) {
         {/* Scroll row — direct child of section, full viewport width, no bottom scrollbar */}
         <div
           ref={leadershipScrollRef}
-          onWheel={handleLeadershipWheel}
-          className="relative overflow-x-auto scrollbar-hide scroll-smooth pb-4 px-4 sm:px-6 lg:px-10 xl:px-14"
+          className={`${
+            isMobileLeadership
+              ? "touch-pan-x snap-x snap-mandatory overflow-x-auto overscroll-x-contain scroll-smooth scrollbar-hide"
+              : "overflow-hidden"
+          } relative pb-4 px-4 sm:px-6 lg:px-10 xl:px-14`}
         >
-          <div className="flex gap-3 sm:gap-3.5 min-w-max">
+          <div
+            ref={leadershipTrackRef}
+            className="flex min-w-max gap-5 will-change-transform sm:gap-6 lg:gap-7"
+            style={{
+              transform: isMobileLeadership
+                ? "none"
+                : `translate3d(-${leadershipOffset}px, 0, 0)`,
+            }}
+          >
             {managementTeam.map((leader, index) => (
               <MotionDiv
                 key={leader.id || `${leader.name}-${index}`}
@@ -1100,7 +1168,7 @@ export default function AboutUs({ previewData = null }) {
                 whileInView={{ opacity: 1, y: 0, scale: 1 }}
                 viewport={{ once: true, margin: "-50px" }}
                 transition={{ duration: 0.55, delay: index * 0.08 }}
-                className="w-[200px] sm:w-[220px] md:w-[235px] lg:w-[245px] shrink-0"
+                className="w-[200px] shrink-0 snap-start sm:w-[220px] md:w-[235px] lg:w-[245px]"
               >
                 <button
                   type="button"
@@ -1128,6 +1196,7 @@ export default function AboutUs({ previewData = null }) {
               </MotionDiv>
             ))}
           </div>
+        </div>
         </div>
       </section>
 
@@ -1288,34 +1357,67 @@ export default function AboutUs({ previewData = null }) {
       )}
 
       {/* ================================================================ MISSION */}
-      <section id="about-mission" className="bg-white py-16 sm:py-20 lg:py-24">
-        <div className="mx-auto max-w-[1540px] px-4 sm:px-6 lg:px-10 xl:px-14">
-          <div className="mb-10">
+      <section id="about-mission" className="bg-white py-16 sm:py-20 lg:py-28">
+        <div className="mx-auto grid max-w-[1540px] gap-10 px-4 sm:px-6 lg:grid-cols-[0.7fr_1.3fr] lg:gap-16 lg:px-10 xl:px-14">
+          <MotionDiv
+            initial={{ opacity: 0, x: -24 }}
+            whileInView={{ opacity: 1, x: 0 }}
+            viewport={{ once: true, amount: 0.4 }}
+            transition={{ duration: 0.6 }}
+            className="lg:sticky lg:top-28 lg:self-start"
+          >
             <SectionEyebrow>{data.missionEyebrow}</SectionEyebrow>
-            <PremiumHeading className="max-w-3xl">{data.missionTitle}</PremiumHeading>
-          </div>
+            <PremiumHeading className="max-w-xl">{data.missionTitle}</PremiumHeading>
+            <p className="mt-5 max-w-md text-sm leading-7 text-slate-500 sm:text-base sm:leading-8">
+              The principles that shape our work, guide our decisions, and define the value we create for every client.
+            </p>
+            <div className="mt-8 flex items-center gap-3">
+              <span className="h-2.5 w-2.5 rounded-full bg-emerald-600" />
+              <span className="h-px w-20 bg-emerald-200" />
+              <span className="text-[9px] font-bold uppercase tracking-[0.22em] text-emerald-700">
+                North South Group
+              </span>
+            </div>
+          </MotionDiv>
 
-          <div className="grid gap-4 md:grid-cols-3">
-            {data.missionCards.map((card, index) => (
-              <article
-                key={card.title}
-                className="group rounded-[24px] border border-emerald-100 bg-[#F8FBF8] p-5 transition hover:border-emerald-300 hover:bg-white hover:shadow-[0_18px_50px_rgba(15,76,58,0.09)] sm:p-6 lg:p-7"
-              >
-                <div className="flex items-center justify-between">
-                  <span className="grid h-10 w-10 place-items-center rounded-full bg-emerald-800 text-white">
-                    <FaCheckCircle className="text-sm" />
-                  </span>
-                  <span className="font-mono text-[10px] tracking-[0.16em] text-slate-300">
-                    {String(index + 1).padStart(2, "0")}
-                  </span>
-                </div>
+          <div className="overflow-hidden rounded-[26px] border border-emerald-100 bg-[#F8FBF8] sm:rounded-[32px]">
+            {data.missionCards.map((card, index) => {
+              const PurposeIcon = purposeIcons[index % purposeIcons.length];
 
-                <h3 className="mt-7 font-about-display text-2xl font-semibold text-slate-950">
-                  {card.title}
-                </h3>
-                <p className="mt-4 text-sm leading-7 text-slate-500">{card.text}</p>
-              </article>
-            ))}
+              return (
+                <MotionDiv
+                  key={card.title}
+                  initial={{ opacity: 0, y: 22 }}
+                  whileInView={{ opacity: 1, y: 0 }}
+                  viewport={{ once: true, amount: 0.45 }}
+                  transition={{ duration: 0.5, delay: index * 0.08 }}
+                >
+                  <article className={`${index > 0 ? "border-t border-emerald-100" : ""} group grid gap-5 p-5 transition-colors duration-300 hover:bg-white sm:p-7 md:grid-cols-[64px_0.62fr_1fr] md:items-center md:gap-7 lg:p-8`}>
+                    <div className="flex items-center justify-between md:block">
+                      <span className="grid h-12 w-12 place-items-center rounded-full border border-emerald-200 bg-white text-emerald-800 shadow-[0_8px_22px_rgba(6,78,59,0.07)] transition duration-300 group-hover:border-emerald-700 group-hover:bg-emerald-800 group-hover:text-white sm:h-14 sm:w-14">
+                        <PurposeIcon className="text-lg sm:text-xl" />
+                      </span>
+                      <span className="font-mono text-[10px] font-semibold tracking-[0.2em] text-emerald-700/45 md:hidden">
+                        {String(index + 1).padStart(2, "0")}
+                      </span>
+                    </div>
+
+                    <div>
+                      <span className="hidden font-mono text-[9px] font-semibold tracking-[0.2em] text-emerald-700/40 md:block">
+                        / {String(index + 1).padStart(2, "0")}
+                      </span>
+                      <h3 className="mt-1 font-about-display text-2xl font-semibold tracking-[-0.03em] text-slate-950 sm:text-3xl">
+                        {card.title}
+                      </h3>
+                    </div>
+
+                    <p className="text-sm leading-7 text-slate-500 sm:text-[15px] sm:leading-8">
+                      {card.text}
+                    </p>
+                  </article>
+                </MotionDiv>
+              );
+            })}
           </div>
         </div>
       </section>
