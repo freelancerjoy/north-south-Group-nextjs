@@ -337,6 +337,8 @@ export default function AboutUs({ previewData = null }) {
 
 
   const managementTeam = sortedLeaders;
+  const leadershipCardCount = Math.max(1, managementTeam.length);
+  const visibleLeadershipCardCount = Math.min(6, leadershipCardCount);
 
   useEffect(() => {
     let frameId = null;
@@ -358,8 +360,10 @@ export default function AboutUs({ previewData = null }) {
           return;
         }
 
-        const maxOffset = Math.max(0, track.scrollWidth - viewport.clientWidth + 28);
-        const scrollDistance = maxOffset;
+        const maxOffset = Math.max(0, track.scrollWidth - viewport.clientWidth);
+        // Keep enough vertical travel for the horizontal reveal without making
+        // this sticky section excessively tall on very wide/zoomed-out screens.
+        const scrollDistance = Math.min(maxOffset, 520);
         const scrollRange = Math.max(1, scrollDistance);
         const progress = Math.min(1, Math.max(0, -section.getBoundingClientRect().top / scrollRange));
         setLeadershipScrollDistance((current) =>
@@ -1168,12 +1172,18 @@ export default function AboutUs({ previewData = null }) {
                 whileInView={{ opacity: 1, y: 0, scale: 1 }}
                 viewport={{ once: true, margin: "-50px" }}
                 transition={{ duration: 0.55, delay: index * 0.08 }}
-                className="w-[200px] shrink-0 snap-start sm:w-[220px] md:w-[235px] lg:w-[245px]"
+                className="shrink-0 snap-start"
+                style={{
+                  width: isMobileLeadership
+                    ? "min(78vw, 220px)"
+                    : `max(245px, calc((100vw - 7rem - ${(visibleLeadershipCardCount - 1) * 28}px) / ${visibleLeadershipCardCount}))`,
+                  aspectRatio: isMobileLeadership ? "220 / 340" : "245 / 405",
+                }}
               >
                 <button
                   type="button"
                   onClick={() => setSelectedLeader(leader)}
-                  className="group relative h-[340px] sm:h-[375px] lg:h-[405px] w-full overflow-hidden rounded-[20px] bg-[#E9F3EC] text-left shadow-[0_16px_36px_rgba(15,76,58,0.08)] ring-1 ring-emerald-100 transition-all duration-500 hover:-translate-y-1.5 hover:shadow-[0_28px_60px_rgba(15,76,58,0.14)] hover:ring-emerald-300"
+                  className="group relative h-full w-full overflow-hidden rounded-[20px] bg-[#E9F3EC] text-left shadow-[0_16px_36px_rgba(15,76,58,0.08)] ring-1 ring-emerald-100 transition-all duration-500 hover:-translate-y-1.5 hover:shadow-[0_28px_60px_rgba(15,76,58,0.14)] hover:ring-emerald-300"
                   aria-label={`View profile of ${leader.name}`}
                 >
                   <img
