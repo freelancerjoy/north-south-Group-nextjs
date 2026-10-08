@@ -204,9 +204,7 @@ export default function AboutUs({ previewData = null }) {
   const leadershipSectionRef = useRef(null);
   const leadershipScrollRef = useRef(null);
   const leadershipTrackRef = useRef(null);
-  const [leadershipOffset, setLeadershipOffset] = useState(0);
-  const [leadershipScrollDistance, setLeadershipScrollDistance] = useState(0);
-  const [isMobileLeadership, setIsMobileLeadership] = useState(false);
+  const leadershipDragRef = useRef({ active: false, startX: 0, startScrollLeft: 0 });
 
   const { aboutContent, loadAboutContent } = useAboutStore();
   const { partners, loadPartners } = usePartnerStore();
@@ -337,52 +335,35 @@ export default function AboutUs({ previewData = null }) {
 
 
   const managementTeam = sortedLeaders;
-  const leadershipCardCount = Math.max(1, managementTeam.length);
-  const visibleLeadershipCardCount = Math.min(6, leadershipCardCount);
 
-  useEffect(() => {
-    let frameId = null;
+  const handleLeadershipPointerDown = (event) => {
+    const viewport = leadershipScrollRef.current;
+    if (!viewport) return;
 
-    const updateLeadershipScroll = () => {
-      if (frameId) cancelAnimationFrame(frameId);
-      frameId = requestAnimationFrame(() => {
-        const section = leadershipSectionRef.current;
-        const viewport = leadershipScrollRef.current;
-        const track = leadershipTrackRef.current;
-        if (!section || !viewport || !track) return;
-
-        const isMobile = window.innerWidth < 640;
-        setIsMobileLeadership(isMobile);
-
-        if (isMobile) {
-          setLeadershipScrollDistance(0);
-          setLeadershipOffset(0);
-          return;
-        }
-
-        const maxOffset = Math.max(0, track.scrollWidth - viewport.clientWidth);
-        // Keep enough vertical travel for the horizontal reveal without making
-        // this sticky section excessively tall on very wide/zoomed-out screens.
-        const scrollDistance = Math.min(maxOffset, 520);
-        const scrollRange = Math.max(1, scrollDistance);
-        const progress = Math.min(1, Math.max(0, -section.getBoundingClientRect().top / scrollRange));
-        setLeadershipScrollDistance((current) =>
-          Math.abs(current - scrollDistance) > 1 ? scrollDistance : current
-        );
-        setLeadershipOffset(progress * maxOffset);
-      });
+    leadershipDragRef.current = {
+      active: true,
+      startX: event.clientX,
+      startScrollLeft: viewport.scrollLeft,
     };
+    viewport.setPointerCapture?.(event.pointerId);
+  };
 
-    updateLeadershipScroll();
-    window.addEventListener("scroll", updateLeadershipScroll, { passive: true });
-    window.addEventListener("resize", updateLeadershipScroll);
+  const handleLeadershipPointerMove = (event) => {
+    const viewport = leadershipScrollRef.current;
+    const drag = leadershipDragRef.current;
+    if (!viewport || !drag.active) return;
 
-    return () => {
-      if (frameId) cancelAnimationFrame(frameId);
-      window.removeEventListener("scroll", updateLeadershipScroll);
-      window.removeEventListener("resize", updateLeadershipScroll);
-    };
-  }, [managementTeam.length]);
+    const distance = event.clientX - drag.startX;
+    if (Math.abs(distance) > 4) viewport.classList.add("cursor-grabbing");
+    viewport.scrollLeft = drag.startScrollLeft - distance;
+  };
+
+  const handleLeadershipPointerUp = (event) => {
+    const viewport = leadershipScrollRef.current;
+    leadershipDragRef.current.active = false;
+    viewport?.releasePointerCapture?.(event.pointerId);
+    viewport?.classList.remove("cursor-grabbing");
+  };
 
   const workspaceGallery = Array.isArray(data.officeGalleryImages) && data.officeGalleryImages.length > 0
     ? data.officeGalleryImages
@@ -1089,18 +1070,9 @@ export default function AboutUs({ previewData = null }) {
         id="leadership"
         ref={leadershipSectionRef}
         className="relative bg-[#F6FAF7]"
-        style={{
-          minHeight: isMobileLeadership
-            ? "auto"
-            : `calc(100svh + ${leadershipScrollDistance}px)`,
-        }}
       >
         <div
-          className={`${
-            isMobileLeadership
-              ? "relative min-h-0"
-              : "sticky top-0 min-h-[100svh] justify-center overflow-hidden"
-          } flex flex-col py-10 sm:py-16 lg:py-20`}
+          className="relative flex flex-col py-10 sm:py-16 lg:py-20"
         >
           <div className="pointer-events-none absolute -left-28 top-24 h-72 w-72 rounded-full bg-emerald-100/55 blur-3xl" />
           <div className="pointer-events-none absolute -right-28 bottom-12 h-80 w-80 rounded-full bg-green-100/45 blur-3xl" />
@@ -1147,23 +1119,18 @@ export default function AboutUs({ previewData = null }) {
           </div>
         </div>
 
-        {/* Scroll row — direct child of section, full viewport width, no bottom scrollbar */}
+        {/* Drag/swipe row — page scrolling never moves the cards automatically */}
         <div
           ref={leadershipScrollRef}
-          className={`${
-            isMobileLeadership
-              ? "touch-pan-x snap-x snap-mandatory overflow-x-auto overscroll-x-contain scroll-smooth scrollbar-hide"
-              : "overflow-hidden"
-          } relative pb-4 px-4 sm:px-6 lg:px-10 xl:px-14`}
+          onPointerDown={handleLeadershipPointerDown}
+          onPointerMove={handleLeadershipPointerMove}
+          onPointerUp={handleLeadershipPointerUp}
+          onPointerCancel={handleLeadershipPointerUp}
+          className="relative cursor-grab touch-pan-x select-none overflow-x-auto overscroll-x-contain scroll-smooth scrollbar-hide px-4 pb-4 sm:px-6 lg:px-10 xl:px-14"
         >
           <div
             ref={leadershipTrackRef}
             className="flex min-w-max gap-5 will-change-transform sm:gap-6 lg:gap-7"
-            style={{
-              transform: isMobileLeadership
-                ? "none"
-                : `translate3d(-${leadershipOffset}px, 0, 0)`,
-            }}
           >
             {managementTeam.map((leader, index) => (
               <MotionDiv
@@ -1172,13 +1139,7 @@ export default function AboutUs({ previewData = null }) {
                 whileInView={{ opacity: 1, y: 0, scale: 1 }}
                 viewport={{ once: true, margin: "-50px" }}
                 transition={{ duration: 0.55, delay: index * 0.08 }}
-                className="shrink-0 snap-start"
-                style={{
-                  width: isMobileLeadership
-                    ? "min(78vw, 220px)"
-                    : `max(245px, calc((100vw - 7rem - ${(visibleLeadershipCardCount - 1) * 28}px) / ${visibleLeadershipCardCount}))`,
-                  aspectRatio: isMobileLeadership ? "220 / 340" : "245 / 405",
-                }}
+                className="w-[min(78vw,220px)] shrink-0 snap-start aspect-[220/340] sm:w-[250px] lg:w-[280px] xl:w-[300px]"
               >
                 <button
                   type="button"
