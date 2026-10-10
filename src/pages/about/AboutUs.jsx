@@ -340,6 +340,14 @@ export default function AboutUs({ previewData = null }) {
     const viewport = leadershipScrollRef.current;
     if (!viewport) return;
 
+    const target = event.target;
+    const isInteractiveChild = target instanceof HTMLElement && target.closest("button, a, input, textarea, select, [role='button']");
+
+    if (isInteractiveChild) {
+      leadershipDragRef.current = { active: false, startX: 0, startScrollLeft: viewport.scrollLeft };
+      return;
+    }
+
     leadershipDragRef.current = {
       active: true,
       startX: event.clientX,
