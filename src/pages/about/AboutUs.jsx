@@ -1087,7 +1087,7 @@ export default function AboutUs({ previewData = null }) {
 
         {/* Header — padded container aligned to match cards */}
         <div className="relative px-4 sm:px-6 lg:px-10 xl:px-14">
-          <div className="mb-9 grid gap-6 lg:grid-cols-[1fr_0.82fr] lg:items-end">
+          <div className="mb-9 grid min-h-[150px] gap-6 lg:grid-cols-[1fr_0.82fr] lg:items-center">
             <div>
               <MotionDiv
                 initial={{ opacity: 0, x: -20 }}
@@ -1138,7 +1138,7 @@ export default function AboutUs({ previewData = null }) {
         >
           <div
             ref={leadershipTrackRef}
-            className="flex min-w-max gap-5 will-change-transform sm:gap-6 lg:gap-7"
+            className="mx-auto flex w-max gap-5 will-change-transform sm:gap-6 lg:gap-7"
           >
             {managementTeam.map((leader, index) => (
               <MotionDiv
@@ -1147,7 +1147,7 @@ export default function AboutUs({ previewData = null }) {
                 whileInView={{ opacity: 1, y: 0, scale: 1 }}
                 viewport={{ once: true, margin: "-50px" }}
                 transition={{ duration: 0.55, delay: index * 0.08 }}
-                className="w-[min(70vw,180px)] shrink-0 snap-start aspect-[180/285] sm:w-[210px] lg:w-[230px] xl:w-[245px]"
+                className="w-[min(58vw,135px)] shrink-0 snap-start aspect-[135/210] sm:w-[155px] lg:w-[175px] xl:w-[190px]"
               >
                 <button
                   type="button"
@@ -1162,12 +1162,12 @@ export default function AboutUs({ previewData = null }) {
                   />
                   <div className="absolute inset-0 bg-gradient-to-t from-emerald-950/76 via-emerald-950/8 to-transparent" />
                   <div className="pointer-events-none absolute inset-3 rounded-[15px] border border-white/18 opacity-65 transition-all duration-500 group-hover:inset-3.5 group-hover:border-emerald-200/90 group-hover:opacity-100 sm:inset-4 sm:rounded-[16px]" />
-                  <div className="absolute inset-x-0 bottom-0 z-20 p-4 sm:p-5">
-                    <p className="text-[7px] font-extrabold uppercase tracking-[0.18em] text-emerald-200 sm:text-[8px]">{leader.role}</p>
-                    <h3 className="mt-1.5 font-about-display text-lg font-semibold leading-tight text-white drop-shadow-sm sm:text-xl lg:text-[22px]">{leader.name}</h3>
-                    <div className="mt-3 flex items-center gap-2">
+                   <div className="absolute inset-x-0 bottom-0 z-20 p-2 sm:p-3">
+                     <p className="text-[5px] font-extrabold uppercase tracking-[0.1em] text-emerald-200 sm:text-[6px]">{leader.role}</p>
+                     <h3 className="mt-0.5 font-about-display text-sm font-semibold leading-tight text-white drop-shadow-sm sm:text-base lg:text-lg">{leader.name}</h3>
+                     <div className="mt-1.5 flex items-center gap-1">
                       <span className="h-px w-7 bg-emerald-300/90 transition-all duration-500 group-hover:w-11" />
-                      <span className="text-[6px] font-bold uppercase tracking-[0.15em] text-white/72 sm:text-[7px]">View Profile</span>
+                       <span className="text-[4px] font-bold uppercase tracking-[0.1em] text-white/72 sm:text-[5px]">View Profile</span>
                     </div>
                   </div>
                   <div className="pointer-events-none absolute inset-x-0 bottom-0 h-[2px] origin-left scale-x-0 bg-emerald-300 transition-transform duration-500 group-hover:scale-x-100" />

@@ -144,6 +144,7 @@ const Gallery = ({ homeContent }) => {
   const { pathname } = useLocation();
   const navigate = useNavigate();
   const isGalleryPage = pathname === "/gallery" || pathname === "/adminDashboard/gallery";
+  const isAdminGalleryPage = pathname === "/adminDashboard/gallery";
 
   useEffect(() => {
     if (isGalleryPage) loadHomeContent().catch(() => {});
@@ -231,7 +232,7 @@ const Gallery = ({ homeContent }) => {
       </section>
       )}
 
-      {isGalleryPage && (
+      {isAdminGalleryPage && (
         <section className="border-b border-emerald-100 bg-emerald-50 px-4 py-5 sm:px-6 lg:px-8">
           <div className="mx-auto flex max-w-7xl flex-col gap-3 rounded-2xl border border-emerald-200 bg-white p-4 shadow-sm md:flex-row md:items-center md:justify-between">
             <div>
