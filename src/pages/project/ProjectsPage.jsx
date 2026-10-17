@@ -536,9 +536,7 @@ export default function ProjectsPage() {
   const heroSlides = useMemo(() => {
     const projectList = Array.isArray(projects) ? projects : [];
 
-    if (!projectList.length) return LUXURY_SHOWCASE_SLIDES;
-
-    return projectList.flatMap((project) =>
+    const uploadedProjectSlides = projectList.flatMap((project) =>
       getProjectSliderImages(project).map((image, imageIndex) => ({
         title: project?.title || "North South Project",
         subtitle: project?.status || "North South Group",
@@ -548,6 +546,11 @@ export default function ProjectsPage() {
         imageIndex,
       }))
     );
+
+    // Keep the curated Cloudinary showcase in the hero even when the API
+    // returns projects. Previously it was discarded as soon as one project
+    // existed, which made the uploaded showcase images disappear on live.
+    return [...LUXURY_SHOWCASE_SLIDES, ...uploadedProjectSlides];
   }, [projects]);
 
   useEffect(() => {
