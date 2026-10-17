@@ -1077,17 +1077,17 @@ export default function AboutUs({ previewData = null }) {
       <section
         id="leadership"
         ref={leadershipSectionRef}
-        className="relative bg-[#F6FAF7]"
+        className="relative bg-[#F6FAF7] overflow-hidden"
       >
         <div
-          className="relative flex flex-col py-10 sm:py-16 lg:py-20"
+          className="relative w-full flex flex-col py-10 sm:py-16 lg:py-20 px-4 sm:px-6 lg:px-8 xl:px-10 2xl:px-14"
         >
           <div className="pointer-events-none absolute -left-28 top-24 h-72 w-72 rounded-full bg-emerald-100/55 blur-3xl" />
           <div className="pointer-events-none absolute -right-28 bottom-12 h-80 w-80 rounded-full bg-green-100/45 blur-3xl" />
 
-        {/* Header — padded container aligned to match cards */}
-        <div className="relative px-4 sm:px-6 lg:px-10 xl:px-14">
-          <div className="mb-9 grid min-h-[150px] gap-6 lg:grid-cols-[1fr_0.82fr] lg:items-center">
+        {/* Header — aligned with cards */}
+        <div className="relative w-full max-w-[1360px] mx-auto mb-8 lg:mb-10">
+          <div className="grid gap-6 lg:grid-cols-[1fr_0.82fr] lg:items-end">
             <div>
               <MotionDiv
                 initial={{ opacity: 0, x: -20 }}
@@ -1127,50 +1127,50 @@ export default function AboutUs({ previewData = null }) {
           </div>
         </div>
 
-        {/* Drag/swipe row — page scrolling never moves the cards automatically */}
+        {/* Full-width Cards Track: 7 columns across on desktop, smooth swipeable on mobile */}
         <div
           ref={leadershipScrollRef}
           onPointerDown={handleLeadershipPointerDown}
           onPointerMove={handleLeadershipPointerMove}
           onPointerUp={handleLeadershipPointerUp}
           onPointerCancel={handleLeadershipPointerUp}
-          className="relative cursor-grab touch-pan-x select-none overflow-x-auto overscroll-x-contain scroll-smooth scrollbar-hide px-4 pb-4 sm:px-6 lg:px-10 xl:px-14"
+          className="relative w-full cursor-grab touch-pan-x select-none overflow-x-auto lg:overflow-visible overscroll-x-contain scrollbar-hide pb-4 pt-2"
         >
           <div
             ref={leadershipTrackRef}
-            className="mx-auto flex w-max gap-5 will-change-transform sm:gap-6 lg:gap-7"
+            className="flex min-w-max lg:min-w-0 lg:w-full max-w-[1360px] mx-auto lg:grid lg:grid-cols-7 gap-3 sm:gap-4 lg:gap-3.5 xl:gap-4 will-change-transform py-2"
           >
             {managementTeam.map((leader, index) => (
               <MotionDiv
                 key={leader.id || `${leader.name}-${index}`}
-                initial={{ opacity: 0, y: 30, scale: 0.97 }}
+                initial={{ opacity: 0, y: 24, scale: 0.98 }}
                 whileInView={{ opacity: 1, y: 0, scale: 1 }}
-                viewport={{ once: true, margin: "-50px" }}
-                transition={{ duration: 0.55, delay: index * 0.08 }}
-                className="w-[min(58vw,135px)] shrink-0 snap-start aspect-[135/210] sm:w-[155px] lg:w-[175px] xl:w-[190px]"
+                viewport={{ once: true, margin: "-40px" }}
+                transition={{ duration: 0.5, delay: index * 0.05 }}
+                className="w-[165px] sm:w-[180px] lg:w-full shrink-0 lg:shrink aspect-[175/270]"
               >
                 <button
                   type="button"
                   onClick={() => setSelectedLeader(leader)}
-                  className="group relative h-full w-full overflow-hidden rounded-[20px] bg-[#E9F3EC] text-left shadow-[0_16px_36px_rgba(15,76,58,0.08)] ring-1 ring-emerald-100 transition-all duration-500 hover:-translate-y-1.5 hover:shadow-[0_28px_60px_rgba(15,76,58,0.14)] hover:ring-emerald-300"
+                  className="group relative h-full w-full overflow-hidden rounded-[18px] bg-[#EAF2EC] text-left shadow-[0_10px_24px_rgba(15,76,58,0.07)] border border-emerald-100/90 transition-all duration-500 hover:-translate-y-1.5 hover:shadow-[0_20px_42px_rgba(15,76,58,0.14)] hover:border-emerald-300"
                   aria-label={`View profile of ${leader.name}`}
                 >
                   <img
                     src={leader.img}
                     alt={leader.name}
-                    className="absolute inset-0 h-full w-full object-cover object-top scale-[0.93] transition duration-[1000ms] ease-out group-hover:scale-[1.0]"
+                    className="absolute inset-0 h-full w-full object-cover object-top transition duration-[800ms] ease-out group-hover:scale-[1.03]"
                   />
-                  <div className="absolute inset-0 bg-gradient-to-t from-emerald-950/76 via-emerald-950/8 to-transparent" />
-                  <div className="pointer-events-none absolute inset-3 rounded-[15px] border border-white/18 opacity-65 transition-all duration-500 group-hover:inset-3.5 group-hover:border-emerald-200/90 group-hover:opacity-100 sm:inset-4 sm:rounded-[16px]" />
-                   <div className="absolute inset-x-0 bottom-0 z-20 p-2 sm:p-3">
-                     <p className="text-[5px] font-extrabold uppercase tracking-[0.1em] text-emerald-200 sm:text-[6px]">{leader.role}</p>
-                     <h3 className="mt-0.5 font-about-display text-sm font-semibold leading-tight text-white drop-shadow-sm sm:text-base lg:text-lg">{leader.name}</h3>
-                     <div className="mt-1.5 flex items-center gap-1">
-                      <span className="h-px w-7 bg-emerald-300/90 transition-all duration-500 group-hover:w-11" />
-                       <span className="text-[4px] font-bold uppercase tracking-[0.1em] text-white/72 sm:text-[5px]">View Profile</span>
+                  <div className="absolute inset-0 bg-gradient-to-t from-emerald-950/95 via-emerald-950/40 via-30% to-transparent to-60%" />
+                  <div className="pointer-events-none absolute inset-2 rounded-[14px] border border-white/20 opacity-70 transition-all duration-500 group-hover:border-emerald-200/90 group-hover:opacity-100" />
+                  <div className="absolute inset-x-0 bottom-0 z-20 p-2.5 sm:p-3">
+                    <p className="text-[7px] font-extrabold uppercase tracking-[0.16em] text-emerald-300 sm:text-[7.5px] truncate drop-shadow-sm">{leader.role}</p>
+                    <h3 className="mt-0.5 font-about-display text-[12px] sm:text-[13px] font-semibold leading-tight text-white drop-shadow-sm line-clamp-2">{leader.name}</h3>
+                    <div className="mt-1.5 flex items-center gap-1.5">
+                      <span className="h-px w-4 bg-emerald-300/90 transition-all duration-500 group-hover:w-6" />
+                      <span className="text-[6px] font-bold uppercase tracking-[0.14em] text-white/80 group-hover:text-emerald-200 sm:text-[6.5px]">View Profile</span>
                     </div>
                   </div>
-                  <div className="pointer-events-none absolute inset-x-0 bottom-0 h-[2px] origin-left scale-x-0 bg-emerald-300 transition-transform duration-500 group-hover:scale-x-100" />
+                  <div className="pointer-events-none absolute inset-x-0 bottom-0 h-[2px] origin-left scale-x-0 bg-gradient-to-r from-emerald-400 to-teal-300 transition-transform duration-500 group-hover:scale-x-100" />
                 </button>
               </MotionDiv>
             ))}
