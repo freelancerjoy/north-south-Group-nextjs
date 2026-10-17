@@ -19,6 +19,7 @@ import {
   MdChevronRight,
   MdViewCarousel,
   MdWeb,
+  MdPhotoLibrary,
 } from "react-icons/md";
 import { FaLeaf, FaCity, FaIndustry } from "react-icons/fa";
 
@@ -80,6 +81,12 @@ const navSections = [
         to: "homePageSettings",
         icon: <MdWeb size={20} />,
         match: ["homePageSettings"],
+      },
+      {
+        label: "Gallery",
+        to: "gallery",
+        icon: <MdPhotoLibrary size={20} />,
+        match: ["/gallery", "adminDashboard/gallery"],
       },
       {
         label: "Commercial Project",

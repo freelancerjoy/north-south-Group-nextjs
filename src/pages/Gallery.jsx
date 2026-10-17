@@ -1,6 +1,10 @@
 import { useEffect, useMemo, useState } from "react";
 import { FiArrowLeft, FiArrowRight, FiCamera, FiGrid, FiMaximize2, FiX } from "react-icons/fi";
-import { Link, useLocation } from "react-router-dom";
+import { Link, useLocation, useNavigate } from "react-router-dom";
+import { toast } from "react-toastify";
+import { useAuthStore } from "../store/auth/authStore";
+import { useHomeContentStore } from "../store/homeContent/homeContentStore";
+import { uploadFiles, getUploadErrorMessage } from "../utils/cloudinaryUpload";
 import gallery1 from "../assets/images/gallery1.jpg";
 import gallery2 from "../assets/images/gallery2.jpg";
 import gallery3 from "../assets/images/gallery3.jpg";
@@ -108,25 +112,42 @@ export const defaultGalleryAlbums = [
 ];
 
 const Gallery = ({ homeContent }) => {
+  const { user } = useAuthStore();
+  const { content: storedContent, loadHomeContent, updateHomeContent } = useHomeContentStore();
+  const isAdmin = user?.role === "admin";
   const albums = useMemo(() => {
-    const configured = Array.isArray(homeContent?.albums) ? homeContent.albums : [];
+    const configured = Array.isArray(homeContent?.albums)
+      ? homeContent.albums
+      : Array.isArray(storedContent?.gallery?.albums)
+        ? storedContent.gallery.albums
+        : [];
     return defaultGalleryAlbums.map((defaultAlbum) => {
       const savedAlbum = configured.find((album) => album.id === defaultAlbum.id);
       if (!savedAlbum) return defaultAlbum;
+      const savedImages = Array.isArray(savedAlbum.images) ? savedAlbum.images : [];
+      const images = [...defaultAlbum.images, ...savedImages].filter((image, index, collection) => {
+        const key = image?.src || image?.url || image?.id;
+        return key && collection.findIndex((candidate) => (candidate?.src || candidate?.url || candidate?.id) === key) === index;
+      });
       return {
         ...defaultAlbum,
         ...savedAlbum,
-        images: Array.isArray(savedAlbum.images) && savedAlbum.images.length
-          ? savedAlbum.images
-          : defaultAlbum.images,
+        images,
       };
     });
-  }, [homeContent?.albums]);
+  }, [homeContent?.albums, storedContent?.gallery?.albums]);
   const [activeAlbumId, setActiveAlbumId] = useState(defaultGalleryAlbums[0].id);
   const [selectedIndex, setSelectedIndex] = useState(null);
   const [homeSlideIndex, setHomeSlideIndex] = useState(0);
+  const [uploadAlbumId, setUploadAlbumId] = useState("northsouth");
+  const [uploading, setUploading] = useState(false);
   const { pathname } = useLocation();
-  const isGalleryPage = pathname === "/gallery";
+  const navigate = useNavigate();
+  const isGalleryPage = pathname === "/gallery" || pathname === "/adminDashboard/gallery";
+
+  useEffect(() => {
+    if (isGalleryPage) loadHomeContent().catch(() => {});
+  }, [isGalleryPage, loadHomeContent]);
   const homeSlides = useMemo(
     () =>
       albums.flatMap((album) =>
@@ -167,6 +188,21 @@ const Gallery = ({ homeContent }) => {
     setSelectedIndex((current) =>
       current === activeAlbum.images.length - 1 ? 0 : current + 1
     );
+  const selectedSavedAlbum = (storedContent?.gallery?.albums || []).find((album) => album.id === uploadAlbumId);
+  const removeUploadedImage = async (image) => {
+    if (!isAdmin || !selectedSavedAlbum) return;
+    const currentContent = storedContent || {};
+    const nextAlbums = (currentContent.gallery?.albums || []).map((album) => {
+      if (album.id !== uploadAlbumId) return album;
+      return { ...album, images: (album.images || []).filter((item) => item.src !== image.src) };
+    });
+    try {
+      await updateHomeContent({ ...currentContent, gallery: { ...(currentContent.gallery || {}), albums: nextAlbums } });
+      toast.success("Image removed from the gallery.");
+    } catch (error) {
+      toast.error(getUploadErrorMessage(error));
+    }
+  };
 
   const galleryContent = (
     <>
@@ -193,6 +229,71 @@ const Gallery = ({ homeContent }) => {
           </div>
         </div>
       </section>
+      )}
+
+      {isGalleryPage && (
+        <section className="border-b border-emerald-100 bg-emerald-50 px-4 py-5 sm:px-6 lg:px-8">
+          <div className="mx-auto flex max-w-7xl flex-col gap-3 rounded-2xl border border-emerald-200 bg-white p-4 shadow-sm md:flex-row md:items-center md:justify-between">
+            <div>
+              <p className="text-xs font-black uppercase tracking-[0.2em] text-emerald-700">Gallery upload</p>
+              <p className="mt-1 text-sm text-slate-600">{isAdmin ? "Upload images directly to Cloudinary and save them to this gallery." : "Admin login is required to upload and manage gallery images."}</p>
+            </div>
+            <div className="flex flex-col gap-2 sm:flex-row">
+              <select value={uploadAlbumId} onChange={(event) => setUploadAlbumId(event.target.value)} className="rounded-lg border border-slate-200 bg-white px-3 py-2 text-sm font-semibold text-slate-700">
+                {albums.map((album) => <option key={album.id} value={album.id}>{album.title}</option>)}
+              </select>
+              <label className={`inline-flex cursor-pointer items-center justify-center rounded-lg bg-emerald-700 px-4 py-2 text-xs font-black uppercase tracking-[0.12em] text-white hover:bg-emerald-800 ${uploading ? "pointer-events-none opacity-60" : ""}`}>
+                {uploading ? "Uploading..." : isAdmin ? "Upload images" : "Login to upload"}
+                <input type="file" accept="image/*" multiple className="hidden" disabled={uploading} onChange={async (event) => {
+                  if (!isAdmin) {
+                    event.target.value = "";
+                    navigate("/login");
+                    return;
+                  }
+                  const files = Array.from(event.target.files || []);
+                  if (!files.length) return;
+                  setUploading(true);
+                  try {
+                    const urls = await uploadFiles(files, `home/gallery/${uploadAlbumId}`);
+                    const currentContent = storedContent || {};
+                    const savedAlbums = Array.isArray(currentContent.gallery?.albums) ? currentContent.gallery.albums : [];
+                    const baseAlbum = albums.find((album) => album.id === uploadAlbumId) || defaultGalleryAlbums[0];
+                    const existing = savedAlbums.find((album) => album.id === uploadAlbumId);
+                    const preservedImages = existing?.images?.length ? existing.images : baseAlbum.images;
+                    const nextImages = [...preservedImages, ...urls.map((src, index) => ({ id: `${uploadAlbumId}-cloud-${Date.now()}-${index}`, src, alt: `${baseAlbum.title} ${index + 1}` }))].filter((image, index, collection) => {
+                      const key = image?.src || image?.url || image?.id;
+                      return key && collection.findIndex((candidate) => (candidate?.src || candidate?.url || candidate?.id) === key) === index;
+                    });
+                    const nextAlbum = {
+                      ...baseAlbum,
+                      ...(existing || {}),
+                      images: nextImages,
+                    };
+                    await updateHomeContent({ ...currentContent, gallery: { ...(currentContent.gallery || {}), albums: [...savedAlbums.filter((album) => album.id !== uploadAlbumId), nextAlbum] } });
+                    toast.success(`${urls.length} image(s) uploaded successfully.`);
+                  } catch (error) {
+                    toast.error(getUploadErrorMessage(error));
+                  } finally {
+                    setUploading(false);
+                    event.target.value = "";
+                  }
+                }} />
+              </label>
+            </div>
+            {isAdmin && selectedSavedAlbum?.images?.length ? (
+              <div className="mt-3 grid grid-cols-2 gap-3 border-t border-slate-100 pt-3 sm:grid-cols-4 lg:grid-cols-8">
+                {selectedSavedAlbum.images.map((image) => (
+                  <div key={image.id || image.src} className="group relative overflow-hidden rounded-lg border border-slate-200 bg-slate-100">
+                    <img src={image.src} alt={image.alt || "Uploaded gallery image"} className="aspect-square w-full object-cover" />
+                    <button type="button" onClick={() => removeUploadedImage(image)} className="absolute inset-x-1 bottom-1 rounded bg-rose-600/95 px-1 py-1 text-[10px] font-bold uppercase text-white opacity-0 transition group-hover:opacity-100">Delete</button>
+                  </div>
+                ))}
+              </div>
+            ) : isAdmin ? (
+              <p className="mt-3 border-t border-slate-100 pt-3 text-xs text-slate-500">No uploaded database images in this album yet. Default static images remain protected.</p>
+            ) : null}
+          </div>
+        </section>
       )}
 
       {!isGalleryPage && (

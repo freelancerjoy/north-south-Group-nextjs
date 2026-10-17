@@ -336,6 +336,7 @@ function App({ scaling }) {
                 />
                 <Route path="footerSettings" element={<FooterSettings />} />
                 <Route path="homePageSettings" element={<HomePageSettings />} />
+                <Route path="gallery" element={<Gallery />} />
                 <Route
                   path="updateContact/:id"
                   element={<UpdateContact />}

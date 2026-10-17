@@ -84,9 +84,13 @@ export default function HomePageSettings() {
       setForm((current) => {
         const savedAlbums = Array.isArray(current.gallery.albums) ? current.gallery.albums : [];
         const existing = savedAlbums.find((album) => album.id === "northsouth");
+        const preservedImages = existing?.images?.length ? existing.images : base.images;
         const nextAlbum = {
           ...(existing || { id: base.id, title: base.title, homeTitle: base.homeTitle, label: base.label, description: base.description }),
-          images: [...(existing?.images || []), ...urls.map((src, index) => ({ id: `cloud-${Date.now()}-${index}`, src, alt: "North South Gallery" }))],
+          images: [...preservedImages, ...urls.map((src, index) => ({ id: `cloud-${Date.now()}-${index}`, src, alt: "North South Gallery" }))].filter((image, index, collection) => {
+            const key = image?.src || image?.url || image?.id;
+            return key && collection.findIndex((candidate) => (candidate?.src || candidate?.url || candidate?.id) === key) === index;
+          }),
         };
         return { ...current, gallery: { ...current.gallery, albums: [...savedAlbums.filter((album) => album.id !== "northsouth"), nextAlbum] } };
       });
