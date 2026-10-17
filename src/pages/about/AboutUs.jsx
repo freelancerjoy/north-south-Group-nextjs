@@ -1139,7 +1139,7 @@ export default function AboutUs({ previewData = null }) {
                 whileInView={{ opacity: 1, y: 0, scale: 1 }}
                 viewport={{ once: true, margin: "-50px" }}
                 transition={{ duration: 0.55, delay: index * 0.08 }}
-                className="w-[min(78vw,220px)] shrink-0 snap-start aspect-[220/340] sm:w-[250px] lg:w-[280px] xl:w-[300px]"
+                className="w-[min(70vw,180px)] shrink-0 snap-start aspect-[180/285] sm:w-[210px] lg:w-[230px] xl:w-[245px]"
               >
                 <button
                   type="button"

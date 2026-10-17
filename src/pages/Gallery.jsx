@@ -74,7 +74,7 @@ const makeAssetImages = (id, images, altPrefix) =>
     alt: `${altPrefix} ${index + 1}`,
   }));
 
-const albums = [
+export const defaultGalleryAlbums = [
   {
     id: "northsouth",
     title: "Northsouth Group",
@@ -108,7 +108,21 @@ const albums = [
 ];
 
 const Gallery = ({ homeContent }) => {
-  const [activeAlbumId, setActiveAlbumId] = useState(albums[0].id);
+  const albums = useMemo(() => {
+    const configured = Array.isArray(homeContent?.albums) ? homeContent.albums : [];
+    return defaultGalleryAlbums.map((defaultAlbum) => {
+      const savedAlbum = configured.find((album) => album.id === defaultAlbum.id);
+      if (!savedAlbum) return defaultAlbum;
+      return {
+        ...defaultAlbum,
+        ...savedAlbum,
+        images: Array.isArray(savedAlbum.images) && savedAlbum.images.length
+          ? savedAlbum.images
+          : defaultAlbum.images,
+      };
+    });
+  }, [homeContent?.albums]);
+  const [activeAlbumId, setActiveAlbumId] = useState(defaultGalleryAlbums[0].id);
   const [selectedIndex, setSelectedIndex] = useState(null);
   const [homeSlideIndex, setHomeSlideIndex] = useState(0);
   const { pathname } = useLocation();
@@ -122,7 +136,7 @@ const Gallery = ({ homeContent }) => {
           title: album.homeTitle,
         }))
       ),
-    []
+    [albums]
   );
   const activeHomeSlide = homeSlides[homeSlideIndex];
 
@@ -137,7 +151,7 @@ const Gallery = ({ homeContent }) => {
 
   const activeAlbum = useMemo(
     () => albums.find((album) => album.id === activeAlbumId) || albums[0],
-    [activeAlbumId]
+    [activeAlbumId, albums]
   );
 
   const selectedImage =

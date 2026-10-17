@@ -1,10 +1,11 @@
 import { useEffect, useMemo, useRef, useState } from "react";
-import { MdAdd, MdDelete, MdDragIndicator, MdSave } from "react-icons/md";
+import { MdAdd, MdCloudUpload, MdDelete, MdDragIndicator, MdSave } from "react-icons/md";
 import { toast } from "react-toastify";
 import Home from "../Home";
+import { defaultGalleryAlbums } from "../Gallery";
 import { useHomeContentStore } from "../../store/homeContent/homeContentStore";
 import { mergeHomeContent } from "../home/defaultHomeContent";
-import { getUploadErrorMessage, uploadSingle } from "../../utils/cloudinaryUpload";
+import { getUploadErrorMessage, uploadFiles, uploadSingle } from "../../utils/cloudinaryUpload";
 
 const input = "w-full rounded-lg border border-slate-200 bg-white px-3 py-2 text-sm outline-none focus:border-teal-500";
 const sections = { hero: "Hero buttons", about: "About", featured: "Featured projects", investment: "Investment insight", projectOverview: "Project overview", gallery: "Gallery", meeting: "Meeting form", partners: "Partners", contact: "Contact" };
@@ -47,6 +48,8 @@ export default function HomePageSettings() {
   const [form, setForm] = useState(() => mergeHomeContent(content));
   const [active, setActive] = useState("hero");
   const [saving, setSaving] = useState(false);
+  const [galleryUploadBusy, setGalleryUploadBusy] = useState(false);
+  const [galleryImportBusy, setGalleryImportBusy] = useState(false);
   const [previewScale, setPreviewScale] = useState(0.5);
   const previewViewportRef = useRef(null);
 
@@ -71,6 +74,50 @@ export default function HomePageSettings() {
     catch (error) { toast.error(error?.response?.data?.message || "Failed to update home page"); }
     finally { setSaving(false); }
   };
+  const uploadGalleryImages = async (event) => {
+    const files = Array.from(event.target.files || []);
+    if (!files.length) return;
+    setGalleryUploadBusy(true);
+    try {
+      const urls = await uploadFiles(files, "home/gallery");
+      const base = defaultGalleryAlbums.find((album) => album.id === "northsouth");
+      setForm((current) => {
+        const savedAlbums = Array.isArray(current.gallery.albums) ? current.gallery.albums : [];
+        const existing = savedAlbums.find((album) => album.id === "northsouth");
+        const nextAlbum = {
+          ...(existing || { id: base.id, title: base.title, homeTitle: base.homeTitle, label: base.label, description: base.description }),
+          images: [...(existing?.images || []), ...urls.map((src, index) => ({ id: `cloud-${Date.now()}-${index}`, src, alt: "North South Gallery" }))],
+        };
+        return { ...current, gallery: { ...current.gallery, albums: [...savedAlbums.filter((album) => album.id !== "northsouth"), nextAlbum] } };
+      });
+      toast.success(`${urls.length} image(s) uploaded. Save changes to publish them.`);
+    } catch (error) {
+      toast.error(getUploadErrorMessage(error));
+    } finally {
+      setGalleryUploadBusy(false);
+      event.target.value = "";
+    }
+  };
+  const importStaticGallery = async () => {
+    setGalleryImportBusy(true);
+    try {
+      const uploadedAlbums = await Promise.all(defaultGalleryAlbums.map(async (album) => {
+        const files = await Promise.all(album.images.map(async (image, index) => {
+          const response = await fetch(image.src);
+          const blob = await response.blob();
+          return new File([blob], `${album.id}-${index}.jpg`, { type: blob.type || "image/jpeg" });
+        }));
+        const urls = await uploadFiles(files, `home/gallery/${album.id}`);
+        return { ...album, images: urls.map((src, index) => ({ id: `${album.id}-cloud-${index}`, src, alt: `${album.title} ${index + 1}` })) };
+      }));
+      setForm((current) => ({ ...current, gallery: { ...current.gallery, albums: uploadedAlbums } }));
+      toast.success("Current gallery images uploaded to Cloudinary. Save changes to publish them.");
+    } catch (error) {
+      toast.error(getUploadErrorMessage(error));
+    } finally {
+      setGalleryImportBusy(false);
+    }
+  };
   const field = (section, label, key, area = false) => <label className="block space-y-1"><span className="text-[11px] font-bold uppercase tracking-wide text-slate-500">{label}</span>{area ? <textarea className={`${input} min-h-24 resize-y`} value={form[section][key] || ""} onChange={(event) => setSection(section, key, event.target.value)} /> : <input className={input} value={form[section][key] || ""} onChange={(event) => setSection(section, key, event.target.value)} />}</label>;
 
   let controls;
@@ -79,7 +126,25 @@ export default function HomePageSettings() {
   if (active === "featured") controls = <div className="space-y-4">{field("featured", "Eyebrow", "eyebrow")}{field("featured", "Title line 1", "titleLineOne")}{field("featured", "Title line 2", "titleLineTwo")}{field("featured", "Button label", "buttonLabel")}</div>;
   if (active === "investment") controls = <div className="space-y-4">{field("investment", "Eyebrow", "eyebrow")}{field("investment", "Title line 1", "titleLineOne")}{field("investment", "Title line 2", "titleLineTwo")}{field("investment", "Heading", "heading")}{field("investment", "Description", "text", true)}{field("investment", "Author", "author")}{field("investment", "Author role", "authorRole")}<VideoField value={form.investment.videoUrl} onChange={(value) => setSection("investment", "videoUrl", value)} />{field("investment", "Or paste video URL", "videoUrl")}<MediaField label="Video poster" value={form.investment.posterUrl} folder="home/investment" onChange={(value) => setSection("investment", "posterUrl", value)} /></div>;
   if (active === "projectOverview") controls = <div className="space-y-4">{field("projectOverview", "Title", "title")}<MediaField label="Background image" value={form.projectOverview.backgroundUrl} folder="home/project-overview" onChange={(value) => setSection("projectOverview", "backgroundUrl", value)} />{form.projectOverview.cards.map((card, index) => <div key={index} className="space-y-2 rounded-xl border border-slate-200 p-3"><select className={input} value={card.icon} onChange={(event) => setSection("projectOverview", "cards", form.projectOverview.cards.map((item, i) => i === index ? { ...item, icon: event.target.value } : item))}><option value="hotel">Hotel icon</option><option value="land">Land icon</option><option value="flat">Building icon</option></select><input className={input} value={card.title} onChange={(event) => setSection("projectOverview", "cards", form.projectOverview.cards.map((item, i) => i === index ? { ...item, title: event.target.value } : item))} /><textarea className={`${input} min-h-20`} value={card.text} onChange={(event) => setSection("projectOverview", "cards", form.projectOverview.cards.map((item, i) => i === index ? { ...item, text: event.target.value } : item))} /></div>)}</div>;
-  if (active === "gallery") controls = <div className="space-y-4">{field("gallery", "Eyebrow", "eyebrow")}{field("gallery", "Title", "title")}{field("gallery", "View albums label", "buttonLabel")}{field("gallery", "Description", "description", true)}{field("gallery", "Gallery badge", "badge")}{field("gallery", "Open eyebrow", "openEyebrow")}{field("gallery", "Open title", "openTitle")}{field("gallery", "Explore label", "exploreLabel")}{field("gallery", "Album label", "albumLabel")}</div>;
+  if (active === "gallery") {
+    const galleryAlbums = Array.isArray(form.gallery.albums) ? form.gallery.albums : [];
+    const northSouthAlbum = galleryAlbums.find((album) => album.id === "northsouth");
+    controls = <div className="space-y-4">
+      {field("gallery", "Eyebrow", "eyebrow")}{field("gallery", "Title", "title")}{field("gallery", "View albums label", "buttonLabel")}{field("gallery", "Description", "description", true)}{field("gallery", "Gallery badge", "badge")}{field("gallery", "Open eyebrow", "openEyebrow")}{field("gallery", "Open title", "openTitle")}{field("gallery", "Explore label", "exploreLabel")}{field("gallery", "Album label", "albumLabel")}
+      <div className="rounded-xl border border-dashed border-teal-300 bg-teal-50 p-3">
+        <p className="text-xs font-black uppercase tracking-wide text-teal-800">Visual Diary images</p>
+        <p className="mt-1 text-[11px] leading-4 text-teal-700">Upload images to Cloudinary. They will be stored in the database and shown on the Home page and Gallery page.</p>
+        <label className="mt-3 flex cursor-pointer items-center justify-center gap-2 rounded-lg bg-teal-700 px-3 py-2 text-xs font-bold text-white hover:bg-teal-800">
+          <MdCloudUpload />{galleryUploadBusy ? "Uploading..." : "Upload images"}
+          <input type="file" accept="image/*" multiple className="hidden" disabled={galleryUploadBusy} onChange={uploadGalleryImages} />
+        </label>
+        <button type="button" onClick={importStaticGallery} disabled={galleryImportBusy || galleryUploadBusy} className="mt-2 flex w-full items-center justify-center gap-2 rounded-lg border border-teal-300 bg-white px-3 py-2 text-xs font-bold text-teal-800 disabled:opacity-60">
+          <MdCloudUpload />{galleryImportBusy ? "Importing current images..." : "Import current static images to Cloudinary"}
+        </button>
+        {northSouthAlbum?.images?.length ? <p className="mt-2 text-[10px] font-semibold text-teal-700">{northSouthAlbum.images.length} uploaded image(s) ready to save.</p> : null}
+      </div>
+    </div>;
+  }
   if (active === "meeting") controls = <div className="space-y-4">{field("meeting", "Title", "title")}<MediaField label="Meeting image" value={form.meeting.imageUrl} folder="home/meeting" onChange={(value) => setSection("meeting", "imageUrl", value)} />{field("meeting", "Name label", "fullNameLabel")}{field("meeting", "Name placeholder", "fullNamePlaceholder")}{field("meeting", "Phone label", "phoneLabel")}{field("meeting", "Phone placeholder", "phonePlaceholder")}{field("meeting", "Address label", "addressLabel")}{field("meeting", "Address placeholder", "addressPlaceholder")}{field("meeting", "Submit label", "submitLabel")}{field("meeting", "Sending label", "sendingLabel")}</div>;
   if (active === "partners") controls = <label className="block space-y-1"><span className="text-[11px] font-bold uppercase tracking-wide text-slate-500">Section title</span><input className={input} value={form.partnersTitle || ""} onChange={(event) => setForm((current) => ({ ...current, partnersTitle: event.target.value }))} /></label>;
   if (active === "contact") controls = <div className="space-y-4">{field("contact", "Eyebrow", "eyebrow")}{field("contact", "Title", "titleBeforeAccent")}{field("contact", "Accent title", "titleAccent")}{field("contact", "Description", "description", true)}{field("contact", "Form title", "formTitle")}{field("contact", "Submit label", "submitLabel")}{field("contact", "Sending label", "sendingLabel")}</div>;

@@ -30,6 +30,7 @@ export const defaultHomeContent = {
     description: "Explore our corporate activities, press coverage, and event memories through a refined album experience.",
     badge: "Auto Changing Gallery", openEyebrow: "Tap to open full album", openTitle: "North South Gallery",
     exploreLabel: "Explore", albumLabel: "Open Gallery",
+    albums: [],
   },
   meeting: {
     title: "Schedule a Meeting", imageUrl: "", fullNameLabel: "Full Name*", fullNamePlaceholder: "Enter your full name",
