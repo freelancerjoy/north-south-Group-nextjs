@@ -437,6 +437,18 @@ const getProjectImage = (project) =>
   project?.galleryImages?.find(Boolean) ||
   fallbackImage;
 
+const getProjectSliderImages = (project) => {
+  const uploadedSlides = Array.isArray(project?.slideImage)
+    ? project.slideImage.filter(Boolean)
+    : [];
+  if (uploadedSlides.length) return uploadedSlides;
+
+  const projectImages = Array.isArray(project?.image)
+    ? project.image.filter(Boolean)
+    : [];
+  return projectImages.length ? projectImages : [getProjectImage(project)];
+};
+
 const getDescription = (project) =>
   project?.description?.shortOverview ||
   project?.description?.generalFeature ||
@@ -526,13 +538,16 @@ export default function ProjectsPage() {
 
     if (!projectList.length) return LUXURY_SHOWCASE_SLIDES;
 
-    return projectList.map((project) => ({
-      title: project?.title || "North South Project",
-      subtitle: project?.status || "North South Group",
-      caption: getDescription(project),
-      image: getProjectImage(project),
-      source: "project",
-    }));
+    return projectList.flatMap((project) =>
+      getProjectSliderImages(project).map((image, imageIndex) => ({
+        title: project?.title || "North South Project",
+        subtitle: project?.status || "North South Group",
+        caption: getDescription(project),
+        image,
+        source: "project",
+        imageIndex,
+      }))
+    );
   }, [projects]);
 
   useEffect(() => {
