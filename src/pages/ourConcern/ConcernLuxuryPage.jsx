@@ -57,11 +57,15 @@ export default function ConcernLuxuryPage({
   statementTitle = "A stronger future.\nBeautifully considered.",
   statementEyebrow = "Purpose, precision, and long-term value",
   galleryTitle,
+  curatedMedia = false,
   sections = [],
 }) {
   const fallbackHero = heroImage || services[0]?.image || aboutImage;
-  const slides = [...new Set([...heroSliderImages, fallbackHero, aboutImage, ...services.map((item) => item.image)].filter(Boolean))].slice(0, 6);
-  const gallery = [...new Set([...galleryImages, ...slides, ...services.map((item) => item.image)].filter(Boolean))].slice(0, 8);
+  const serviceImages = services.map((item) => item.image);
+  const heroSources = curatedMedia ? [fallbackHero] : [...heroSliderImages, fallbackHero, aboutImage, ...serviceImages];
+  const slides = [...new Set(heroSources.filter(Boolean))].slice(0, 6);
+  const gallerySources = curatedMedia ? galleryImages : [...galleryImages, ...slides, ...serviceImages];
+  const gallery = [...new Set(gallerySources.filter(Boolean))].slice(0, 8);
   const cards = services.length ? services : highlights.slice(0, 3);
   const detailItems = highlights.length ? highlights : processItems.map((text, index) => ({ title: `Step ${index + 1}`, text }));
   const [current, setCurrent] = useState(0);

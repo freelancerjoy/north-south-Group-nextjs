@@ -11,6 +11,7 @@ import OptimizedImage from "../../components/OptimizedImage";
 import ConcernLogo, { getOfficialConcern, includeOfficialConcerns } from "../../components/ConcernLogo";
 import { LUXURY_SHOWCASE_SLIDES, getProjectSliderImages } from "./projectHeroImages";
 import { useProjectStore } from "../../store/project/projectStore";
+import { useConcernStore } from "../../store/concern/concernStore";
 import { useMenuStore } from "../../store/menu/menuStore";
 import { entityId, projectDetailsPath } from "../../utils/entity";
 import fallbackImage from "../../assets/images/bannerProjectImg2.jpg";
@@ -18,18 +19,16 @@ import landImage from "../../assets/images/land1.jpg";
 import commercialImage from "../../assets/images/bannerProjectImg1.jpg";
 import duplexImage from "../../assets/images/duplex.jpg";
 import condominiumImage from "../../assets/images/realEstateImg3.jpg";
-import greenCityImage from "../../assets/images/greenCityImg1.jpg";
-import squareCityImage from "../../assets/images/greenCityImg4.jpg";
-import industrialCityImage from "../../assets/images/greenCityImg2.jpg";
-import titanicBayImage from "../../assets/images/heroTitanicBay.jpg";
-import { getDefaultConcern } from "../ourConcern/defaultConcernData";
+import { isTitanicBay, projectImageKey, TITANIC_BAY_PATH, titanicBayMedia } from "./projectMedia";
+import { DUPLEX_HOME_PATH, DUPLEX_HOME_SLUG, MAYALOK_RESORT_PATH, MAYALOK_RESORT_SLUG, getDefaultConcern } from "../ourConcern/defaultConcernData";
 
 const fallbackProjects = [
   {
     _id: "titanic-bay-project",
     title: "Titanic Bay Hotel & Resort Ltd.",
     status: "upcoming",
-    image: [fallbackImage],
+    image: [titanicBayMedia.heroImage],
+    to: TITANIC_BAY_PATH,
     description: {
       generalFeature:
         "A premium hotel and resort opportunity planned around hospitality, leisure, and long-term investment value.",
@@ -42,11 +41,16 @@ const fallbackProjects = [
   },
 ];
 
+const greenCityImage = "https://res.cloudinary.com/dpsjkcaa/image/upload/v1795086879/WhatsApp_Image_2025-07-24_at_16.46.17_035faa7a_-_Copy.jpg";
+const industrialCityImage = "https://res.cloudinary.com/dpsjkcaa/image/upload/v1795086595/IMG-20241204-WA0062.jpg";
+const squareCityImage = "https://res.cloudinary.com/dpsjkcaa/image/upload/v1795086492/DJI_0723.jpg";
+
+const duplexConcern = { label: "North South Duplex Home", to: DUPLEX_HOME_PATH };
+
+const mayalokConcern = { label: "Mayalok Resort", to: MAYALOK_RESORT_PATH };
+
 const projectDirectoryFallbacks = [
-  {
-    label: "Mayalok Resort",
-    to: "/aboutUs",
-  },
+  mayalokConcern,
   {
     label: "Northsouth Garments",
     to: "/northsouthGarments",
@@ -63,10 +67,7 @@ const projectDirectoryFallbacks = [
     label: "Northsouth Industrial City",
     to: "/industrialCity",
   },
-  {
-    label: "North South Duplex Home",
-    to: "/conceptDetails",
-  },
+  duplexConcern,
   {
     label: "Northsouth Green City Ltd.",
     to: "/greenCity",
@@ -99,10 +100,7 @@ const projectDirectoryFallbacks = [
 ];
 
 const directoryImageRules = [
-  { pattern: /green city/i, image: greenCityImage },
-  { pattern: /square city/i, image: squareCityImage },
-  { pattern: /industrial city/i, image: industrialCityImage },
-  { pattern: /titanic/i, image: titanicBayImage },
+  { pattern: /titanic/i, image: titanicBayMedia.heroImage },
   { pattern: /green city/i, image: landImage },
   { pattern: /square city/i, image: landImage },
   { pattern: /industrial city|building construction/i, image: commercialImage },
@@ -116,6 +114,7 @@ const routeSlugMap = {
   "/northsouthconsortiumltd": "north-south-consortium-ltd",
   "/purbachalnirapadvalley": "purbachal-nirapad-valley",
   "/conceptdetails": "concept-details",
+  "/northsouthduplexhome": "concept-details",
   "/northsouthfarmsltd": "northsouth-farms-ltd",
   "/northsouthgarments": "northsouth-garments",
   "/northsouthtourstravels": "northsouth-tours-travels",
@@ -128,6 +127,7 @@ const labelSlugMap = {
   "north south consortium ltd.": "north-south-consortium-ltd",
   "purbachal nirapad valley": "purbachal-nirapad-valley",
   "nirapad valley condominium project": "purbachal-nirapad-valley",
+  "mayalok resort": MAYALOK_RESORT_SLUG,
   "northsouth duplex home": "concept-details",
   "north south duplex home": "concept-details",
   "northsouth farms ltd.": "northsouth-farms-ltd",
@@ -143,12 +143,35 @@ const normalizeRouteKey = (value = "") => String(value || "").trim().toLowerCase
 
 const getDirectorySlug = (item = {}, label = "") => {
   const route = normalizeRouteKey(item.to || item.routePath || "");
+  if (/^\/mayalok(?:%20|[ -])resort$/.test(route)) return MAYALOK_RESORT_SLUG;
   if (route.startsWith("/concern/")) return route.split("/concern/")[1];
   return item.concernSlug || routeSlugMap[route] || labelSlugMap[normalizeRouteKey(label)];
 };
 
-const getDirectoryImage = (label = "", item = {}) => {
-  const defaultConcern = getDefaultConcern(getDirectorySlug(item, label));
+const getDirectoryImage = (label = "", item = {}, directoryConcernData) => {
+  const slug = getDirectorySlug(item, label);
+  if (normalizeRouteKey(item.to || item.routePath) === "/squarecity" || /square\s*city/i.test(label)) {
+    return squareCityImage;
+  }
+  if (normalizeRouteKey(item.to || item.routePath) === "/industrialcity" || /industrial\s*city/i.test(label)) {
+    return industrialCityImage;
+  }
+  if (normalizeRouteKey(item.to || item.routePath) === "/greencity" || /green\s*city/i.test(label)) {
+    return greenCityImage;
+  }
+  if (slug === "purbachal-nirapad-valley" || /nirapad\s*valley/i.test(label)) {
+    return "https://res.cloudinary.com/dpsjkcaa/image/upload/v1795087032/491384683_642635775316584_1593527887014774131_n.jpg";
+  }
+  const defaultConcern = getDefaultConcern(slug);
+  if (slug === "concept-details") {
+    const concern = { ...getDefaultConcern(DUPLEX_HOME_SLUG), ...directoryConcernData[DUPLEX_HOME_SLUG] };
+    return concern.heroSliderImages?.find(Boolean) || concern.heroImage ||
+      concern.services?.[0]?.image || concern.aboutImage || duplexImage;
+  }
+  if (slug === MAYALOK_RESORT_SLUG) {
+    const concern = { ...defaultConcern, ...directoryConcernData[MAYALOK_RESORT_SLUG] };
+    return concern.heroSliderImages?.find(Boolean) || concern.heroImage || defaultConcern.heroImage;
+  }
   return (
     defaultConcern?.heroImage ||
     defaultConcern?.aboutImage ||
@@ -211,8 +234,22 @@ const sortDirectoryProjects = (projects = []) =>
     return String(a?.title || "").localeCompare(String(b?.title || ""));
   });
 
-const buildDirectoryProjects = (items = []) => {
-  const sourceItems = Array.isArray(items) && items.length ? items : projectDirectoryFallbacks;
+const buildDirectoryProjects = (items = [], directoryConcernData = {}) => {
+  const menuItems = (Array.isArray(items) && items.length ? items : projectDirectoryFallbacks)
+    .filter((item) => item && normalize(item.label || item.title) !== "duplex project");
+  const isDuplexItem = (item) =>
+    ["concept-details", DUPLEX_HOME_SLUG].includes(getDirectorySlug(item, item.label || item.title));
+  const officialDuplex = menuItems.find((item) =>
+    item.isVisible !== false && normalizeRouteKey(item.to || item.routePath) === normalizeRouteKey(DUPLEX_HOME_PATH)
+  );
+  const officialMayalok = menuItems.find((item) => item.isVisible !== false &&
+    getDirectorySlug(item, item.label || item.title) === MAYALOK_RESORT_SLUG);
+  const sourceItems = [
+    ...menuItems.filter((item) => !isDuplexItem(item) &&
+      getDirectorySlug(item, item.label || item.title) !== MAYALOK_RESORT_SLUG),
+    officialDuplex || duplexConcern,
+    { ...(officialMayalok || mayalokConcern), to: MAYALOK_RESORT_PATH, href: undefined },
+  ];
   const seen = new Set();
   const directoryItems = includeOfficialConcerns(
     sourceItems.filter((item) => item?.isVisible !== false).map((item) => ({
@@ -225,7 +262,7 @@ const buildDirectoryProjects = (items = []) => {
     .filter((item) => !isDailyAdinDirectoryItem(item))
     .map((item, index) => {
       const title = normalizeDirectoryLabel(item.name || "");
-      const key = normalize(title);
+      const key = getDirectorySlug(item, title) === "concept-details" ? "concept-details" : normalize(title);
       if (!title || seen.has(key)) return null;
       seen.add(key);
 
@@ -233,7 +270,7 @@ const buildDirectoryProjects = (items = []) => {
         _id: `directory-${key || index}`,
         title,
         status: "Project Directory",
-        image: [getDirectoryImage(title, item)],
+        image: [getDirectoryImage(title, item, directoryConcernData)],
         to: item.to || (!item.href ? (item.mark ? "/aboutUs#about-concerns" : "/aboutUs") : undefined),
         href: item.href,
         external: item.external,
@@ -251,25 +288,10 @@ const buildDirectoryProjects = (items = []) => {
 
 const featuredCategoryProjects = [
   {
-    _id: "category-land-project",
-    title: "Land Project",
-    status: "Project Category",
-    image: [landImage],
-    to: "/greenCity",
-    description: {
-      generalFeature:
-        "Explore North South Group land developments including Green City, Square City, and Industrial City.",
-    },
-    specs: {
-      address: "Green City, Square City, Industrial City",
-      apartmentSize: "Land Development",
-    },
-  },
-  {
     _id: "category-commercial-project",
     title: "Commercial Project",
     status: "Project Category",
-    image: [commercialImage],
+    image: ["https://images.unsplash.com/photo-1790511808041-9b80fe88efd8?auto=format&fit=crop&w=1100&h=1200&q=85"],
     to: "/commercial-project",
     description: {
       generalFeature:
@@ -278,21 +300,6 @@ const featuredCategoryProjects = [
     specs: {
       address: "Bangladesh",
       apartmentSize: "Commercial",
-    },
-  },
-  {
-    _id: "category-duplex-project",
-    title: "Duplex Project",
-    status: "Project Category",
-    image: [duplexImage],
-    to: "/conceptDetails",
-    description: {
-      generalFeature:
-        "Northsouth Duplex Home brings private residential planning with modern family living in focus.",
-    },
-    specs: {
-      address: "Bangladesh",
-      apartmentSize: "Duplex Residence",
     },
   },
   {
@@ -308,21 +315,6 @@ const featuredCategoryProjects = [
     specs: {
       address: "Purbachal",
       apartmentSize: "Condominium",
-    },
-  },
-  {
-    _id: "category-hotel-project",
-    title: "Hotel Project",
-    status: "Project Category",
-    image: [fallbackImage],
-    href: "https://www.titanicbay.com/",
-    description: {
-      generalFeature:
-        "Titanic Bay Hotel & Resort Ltd. represents the group's hospitality and resort development vision.",
-    },
-    specs: {
-      address: "Bangladesh",
-      apartmentSize: "Hospitality",
     },
   },
 ];
@@ -357,7 +349,7 @@ const getProjectGallery = (project) => {
     .flatMap((item) => (Array.isArray(item) ? item : item ? [item] : []))
     .filter(Boolean)
     .filter((item) => {
-      const key = String(item);
+      const key = projectImageKey(item);
       if (seen.has(key)) return false;
       seen.add(key);
       return true;
@@ -393,6 +385,10 @@ const getLocation = (project) =>
 
 const normalize = (value = "") => String(value || "").trim().toLowerCase();
 
+const isGenericProject = (project) =>
+  ["category-hotel-project", "category-duplex-project", "category-land-project"].includes(entityId(project)) ||
+  ["hotel project", "duplex project", "land project"].includes(normalize(project?.title));
+
 const getProjectLink = (project) => project?.href || project?.to || projectDetailsPath(project);
 
 const isExternalProject = (project) => Boolean(project?.href);
@@ -419,6 +415,8 @@ const uniqueProjects = (projects) => {
 export default function ProjectsPage() {
   const { projects, loadProjects, isLoading } = useProjectStore();
   const { concernMenuItems, loadConcernMenuItems } = useMenuStore();
+  const loadConcernBySlug = useConcernStore((state) => state.loadConcernBySlug);
+  const [directoryConcernData, setDirectoryConcernData] = useState({});
   const [searchParams] = useSearchParams();
   const [status, setStatus] = useState("all");
   const [location, setLocation] = useState("all");
@@ -431,6 +429,18 @@ export default function ProjectsPage() {
   useEffect(() => {
     loadConcernMenuItems();
   }, [loadConcernMenuItems]);
+
+  useEffect(() => {
+    let active = true;
+    for (const slug of [DUPLEX_HOME_SLUG, MAYALOK_RESORT_SLUG]) {
+      loadConcernBySlug(slug).then((concern) => {
+        if (active && concern && concern.isPublished !== false) {
+          setDirectoryConcernData((data) => ({ ...data, [slug]: concern }));
+        }
+      }).catch(() => {});
+    }
+    return () => { active = false; };
+  }, [loadConcernBySlug]);
 
   // Read ?status= from URL and apply as filter, then scroll to grid
   useEffect(() => {
@@ -450,13 +460,25 @@ export default function ProjectsPage() {
 
   const allProjects = useMemo(() => {
     const projectList = Array.isArray(projects) ? projects : [];
-    const hasTitanicBay = projectList.some((project) =>
-      project?.title?.toLowerCase().includes("titanic bay")
+    const titanicProject = projectList.find(isTitanicBay) || fallbackProjects[0];
+    const listedProjects = projectList
+      .filter((project) => !isTitanicBay(project) || project === titanicProject)
+      .map((project) => project === titanicProject
+        ? { ...project, image: [titanicBayMedia.heroImage], href: undefined, to: TITANIC_BAY_PATH }
+        : project);
+    if (titanicProject === fallbackProjects[0]) listedProjects.push(titanicProject);
+
+    const directoryProjects = sortDirectoryProjects(buildDirectoryProjects(concernMenuItems, directoryConcernData))
+      .filter((project) => !isTitanicBay(project));
+    const hasDuplexConcern = directoryProjects.some((project) => entityId(project) === "directory-concept-details");
+    const projectCards = listedProjects.filter((project) =>
+      !hasDuplexConcern || !["concept-details", DUPLEX_HOME_SLUG].includes(getDirectorySlug(project, project?.title))
     );
-    const listedProjects = hasTitanicBay ? projectList : [...projectList, ...fallbackProjects];
-    const directoryProjects = sortDirectoryProjects(buildDirectoryProjects(concernMenuItems));
-    return uniqueProjects([...listedProjects, ...directoryProjects, ...featuredCategoryProjects]);
-  }, [concernMenuItems, projects]);
+    return uniqueProjects(
+      [...projectCards, ...directoryProjects, ...featuredCategoryProjects]
+        .filter((project) => !isGenericProject(project))
+    );
+  }, [concernMenuItems, directoryConcernData, projects]);
 
   const locationOptions = useMemo(() => {
     const locations = allProjects
@@ -469,7 +491,7 @@ export default function ProjectsPage() {
   const heroSlides = useMemo(() => {
     const projectList = Array.isArray(projects) ? projects : [];
 
-    const uploadedProjectSlides = projectList.flatMap((project) =>
+    const uploadedProjectSlides = projectList.filter((project) => !isTitanicBay(project) && !isGenericProject(project)).flatMap((project) =>
       getProjectSliderImages(project).map((image, imageIndex) => ({
         title: project?.title || "North South Project",
         subtitle: project?.status || "North South Group",
@@ -483,7 +505,13 @@ export default function ProjectsPage() {
     // Keep the curated Cloudinary showcase in the hero even when the API
     // returns projects. Previously it was discarded as soon as one project
     // existed, which made the uploaded showcase images disappear on live.
-    return [...LUXURY_SHOWCASE_SLIDES, ...uploadedProjectSlides];
+    const seen = new Set();
+    return [...LUXURY_SHOWCASE_SLIDES, ...uploadedProjectSlides].filter(({ image }) => {
+      const key = projectImageKey(image);
+      if (seen.has(key)) return false;
+      seen.add(key);
+      return true;
+    });
   }, [projects]);
 
   useEffect(() => {

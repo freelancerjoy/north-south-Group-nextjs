@@ -1,3 +1,4 @@
+import { titanicBayMedia } from "../project/projectMedia";
 import ConcernLogo, { getOfficialConcern } from "../../components/ConcernLogo";
 import { useEffect, useState } from "react";
 import Spinner from "../../components/Spinner";
@@ -7,7 +8,7 @@ import FoundationLuxury from "./FoundationLuxury";
 import ConstructionLuxury from "./ConstructionLuxury";
 import MayalokResortLuxury from "./MayalokResortLuxury";
 import ConcernLuxuryPage from "./ConcernLuxuryPage";
-import { getDefaultConcern, hasDefaultConcern } from "./defaultConcernData";
+import { DUPLEX_HOME_SLUG, getDefaultConcern, hasDefaultConcern } from "./defaultConcernData";
 import { useConcernStore } from "../../store/concern/concernStore";
 import { slugify } from "../../utils/entity";
 
@@ -17,7 +18,10 @@ const normalizeConcernSlug = (value = "") => {
 };
 
 const DynamicConcernPage = ({ slug }) => {
-  const lookupSlug = normalizeConcernSlug(slug);
+  const normalizedSlug = normalizeConcernSlug(slug);
+  const lookupSlug = normalizedSlug === "northsouthduplexhome"
+    ? DUPLEX_HOME_SLUG
+    : normalizedSlug;
   const defaultSlug = lookupSlug || slug;
   const [resolved, setResolved] = useState({
     key: defaultSlug,
@@ -31,7 +35,7 @@ const DynamicConcernPage = ({ slug }) => {
     let mounted = true;
     const fallbackConcern = getDefaultConcern(defaultSlug);
 
-    loadConcernBySlug(slug || lookupSlug)
+    loadConcernBySlug(lookupSlug === DUPLEX_HOME_SLUG ? lookupSlug : slug || lookupSlug)
       .then((concern) => {
         if (!mounted) return;
         if (concern?.isPublished === false) {
@@ -76,6 +80,10 @@ const DynamicConcernPage = ({ slug }) => {
 
   if (resolved.key !== defaultSlug || resolved.isResolving) return <Spinner />;
   if (resolved.notFound || !resolved.data) return <NotFound />;
+
+  if (defaultSlug === "titanic-bay-hotel-resort-ltd") {
+    return <ConcernLuxuryPage {...resolved.data} {...titanicBayMedia} curatedMedia />;
+  }
 
   if (defaultSlug === "adin-hidden-eye") {
     const concern = getOfficialConcern(defaultSlug);

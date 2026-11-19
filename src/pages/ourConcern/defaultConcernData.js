@@ -1,16 +1,19 @@
+export const MAYALOK_RESORT_SLUG = "mayalok-resort";
+export const MAYALOK_RESORT_PATH = "/Mayalok Resort";
+
 const defaults = {
   "mayalok-resort": {
     theme: "teal",
     eyebrow: "A nature-inspired escape",
     title: "Mayalok Resort",
     subtitle: "A quiet escape imagined around nature, open space, and moments worth sharing.",
-    heroImage: "https://images.unsplash.com/photo-1540541338287-41700207dee6?auto=format&fit=crop&w=1920&q=85",
+    heroImage: "https://res.cloudinary.com/dhchj00vt/image/upload/v1786686175/concerns/gwvgob8j7dx7fdtz6s7g.webp",
     heroSliderImages: [
-      "https://images.unsplash.com/photo-1540541338287-41700207dee6?auto=format&fit=crop&w=1920&q=85",
-      "https://images.unsplash.com/photo-1571896349842-33c89424de2d?auto=format&fit=crop&w=1920&q=85",
-      "https://images.unsplash.com/photo-1500534623283-312aade485b7?auto=format&fit=crop&w=1920&q=85",
+      "https://res.cloudinary.com/dhchj00vt/image/upload/v1786686177/concerns/slider/innu3q7yausqerszn8g9.webp",
+      "https://res.cloudinary.com/dhchj00vt/image/upload/v1786686223/concerns/slider/uqmvzexc31i8t8nfcwop.webp",
+      "https://res.cloudinary.com/dhchj00vt/image/upload/v1786686189/concerns/slider/pvg2dunblycmf4sk4lpk.webp",
     ],
-    aboutImage: "https://images.unsplash.com/photo-1571896349842-33c89424de2d?auto=format&fit=crop&w=1200&q=85",
+    aboutImage: "https://res.cloudinary.com/dhchj00vt/image/upload/v1790409893/concerns/vfh1wjic0twvcvq5itqo.webp",
     aboutTitle: "A little closer to what matters.",
     aboutParagraphs: ["Mayalok Resort is envisioned as a place to pause, reconnect, and enjoy a slower rhythm surrounded by nature.", "Explore the resort vision with our team and ask about current plans, experiences, and opportunities."],
     services: [], features: [], highlights: [],
@@ -264,10 +267,19 @@ const concernAliases = {
 export const hasDefaultConcern = (slug) =>
   Object.prototype.hasOwnProperty.call(defaults, concernAliases[slug] || slug);
 
+export const DUPLEX_HOME_SLUG = "north-south-duplex-home";
+export const DUPLEX_HOME_PATH = "/NorthSouthDuplexHome";
+
+const duplexHomeImages = {
+  heroImage: "https://res.cloudinary.com/dhchj00vt/image/upload/v1786685017/concerns/peqdvgmjwa7i9rpbrrxa.webp",
+  aboutImage: "https://res.cloudinary.com/dhchj00vt/image/upload/v1787291538/concerns/arw5swu3yhpyjm9mcva0.webp",
+};
+
 export const getDefaultConcern = (slug) => {
   if (!hasDefaultConcern(slug)) return null;
 
   const concern = { ...common, ...defaults[concernAliases[slug] || slug] };
+  if (slug === DUPLEX_HOME_SLUG || slug === "northsouthduplexhome") Object.assign(concern, duplexHomeImages);
   const derivedImages = uniqueImages([
     concern.heroImage,
     concern.aboutImage,

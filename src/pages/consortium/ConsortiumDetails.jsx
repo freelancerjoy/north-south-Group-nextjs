@@ -1,3 +1,5 @@
+import ProjectFilm from "../project/ProjectFilm";
+import { getProjectFilm, isTitanicBay, projectImageKey, titanicBayMedia } from "../project/projectMedia";
 import { useLocation, useParams } from "react-router-dom";
 import { useState, useEffect } from "react";
 import AOS from "aos";
@@ -109,7 +111,9 @@ export default function ProjectDetails() {
   const slideImages = project?.slideImage?.filter(Boolean) || [];
   const uploadedGalleryImages = project?.galleryImages?.filter(Boolean) || [];
   const uploadedProjectGalleryImages = project?.projectGalleryImages?.filter(Boolean) || [];
-  const heroImages = slideImages.length > 0 ? slideImages : images;
+  const projectFilm = getProjectFilm(project);
+  const hasTitanicMedia = isTitanicBay(project);
+  const heroImages = hasTitanicMedia ? [titanicBayMedia.heroImage] : slideImages.length > 0 ? slideImages : images;
   const desc = project?.description || {};
   const projectSpecs = project?.specs || {};
   const heroSummary =
@@ -118,7 +122,7 @@ export default function ProjectDetails() {
     desc.location ||
     projectSpecs.address ||
     "A planned North South Group development with practical amenities and a connected location.";
-  const fallbackSectionImages = images.length > 0 ? images : slideImages;
+  const fallbackSectionImages = hasTitanicMedia ? [] : images.length > 0 ? images : slideImages;
   const detailSections = projectDescriptionFields
     .map((field, index) => ({
       key: field.key,
@@ -153,8 +157,17 @@ export default function ProjectDetails() {
     : [];
 
   const fallbackGalleryPhotos = [...images, ...slideImages];
-  const photos = uploadedGalleryImages.length > 0 ? uploadedGalleryImages : fallbackGalleryPhotos;
-  const projectGalleryPhotos = uploadedProjectGalleryImages.length > 0 ? uploadedProjectGalleryImages : photos;
+  const photos = hasTitanicMedia
+    ? [titanicBayMedia.aboutImage]
+    : Array.from(new Map(
+      (uploadedGalleryImages.length > 0 ? uploadedGalleryImages : fallbackGalleryPhotos)
+        .map((image) => [projectImageKey(image), image])
+    ).values());
+  const projectGalleryPhotos = hasTitanicMedia
+    ? titanicBayMedia.galleryImages
+    : uploadedProjectGalleryImages.length > 0
+      ? Array.from(new Map(uploadedProjectGalleryImages.map((image) => [projectImageKey(image), image])).values())
+      : photos;
   const [current, setCurrent] = useState(0);
 
   const [projectGalleryIndex, setProjectGalleryIndex] = useState(0);
@@ -571,7 +584,7 @@ export default function ProjectDetails() {
         )}
       </div>
      
-      {projectGalleryPhotos.length > 0 && (
+      {(projectGalleryPhotos.length > 0 || projectFilm) && (
         <section className="bg-white px-6 py-20">
           <div className="mx-auto max-w-7xl">
             <div className="mb-12 text-center">
@@ -602,6 +615,11 @@ export default function ProjectDetails() {
                 </button>
               ))}
             </div>
+            {projectFilm && (
+              <div className="mt-8">
+                <ProjectFilm film={projectFilm} />
+              </div>
+            )}
           </div>
 
           {projectGalleryOpen && selectedProjectGallery && (
