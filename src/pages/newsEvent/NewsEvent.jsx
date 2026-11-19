@@ -19,7 +19,7 @@ const HERO_SLIDES = [
     image: news1,
     eyebrow: "Latest Updates",
     title: "News & Events",
-    subtitle: "Stay connected with our latest milestones, launches & stories.",
+    subtitle: "Stay connected with our latest milestones, launches, & stories.",
   },
 ];
 
