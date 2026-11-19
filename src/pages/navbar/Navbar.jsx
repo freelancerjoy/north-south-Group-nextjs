@@ -1,3 +1,4 @@
+import { includeOfficialConcernLinks } from "../../components/ConcernLogo";
 import * as React from "react";
 import { useState, useCallback, useEffect } from "react";
 import logo from "../../assets/images/logo.png";
@@ -176,7 +177,7 @@ const buildConcernItems = (menuItems = []) => {
     });
   }
 
-  return items;
+  return includeOfficialConcernLinks(items);
 };
 
 function Navbar() {

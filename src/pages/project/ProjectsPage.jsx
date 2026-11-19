@@ -8,6 +8,8 @@ import {
   MdClose,
 } from "react-icons/md";
 import OptimizedImage from "../../components/OptimizedImage";
+import ConcernLogo, { getOfficialConcern, includeOfficialConcerns } from "../../components/ConcernLogo";
+import { LUXURY_SHOWCASE_SLIDES, getProjectSliderImages } from "./projectHeroImages";
 import { useProjectStore } from "../../store/project/projectStore";
 import { useMenuStore } from "../../store/menu/menuStore";
 import { entityId, projectDetailsPath } from "../../utils/entity";
@@ -212,12 +214,17 @@ const sortDirectoryProjects = (projects = []) =>
 const buildDirectoryProjects = (items = []) => {
   const sourceItems = Array.isArray(items) && items.length ? items : projectDirectoryFallbacks;
   const seen = new Set();
+  const directoryItems = includeOfficialConcerns(
+    sourceItems.filter((item) => item?.isVisible !== false).map((item) => ({
+      ...item,
+      name: item.label || item.title,
+    }))
+  );
 
-  return sourceItems
-    .filter((item) => item?.isVisible !== false)
+  return directoryItems
     .filter((item) => !isDailyAdinDirectoryItem(item))
     .map((item, index) => {
-      const title = normalizeDirectoryLabel(item.label || item.title || "");
+      const title = normalizeDirectoryLabel(item.name || "");
       const key = normalize(title);
       if (!title || seen.has(key)) return null;
       seen.add(key);
@@ -227,7 +234,7 @@ const buildDirectoryProjects = (items = []) => {
         title,
         status: "Project Directory",
         image: [getDirectoryImage(title, item)],
-        to: item.to || (!item.href ? "/aboutUs" : undefined),
+        to: item.to || (!item.href ? (item.mark ? "/aboutUs#about-concerns" : "/aboutUs") : undefined),
         href: item.href,
         external: item.external,
         description: {
@@ -329,62 +336,6 @@ const statusOptions = [
 ];
 
 
-const LUXURY_SHOWCASE_SLIDES = [
-  {
-    title: "Signature Living",
-    subtitle: "North South Group",
-    caption:
-      "Contemporary architecture shaped around refined living, confident design, and a strong sense of place.",
-    image:
-      "https://res.cloudinary.com/dpsjkcaa/image/upload/v1790317812/Slider1.jpg.jpg",
-    source: "project",
-  },
-  {
-    title: "Designed With Detail",
-    subtitle: "Architectural Experience",
-    caption:
-      "A refined visual language where proportion, material, greenery, and modern residential planning come together.",
-    image:
-      "https://res.cloudinary.com/dpsjkcaa/image/upload/v1790318528/Scene_7_2_copy.jpg",
-    source: "project",
-  },
-  {
-    title: "Modern Perspective",
-    subtitle: "Project View",
-    caption:
-      "Thoughtful contemporary development presented with a clean architectural identity and premium residential character.",
-    image:
-      "https://res.cloudinary.com/dpsjkcaa/image/upload/v1790318527/Scene_4_3.png",
-    source: "project",
-  },
-  {
-    title: "A Better Way To Live",
-    subtitle: "Signature Development",
-    caption:
-      "A modern environment created around comfort, design quality, everyday convenience, and long-term value.",
-    image:
-      "https://res.cloudinary.com/dpsjkcaa/image/upload/v1790318526/2_copy.jpg",
-    source: "project",
-  },
-  {
-    title: "Grand Arrival",
-    subtitle: "Lobby & Reception",
-    caption:
-      "A calm interior experience shaped by light, scale, elegant material choices, and a welcoming sense of arrival.",
-    image:
-      "https://images.unsplash.com/photo-1758193783649-13371d7fb8dd?auto=format&fit=crop&q=88&w=2600",
-    source: "interior",
-  },
-  {
-    title: "Private Living",
-    subtitle: "Interior Experience",
-    caption:
-      "Contemporary interior inspiration with generous proportions, natural light, and a refined residential atmosphere.",
-    image:
-      "https://images.unsplash.com/photo-1776362355123-ca966d36e29c?auto=format&fit=crop&q=88&w=2600",
-    source: "interior",
-  },
-];
 
 const getProjectGallery = (project) => {
   const pools = [
@@ -430,24 +381,6 @@ const getStatusMeta = (project) => {
 };
 
 const getStatus = (project) => String(project?.status || "upcoming").toLowerCase();
-
-const getProjectImage = (project) =>
-  project?.image?.find(Boolean) ||
-  project?.slideImage?.find(Boolean) ||
-  project?.galleryImages?.find(Boolean) ||
-  fallbackImage;
-
-const getProjectSliderImages = (project) => {
-  const uploadedSlides = Array.isArray(project?.slideImage)
-    ? project.slideImage.filter(Boolean)
-    : [];
-  if (uploadedSlides.length) return uploadedSlides;
-
-  const projectImages = Array.isArray(project?.image)
-    ? project.image.filter(Boolean)
-    : [];
-  return projectImages.length ? projectImages : [getProjectImage(project)];
-};
 
 const getDescription = (project) =>
   project?.description?.shortOverview ||
@@ -891,6 +824,7 @@ function CompactFilterSelect({
 }
 
 function PremiumProjectCard({ project, index }) {
+  const officialConcern = getOfficialConcern(project.title, project.to);
   const meta = getStatusMeta(project);
   const projectGallery = getProjectGallery(project);
 
@@ -949,6 +883,12 @@ function PremiumProjectCard({ project, index }) {
         />
 
         <div className="absolute inset-0 bg-gradient-to-t from-emerald-950/90 via-emerald-950/8 to-white/5" />
+
+        {officialConcern && (
+          <div className="absolute left-4 top-14 z-20 max-w-[calc(100%-2rem)] rounded-md bg-white px-3 py-2">
+            <ConcernLogo concern={officialConcern} />
+          </div>
+        )}
 
         {/* Status */}
         <div className="absolute left-3 top-3 z-20 sm:left-4 sm:top-4 xl:left-5 xl:top-5">

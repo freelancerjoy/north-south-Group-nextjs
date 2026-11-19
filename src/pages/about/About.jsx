@@ -1,3 +1,4 @@
+import ConcernLogo, { includeOfficialConcerns } from "../../components/ConcernLogo";
 import { useEffect, useMemo, useState } from "react";
 import useReveal from "../../components/useReveal";
 import OptimizedImage from "../../components/OptimizedImage";
@@ -31,15 +32,14 @@ export default function About({ className = "", content }) {
   const concernLogos = useMemo(() => {
     const dynamicLogos = Array.isArray(partners)
       ? partners
-          .map((partner) => partner?.partnersImage)
-          .filter(Boolean)
-          .map((partnerLogo, index) => ({
-            name: `Concern ${index + 1}`,
-            logo: partnerLogo,
+          .map((partner, index) => ({
+            name: partner?.title || partner?.name || `Concern ${index + 1}`,
+            logo: partner?.partnersImage || partner?.image,
           }))
+          .filter((partner) => partner.logo)
       : [];
 
-    return dynamicLogos.length > 0 ? dynamicLogos : concerns;
+    return includeOfficialConcerns(dynamicLogos.length > 0 ? dynamicLogos : concerns);
   }, [partners]);
 
   return (
@@ -84,12 +84,12 @@ export default function About({ className = "", content }) {
                   key={`${item.name}-${index}`}
                   className="relative flex h-28 w-44 shrink-0 items-center justify-center rounded-lg border border-white/80 bg-white p-5 shadow-[0_18px_45px_-28px_rgba(0,0,0,0.75)] ring-1 ring-black/5 transition-transform duration-300 hover:-translate-y-1"
                 >
-                  <OptimizedImage
+                  {item.mark ? <ConcernLogo concern={item} /> : <OptimizedImage
                     src={item.logo}
                     alt={item.name}
                     objectFit="contain"
                     sizes="176px"
-                  />
+                  />}
                 </div>
               ))}
             </div>

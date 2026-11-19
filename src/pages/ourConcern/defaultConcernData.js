@@ -182,10 +182,14 @@ const defaults = {
     aboutParagraphs: ["Northsouth Tours & Travels helps clients experience destinations with better planning and less stress.", "The concern focuses on bookings, itinerary design, transportation support, and client guidance."],
     stats: [{ value: "24/7", label: "Support" }, { value: "Custom", label: "Packages" }, { value: "Safe", label: "Travel" }],
   },
+  "adin-hidden-eye": {
+    title: "Adin Hidden Eye",
+    subtitle: "Exposing the hidden",
+  },
   "northsouth-foundation": {
     theme: "emerald",
     eyebrow: "Social Impact",
-    title: "Northsouth Foundation",
+    title: "North South Humanity Aid Foundation",
     subtitle: "A people-focused initiative dedicated to education, healthcare, community upliftment, and long-term social development.",
     heroImage: "https://images.unsplash.com/photo-1593442808882-775dfcd90699?auto=format&fit=crop&w=1200&q=75",
     aboutImage: "https://plus.unsplash.com/premium_photo-1723809828438-94b1351d04c0?auto=format&fit=crop&w=900&q=75",

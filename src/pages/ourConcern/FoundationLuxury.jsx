@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState } from "react";
 import { FiArrowDown, FiArrowUpRight, FiBookOpen, FiHeart, FiUsers, FiGlobe, FiChevronLeft, FiChevronRight, FiPause, FiPlay, FiX, FiPlus, FiShield, FiSun } from "react-icons/fi";
 import { ContactSection } from "./ConcernPageTemplate";
+import ConcernLogo, { getOfficialConcern } from "../../components/ConcernLogo";
 import luxury from "./NirapadValleyLuxury.module.css";
 import styles from "./FoundationLuxury.module.css";
 
@@ -85,7 +86,7 @@ const commitments = [
 ];
 
 export default function FoundationLuxury({ title, subtitle, eyebrow, heroImage, heroSliderImages = [], aboutImage, aboutTitle, aboutParagraphs = [], services = [], stats = [], galleryImages = [], processItems = [] }) {
-  const displayTitle = !title || title === "Northsouth Foundation" ? "North South Humanity Aid Foundations" : title;
+  const displayTitle = !title || title === "Northsouth Foundation" ? "North South Humanity Aid Foundation" : title;
   const cards = services.some((item) => item.image)
     ? services.map((item, index) => {
         if (index === 0) return { ...item, image: BANGLADESH_EDUCATION_IMAGE };
@@ -167,7 +168,15 @@ export default function FoundationLuxury({ title, subtitle, eyebrow, heroImage, 
       {slides.map((src, index) => <img key={src} className={`${luxury.heroImage} ${index === current ? luxury.active : ""}`} src={src} alt="North South Humanity Aid Foundations community and relief activities" aria-hidden={index !== current} fetchPriority={index === 0 ? "high" : "auto"} />)}
       <div className={luxury.shade} />
       <div className={luxury.heroTop}><span>NORTH SOUTH GROUP</span><span>COMPASSION IN ACTION</span></div>
-      <div className={`${luxury.heroCopy} ${styles.heroCopy}`}><span className={luxury.eyebrow}>{eyebrow || "A shared purpose. A brighter tomorrow."}</span><h1>{displayTitle}</h1><p>{subtitle || "Bringing care, opportunity, and hope closer to the communities that need them."}</p><a href="#foundation-mission" className={luxury.heroLink}>Discover our purpose <FiArrowDown /></a></div>
+      <div className={`${luxury.heroCopy} ${styles.heroCopy}`}>
+        <div className="mb-4 inline-flex max-w-full rounded-md bg-white px-3 py-2">
+          <ConcernLogo concern={getOfficialConcern("Northsouth Foundation")} alt="" />
+        </div>
+        <span className={luxury.eyebrow}>{eyebrow || "A shared purpose. A brighter tomorrow."}</span>
+        <h1>{displayTitle}</h1>
+        <p>{subtitle || "Bringing care, opportunity, and hope closer to the communities that need them."}</p>
+        <a href="#foundation-mission" className={luxury.heroLink}>Discover our purpose <FiArrowDown /></a>
+      </div>
       <div className={styles.heroAside}><FiHeart /><span>People at the heart.<br />Purpose in every step.</span></div>
       <div className={styles.slideControls}><span>{String(current + 1).padStart(2, "0")} <small>/ {String(slides.length).padStart(2, "0")}</small></span><button aria-label="Previous slide" onClick={() => setCurrent((current - 1 + slides.length) % slides.length)}><FiChevronLeft /></button><button aria-label="Next slide" onClick={() => setCurrent((current + 1) % slides.length)}><FiChevronRight /></button><button aria-label={paused ? "Play slideshow" : "Pause slideshow"} onClick={() => setPaused(!paused)}>{paused ? <FiPlay /> : <FiPause />}</button></div>
       <div className={styles.slideProgress}>{slides.map((src, index) => <button key={src} aria-label={`Go to slide ${index + 1}`} aria-current={index === current ? "true" : undefined} onClick={() => setCurrent(index)} className={index === current ? styles.progressActive : ""} />)}</div>

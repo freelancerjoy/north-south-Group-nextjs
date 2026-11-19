@@ -1,3 +1,4 @@
+import ConcernLogo, { getOfficialConcern } from "../../components/ConcernLogo";
 import { useEffect, useState } from "react";
 import Spinner from "../../components/Spinner";
 import NotFound from "../../components/NotFound";
@@ -75,6 +76,17 @@ const DynamicConcernPage = ({ slug }) => {
 
   if (resolved.key !== defaultSlug || resolved.isResolving) return <Spinner />;
   if (resolved.notFound || !resolved.data) return <NotFound />;
+
+  if (defaultSlug === "adin-hidden-eye") {
+    const concern = getOfficialConcern(defaultSlug);
+    return (
+      <main className="mx-auto flex min-h-[60svh] max-w-3xl flex-col items-center justify-center gap-4 px-6 pb-16 pt-32 text-center text-slate-950 [--concern-mark-size:156px]">
+        <ConcernLogo concern={concern} alt="" />
+        <h1 className="text-3xl font-semibold sm:text-4xl">{resolved.data.title}</h1>
+        <p className="text-base text-slate-600">{resolved.data.subtitle}</p>
+      </main>
+    );
+  }
 
   return (
     <div className="opacity-100 transition-opacity">

@@ -1,0 +1,21 @@
+.mark {
+  display: block;
+  position: relative;
+  overflow: hidden;
+  flex: none;
+  max-width: 100%;
+  background: #fff;
+}
+
+.foundation { width: 188px; aspect-ratio: 3.2; --logo-scale: 125%; }
+.hiddenEye { width: var(--concern-mark-size, 78px); aspect-ratio: 1; --logo-scale: 178%; }
+
+.mark > img {
+  position: absolute;
+  inset: 50% auto auto 50%;
+  width: var(--logo-scale);
+  max-width: none;
+  height: auto;
+  aspect-ratio: 1;
+  transform: translate(-50%, -50%);
+}

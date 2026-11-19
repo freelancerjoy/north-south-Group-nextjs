@@ -1,3 +1,4 @@
+import { includeOfficialConcernLinks } from "../components/ConcernLogo";
 import {
   FaFacebookF,
   FaLinkedinIn,
@@ -134,7 +135,7 @@ const Footer = () => {
     ? footer.quickLinks.filter((item) => item.isVisible !== false)
     : quickLinks;
 
-  const concerns = buildConcernItems(concernMenuItems);
+  const concerns = includeOfficialConcernLinks(buildConcernItems(concernMenuItems));
 
   return (
     (!footerContent || footer.isVisible !== false) && (<footer

@@ -1,5 +1,6 @@
+import ConcernLogo, { includeOfficialConcerns } from "../../components/ConcernLogo";
 import React, { useEffect, useMemo, useRef, useState } from "react";
-import { AnimatePresence, motion } from "framer-motion";
+import { AnimatePresence, motion, MotionConfig, useReducedMotion } from "framer-motion";
 import {
   FaArrowRight,
   FaAward,
@@ -25,12 +26,16 @@ import {
 } from "react-icons/hi2";
 import { getYouTubeEmbedUrl } from "../../components/VideoUtility";
 import { defaultAboutContent } from "./defaultAboutContent";
+import { LUXURY_SHOWCASE_SLIDES, getProjectSliderImages } from "../project/projectHeroImages";
+import { useProjectStore } from "../../store/project/projectStore";
 import { useAboutStore } from "../../store/about/aboutStore";
 import logo from "../../assets/images/logo.png";
 import greenCityLogo from "../../assets/images/greenCity.png";
 import squareCityLogo from "../../assets/images/squareCityLogo.png";
 import industrialCityLogo from "../../assets/images/industrialCityLogo.png";
 import { usePartnerStore } from "../../store/partners/partnersStore";
+
+import styles from "./AboutEditorial.module.css";
 
 const MotionDiv = motion.div;
 const MotionImg = motion.img;
@@ -197,15 +202,21 @@ function PremiumHeading({ children, className = "" }) {
 
 export default function AboutUs({ previewData = null }) {
   const [currentSlide, setCurrentSlide] = useState(0);
+  const [introSteps, setIntroSteps] = useState(0);
   const [workspaceSlide, setWorkspaceSlide] = useState(0);
   const [selectedLeader, setSelectedLeader] = useState(null);
   const [selectedGalleryItem, setSelectedGalleryItem] = useState(null);
   const [selectedGalleryItems, setSelectedGalleryItems] = useState([]);
+  const reduceMotion = useReducedMotion();
+  const [heroPlaying, setHeroPlaying] = useState(true);
+  const [concernsPlaying, setConcernsPlaying] = useState(true);
+
   const leadershipSectionRef = useRef(null);
   const leadershipScrollRef = useRef(null);
   const leadershipTrackRef = useRef(null);
   const leadershipDragRef = useRef({ active: false, startX: 0, startScrollLeft: 0 });
 
+  const { projects, loadProjects } = useProjectStore();
   const { aboutContent, loadAboutContent } = useAboutStore();
   const { partners, loadPartners } = usePartnerStore();
 
@@ -216,6 +227,10 @@ export default function AboutUs({ previewData = null }) {
   useEffect(() => {
     loadPartners().catch(() => {});
   }, [loadPartners]);
+
+  useEffect(() => {
+    if (!previewData) loadProjects();
+  }, [loadProjects, previewData]);
 
   const sourceContent = previewData || aboutContent;
 
@@ -239,7 +254,7 @@ export default function AboutUs({ previewData = null }) {
       { name: "Northsouth Duplex Home", logo: logo, to: "/conceptDetails" },
     ];
 
-    return dynamic.length > 0 ? dynamic : fallback;
+    return includeOfficialConcerns(dynamic.length > 0 ? dynamic : fallback);
   }, [partners]);
 
   const data = useMemo(
@@ -299,16 +314,15 @@ export default function AboutUs({ previewData = null }) {
     [sourceContent]
   );
 
-  const heroSlides =
-    Array.isArray(data.heroSlides) && data.heroSlides.length > 0
-      ? data.heroSlides
-      : TEMPORARY_OFFICE_IMAGES.map((item) => item.img);
+  const configuredSlides = [...new Set(data.heroSlides.filter(Boolean))];
+  const projectSlides = configuredSlides.length > 1
+    ? configuredSlides
+    : [...new Set([...configuredSlides, ...defaultAboutContent.heroSlides])];
 
-  const heroImage = heroSlides[currentSlide] || heroSlides[0];
   const overviewImage =
-    data.overviewImage || heroSlides[1] || heroSlides[0] || TEMPORARY_OFFICE_IMAGES[0].img;
+    data.overviewImage || projectSlides[1] || projectSlides[0] || TEMPORARY_OFFICE_IMAGES[0].img;
   const secondOverviewImage =
-    data.overviewSecondImage || heroSlides[2] || data.csrImages?.[0]?.img || TEMPORARY_OFFICE_IMAGES[1].img;
+    data.overviewSecondImage || projectSlides[2] || data.csrImages?.[0]?.img || TEMPORARY_OFFICE_IMAGES[1].img;
 
   const embedUrl = getYouTubeEmbedUrl(data.videoUrl);
 
@@ -378,6 +392,27 @@ export default function AboutUs({ previewData = null }) {
     : Array.isArray(data.officeImages) && data.officeImages.length > 0
       ? data.officeImages
       : TEMPORARY_OFFICE_IMAGES;
+  const workspaceSlides = workspaceGallery
+    .filter((item) => item?.img && !item.isPlaceholder)
+    .map((item) => item.img);
+  const addedWorkspaceSlides = [...new Set(workspaceSlides)]
+    .filter((img) => !projectSlides.includes(img))
+    .slice(0, 3);
+  const uploadedProjectSlides = Array.isArray(projects)
+    ? projects.flatMap(getProjectSliderImages)
+    : [];
+  const heroSlides = [...new Set([
+    ...LUXURY_SHOWCASE_SLIDES.map((slide) => slide.image),
+    ...uploadedProjectSlides,
+    ...addedWorkspaceSlides,
+    ...projectSlides,
+  ])];
+  const isHeroIntro = introSteps < 3;
+  const activeHeroSlide = currentSlide % heroSlides.length;
+  const heroImage = heroSlides[activeHeroSlide];
+  const nextHeroImage = heroSlides[(activeHeroSlide + 1) % heroSlides.length];
+  const [heroFrame, setHeroFrame] = useState(() => ({ current: heroImage, previous: null }));
+
   const workspacePageCount = Math.max(1, Math.ceil(workspaceGallery.length / 4));
   const activeWorkspaceSlide = workspaceSlide % workspacePageCount;
   const workspaceSlotCount = Math.min(4, workspaceGallery.length);
@@ -409,269 +444,139 @@ export default function AboutUs({ previewData = null }) {
   const mediaGallery = Array.isArray(data.mediaImages) && data.mediaImages.length > 0
     ? data.mediaImages
     : DAILY_ADIN_MEDIA;
+  const newsroomGallery = mediaGallery.map((item) => {
+    const screenshot = /^https:\/\/res\.cloudinary\.com\/dpsjkcaa\/image\/upload\/v\d+\/WhatsApp_Image_2026-09-24_at_5\.50\.27_PM(?:_1)?\.jpg$/i;
+    if (!screenshot.test(item.img)) return item;
+
+    return { ...item, img: item.img.replace("/image/upload/", "/image/upload/c_crop,g_south,h_0.9,w_1.0/") };
+  });
 
   useEffect(() => {
-    if (heroSlides.length <= 1) return undefined;
+    if (heroFrame.current === heroImage) return undefined;
 
-    const interval = setInterval(() => {
+    let cancelled = false;
+    const image = new Image();
+    image.src = heroImage;
+    image.decode().then(() => {
+      if (!cancelled) setHeroFrame(({ current }) => ({ current: heroImage, previous: current }));
+    }).catch(() => {});
+
+    return () => { cancelled = true; };
+  }, [heroImage, heroFrame.current]);
+
+  useEffect(() => {
+    if (reduceMotion || !heroPlaying || nextHeroImage === heroImage) return;
+    const image = new Image();
+    image.src = nextHeroImage;
+  }, [heroPlaying, reduceMotion, nextHeroImage, heroImage]);
+
+  useEffect(() => {
+    if (heroSlides.length <= 1 || reduceMotion || !heroPlaying) return undefined;
+
+    const timer = setTimeout(() => {
       setCurrentSlide((prev) => (prev + 1) % heroSlides.length);
-    }, 5200);
+      if (isHeroIntro) setIntroSteps((step) => step + 1);
+    }, isHeroIntro ? 950 : 4200);
 
-    return () => clearInterval(interval);
-  }, [heroSlides.length]);
+    return () => clearTimeout(timer);
+  }, [currentSlide, heroSlides.length, reduceMotion, heroPlaying, isHeroIntro]);
 
   useEffect(() => {
-    if (workspacePageCount <= 1) return undefined;
+    if (workspacePageCount <= 1 || reduceMotion) return undefined;
     const interval = setInterval(() => {
       setWorkspaceSlide((current) => (current + 1) % workspacePageCount);
     }, 5000);
     return () => clearInterval(interval);
-  }, [workspacePageCount]);
+  }, [workspacePageCount, reduceMotion]);
 
-  return (
+  const repeatCount = Math.ceil(10 / Math.max(1, concernLogos.length));
+
+  const page = (
     <main
-      className="min-h-screen min-w-0 overflow-x-hidden bg-white text-slate-900 selection:bg-emerald-200 selection:text-emerald-950"
+      className={styles.page}
       style={{ fontFamily: '"Manrope", "Inter", ui-sans-serif, system-ui, sans-serif' }}
     >
       <style>{`
         @import url('https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&family=Playfair+Display:wght@500;600;700&display=swap');
         .font-about-display { font-family: 'Playfair Display', Georgia, serif; }
 
-        @keyframes concernMarquee {
-          0% { transform: translateX(0%); }
-          100% { transform: translateX(-50%); }
-        }
-        .animate-concern-marquee {
-          display: flex;
-          width: max-content;
-          animation: concernMarquee 24s linear infinite;
-        }
-        .animate-concern-marquee:hover {
-          animation-play-state: paused;
-        }
       `}</style>
 
-      {/* ================================================================ HERO */}
-      <section id="about-hero" className="relative w-full overflow-hidden bg-gradient-to-b from-[#F3F9F5] via-[#FAFCFA] to-white pt-20 pb-10 sm:pt-28 sm:pb-18 lg:pt-32 lg:pb-24">
-        {/* Ambient atmospheric lighting */}
-        <div className="pointer-events-none absolute -left-32 -top-20 h-[500px] w-[500px] rounded-full bg-emerald-200/40 blur-[130px]" />
-        <div className="pointer-events-none absolute -right-32 top-1/4 h-[550px] w-[550px] rounded-full bg-green-100/50 blur-[140px]" />
-        <div className="pointer-events-none absolute left-1/3 bottom-0 h-[350px] w-[350px] rounded-full bg-amber-100/40 blur-[110px]" />
-
-        {/* Full-width responsive container */}
-        <div className="relative w-full min-w-0 px-4 sm:px-8 md:px-12 lg:px-16 xl:px-20 2xl:px-24">
-          <div className="grid min-w-0 items-center gap-8 sm:gap-12 lg:min-h-[calc(100svh-9rem)] lg:grid-cols-[1fr_1.18fr] xl:gap-16">
-            <MotionDiv
-              initial={{ opacity: 0, y: 26 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.8, ease: "easeOut" }}
-              className="min-w-0 max-w-2xl"
-            >
-              {/* Luxury Eyebrow Badge */}
-              <div className="mb-5 inline-flex items-center gap-2.5 rounded-full border border-emerald-200/90 bg-white/80 px-4 py-1.5 shadow-sm backdrop-blur-md">
-                <span className="relative flex h-2 w-2">
-                  <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-emerald-400 opacity-75" />
-                  <span className="relative inline-flex h-2 w-2 rounded-full bg-emerald-600" />
-                </span>
-                <span className="text-[10px] sm:text-[11px] font-bold uppercase tracking-[0.22em] text-emerald-900">
-                  {data.heroEyebrow || "About North South Group"}
-                </span>
-              </div>
-
-              {/* Grand Luxury Heading */}
-              <h1 className="max-w-full break-words font-about-display text-[38px] font-medium leading-[1.03] tracking-normal text-slate-950 [overflow-wrap:anywhere] sm:text-6xl sm:tracking-[-0.035em] md:text-7xl xl:text-[80px]">
-                {data.heroTitle && data.heroTitle.trim().length > 0 ? (
-                  data.heroTitle
-                ) : (
-                  <>
-                    Building <span className="italic font-normal text-emerald-800">Planned</span>{" "}
-                    Communities For Tomorrow
-                  </>
-                )}
-              </h1>
-
-              {/* Subtitle with refined typography */}
-              <p className="mt-6 max-w-xl break-words text-base leading-relaxed text-slate-600 [overflow-wrap:anywhere] sm:text-lg">
-                {data.heroSubtitle ||
-                  "Building exceptional spaces with innovative design, uncompromising quality, and a commitment to creating lasting value for our communities and customers."}
-              </p>
-
-              {/* Action Buttons */}
-              <div className="mt-8 flex w-full min-w-0 flex-col items-stretch gap-3 sm:mt-10 sm:flex-row sm:flex-wrap sm:items-center sm:gap-4">
-                <a
-                  href="#story"
-                  className="group inline-flex h-12 w-full min-w-0 items-center justify-center gap-3 rounded-full bg-emerald-800 px-4 text-[10px] font-bold uppercase tracking-[0.1em] text-white shadow-[0_16px_36px_rgba(6,78,59,0.24)] transition-all duration-300 hover:bg-emerald-950 hover:shadow-[0_20px_44px_rgba(6,78,59,0.32)] hover:-translate-y-0.5 active:translate-y-0 sm:h-14 sm:w-auto sm:px-8 sm:text-xs sm:tracking-[0.16em]"
-                >
-                  <span>{data.heroPrimaryButtonLabel}</span>
-                  <FaArrowRight className="text-[11px] transition-transform duration-300 group-hover:translate-x-1" />
-                </a>
-
-                <a
-                  href="#leadership"
-                  className="inline-flex h-12 w-full min-w-0 items-center justify-center rounded-full border border-emerald-200/90 bg-white/90 px-4 text-[10px] font-bold uppercase tracking-[0.1em] text-emerald-900 shadow-sm backdrop-blur-md transition-all duration-300 hover:border-emerald-600 hover:bg-emerald-50/80 hover:-translate-y-0.5 sm:h-14 sm:w-auto sm:px-8 sm:text-xs sm:tracking-[0.16em]"
-                >
-                  {data.heroSecondaryButtonLabel}
-                </a>
-              </div>
-
-              {/* OUR CONCERNS — Light luxury container with larger cards */}
-              <div className="mt-8 sm:mt-10 rounded-[22px] sm:rounded-[26px] border border-emerald-100 bg-white/80 p-4 sm:p-5 shadow-[0_14px_38px_rgba(15,76,58,0.06)] backdrop-blur-md relative overflow-hidden">
-                <div className="relative z-10">
-                  <div className="flex items-center justify-between px-1 mb-3">
-                    <div className="flex items-center gap-2">
-                      <span className="h-1.5 w-1.5 rounded-full bg-emerald-600" />
-                      <p className="text-[10px] sm:text-[11px] font-extrabold uppercase tracking-[0.22em] text-emerald-800">
-                        {data.concernsEyebrow}
-                      </p>
-                    </div>
-                    <span className="text-[10px] font-mono font-medium text-slate-400 uppercase tracking-wider">
-                      {data.concernsLabel}
-                    </span>
-                  </div>
-
-                  {/* Auto-scrolling running marquee with larger, clear white cards */}
-                  <div className="overflow-hidden rounded-xl [mask-image:linear-gradient(to_right,transparent,black_3%,black_97%,transparent)]">
-                    <div className="animate-concern-marquee flex gap-3 sm:gap-4 py-1">
-                      {/* Set 1 */}
-                      {concernLogos.map((item, index) => (
-                        <div
-                          key={`c1-${index}`}
-                          className="group flex h-16 w-36 sm:h-20 sm:w-44 items-center justify-center rounded-2xl bg-white px-4 py-2.5 shadow-[0_4px_16px_rgba(0,0,0,0.06)] border border-slate-100/90 transition-all duration-300 hover:border-emerald-300 hover:shadow-md hover:scale-105 shrink-0"
-                          title={item.name}
-                        >
-                          <img
-                            src={item.logo}
-                            alt={item.name}
-                            className="max-h-10 sm:max-h-12 max-w-[90%] object-contain transition duration-300 group-hover:scale-105"
-                          />
-                        </div>
-                      ))}
-
-                      {/* Set 2 (Duplicate for continuous seamless loop) */}
-                      {concernLogos.map((item, index) => (
-                        <div
-                          key={`c2-${index}`}
-                          className="group flex h-16 w-36 sm:h-20 sm:w-44 items-center justify-center rounded-2xl bg-white px-4 py-2.5 shadow-[0_4px_16px_rgba(0,0,0,0.06)] border border-slate-100/90 transition-all duration-300 hover:border-emerald-300 hover:shadow-md hover:scale-105 shrink-0"
-                          title={item.name}
-                        >
-                          <img
-                            src={item.logo}
-                            alt={item.name}
-                            className="max-h-10 sm:max-h-12 max-w-[90%] object-contain transition duration-300 group-hover:scale-105"
-                          />
-                        </div>
-                      ))}
-                    </div>
-                  </div>
-                </div>
-              </div>
-            </MotionDiv>
-
-            {/* Visual Showcase - Full depth, elegant curves, multiple interactive layers */}
-            <div className="relative w-full py-4 lg:py-0">
-              {/* Glow backdrop frame */}
-              <div className="absolute inset-0 rounded-[36px] sm:rounded-[48px] bg-gradient-to-tr from-emerald-500/10 via-transparent to-amber-500/10 blur-xl" />
-
-              {/* Main Architectural Canvas */}
-              <div className="relative aspect-[4/3] sm:aspect-[16/11] lg:aspect-[16/12] xl:aspect-[16/11] w-full overflow-hidden rounded-[28px] sm:rounded-[40px] border border-white/80 bg-white shadow-[0_36px_90px_rgba(15,76,58,0.18)]">
-                <AnimatePresence mode="wait">
-                  <MotionImg
-                    key={currentSlide}
-                    src={heroImage}
-                    alt="North South Group Architectural Project"
-                    initial={{ opacity: 0, scale: 1.05 }}
-                    animate={{ opacity: 1, scale: 1 }}
-                    exit={{ opacity: 0 }}
-                    transition={{ duration: 1, ease: [0.16, 1, 0.3, 1] }}
-                    className="h-full w-full object-cover object-center"
-                  />
-                </AnimatePresence>
-
-                {/* Subtle Cinematic Vignette */}
-                <div className="pointer-events-none absolute inset-0 bg-gradient-to-t from-emerald-950/75 via-emerald-950/15 to-transparent" />
-                <div className="pointer-events-none absolute inset-0 bg-gradient-to-r from-emerald-950/30 via-transparent to-transparent" />
-
-                {/* Floating Heritage Badge - Top Right */}
-                <div className="absolute top-4 right-4 sm:top-6 sm:right-6 z-20 flex items-center gap-3 rounded-2xl border border-white/30 bg-white/85 px-4 py-3 shadow-[0_12px_36px_rgba(0,0,0,0.12)] backdrop-blur-xl">
-                  <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-emerald-800 text-white font-bold text-xs shadow-md">
-                    2019
-                  </div>
-                  <div>
-                    <p className="text-[9px] font-extrabold uppercase tracking-[0.16em] text-emerald-800">
-                      Established
-                    </p>
-                    <p className="text-xs font-bold text-slate-900 leading-tight">
-                      Trust & Excellence
-                    </p>
-                  </div>
-                </div>
-
-                {/* Bottom Canvas Content */}
-                <div className="absolute inset-x-0 bottom-0 z-20 p-5 sm:p-7 flex flex-col sm:flex-row sm:items-end sm:justify-between gap-4">
-                  <div>
-                    <span className="inline-flex items-center gap-2 rounded-full bg-emerald-900/60 px-3 py-1 text-[10px] font-semibold text-emerald-200 backdrop-blur-md">
-                      <span className="h-1.5 w-1.5 rounded-full bg-emerald-400" />
-                      Signature Real Estate
-                    </span>
-                    <h3 className="mt-2 font-about-display text-xl sm:text-2xl font-semibold text-white drop-shadow-md">
-                      {data.overviewHighlightTitle || "Planned projects shaped around trust and long-term value"}
-                    </h3>
-                  </div>
-
-                  {/* Slide Indicators & Controls */}
-                  <div className="flex items-center gap-2 shrink-0 bg-black/35 backdrop-blur-md px-3 py-2 rounded-full border border-white/20">
-                    {heroSlides.map((_, index) => (
-                      <button
-                        key={index}
-                        type="button"
-                        onClick={() => setCurrentSlide(index)}
-                        aria-label={`Slide ${index + 1}`}
-                        className={`h-2 rounded-full transition-all duration-300 ${
-                          currentSlide === index
-                            ? "w-7 bg-emerald-400"
-                            : "w-2 bg-white/50 hover:bg-white/80"
-                        }`}
-                      />
-                    ))}
-                    <span className="ml-1 text-[10px] font-mono font-medium text-white/80">
-                      0{currentSlide + 1}/0{heroSlides.length}
-                    </span>
-                  </div>
-                </div>
-              </div>
-
-              {/* Floating Media / Daily Adin Card - bottom left overlap with clean card design */}
-              <button
-                type="button"
-                onClick={() => openGallery(mediaGallery[2] || mediaGallery[0], mediaGallery)}
-                className="group relative z-30 mt-4 flex w-full items-center gap-3.5 rounded-2xl border border-white bg-white/95 p-3 shadow-[0_20px_50px_rgba(15,76,58,0.16)] backdrop-blur-xl transition hover:-translate-y-1 hover:shadow-[0_26px_60px_rgba(15,76,58,0.22)] sm:absolute sm:-bottom-8 sm:-left-6 sm:mt-0 sm:w-auto sm:p-3.5"
-              >
-                <div className="h-14 w-14 sm:h-16 sm:w-16 overflow-hidden rounded-xl bg-emerald-100 shrink-0">
-                  <img
-                    src={(mediaGallery[2] || mediaGallery[0])?.img}
-                    alt="Daily Adin publication"
-                    className="h-full w-full object-cover transition duration-500 group-hover:scale-110"
-                  />
-                </div>
-                <div className="text-left pr-2">
-                  <span className="inline-block rounded-sm bg-emerald-100 px-1.5 py-0.5 text-[8px] font-extrabold uppercase tracking-widest text-emerald-800">
-                    Daily Adin
-                  </span>
-                  <p className="mt-1 text-xs sm:text-sm font-bold text-slate-900 leading-tight">
-                    News & Publication
-                  </p>
-                  <p className="text-[10px] text-slate-500 mt-0.5">Media Concern</p>
-                </div>
-              </button>
+      <section id="about-hero" className={styles.hero}>
+        <div className={styles.heroImage}>
+          {heroFrame.previous && !reduceMotion && <img src={heroFrame.previous} alt="" />}
+          <MotionImg
+            key={heroFrame.current}
+            src={heroFrame.current}
+            alt=""
+            fetchPriority={heroFrame.previous ? "auto" : "high"}
+            initial={{ opacity: heroFrame.previous && !reduceMotion ? 0 : 1 }}
+            animate={{ opacity: 1 }}
+            transition={{ duration: reduceMotion ? 0 : isHeroIntro ? 0.2 : 0.6, ease: "easeOut" }}
+          />
+        </div>
+        <div className={styles.heroInner}>
+          <div className={styles.heroCopy}>
+            <h1 className="sr-only">{data.heroEyebrow || defaultAboutContent.heroEyebrow}</h1>
+            <p>{data.heroSubtitle || defaultAboutContent.heroSubtitle}</p>
+            <div className={styles.heroActions}>
+              <a href="#story">{data.heroPrimaryButtonLabel}</a>
+              <a href="#leadership">{data.heroSecondaryButtonLabel}</a>
             </div>
+          </div>
+          <div className={styles.heroFooter}>
+            <p>{data.overviewHighlightTitle}</p>
+            {heroSlides.length > 1 && (
+              <div className={styles.slideControls} role="group" aria-label="Project slideshow">
+                <button type="button" aria-label="Previous slide" onClick={() => setCurrentSlide((current) => (current - 1 + heroSlides.length) % heroSlides.length)}>
+                  <FaChevronLeft aria-hidden="true" />
+                </button>
+                <span>{activeHeroSlide + 1} / {heroSlides.length}</span>
+                <button type="button" aria-label="Next slide" onClick={() => setCurrentSlide((current) => (current + 1) % heroSlides.length)}>
+                  <FaChevronRight aria-hidden="true" />
+                </button>
+                {!reduceMotion && (
+                  <button type="button" onClick={() => setHeroPlaying((playing) => !playing)}>
+                    {heroPlaying ? "Pause" : "Play"}
+                  </button>
+                )}
+              </div>
+            )}
           </div>
         </div>
       </section>
 
-      {/* ================================================================ STATS */}
-      <section className="relative z-20 bg-white">
-        <div className="mx-auto max-w-[1540px] px-4 sm:px-6 lg:px-10 xl:px-14">
-          <div className="mt-8 grid overflow-hidden rounded-[24px] border border-emerald-100 bg-white shadow-[0_24px_70px_rgba(15,76,58,0.09)] sm:grid-cols-2 lg:-mt-8 lg:grid-cols-4">
+      <section className={styles.concerns} aria-label={data.concernsEyebrow}>
+        <div className={styles.shell}>
+          <div className={styles.concernHeader}>
+            <div>
+              <SectionEyebrow>{data.concernsEyebrow}</SectionEyebrow>
+              <h2 className="font-about-display">{data.concernsLabel}</h2>
+            </div>
+            <div className={styles.concernActions}>
+              <button className={styles.mediaLink} type="button" onClick={() => openGallery(newsroomGallery[0], newsroomGallery)}>
+                <FaRegNewspaper aria-hidden="true" />
+                Daily Adin - newsroom
+              </button>
+              <button type="button" className={styles.marqueeToggle} aria-controls="concern-logos" onClick={() => setConcernsPlaying((playing) => !playing)}>
+                {concernsPlaying ? "Pause logos" : "Play logos"}
+              </button>
+            </div>
+          </div>
+          <div id="concern-logos" className={styles.marquee} data-playing={concernsPlaying}>
+            <div className={styles.logoBelt}>
+              {Array.from({ length: repeatCount * 2 }, (_, copy) => (
+                <ul key={copy} className={styles.logoTrack} aria-hidden={copy > 0 || undefined}>
+                  {concernLogos.map((item, index) => (
+                    <li key={index} title={item.name}>
+                      <ConcernLogo concern={item} />
+                    </li>
+                  ))}
+                </ul>
+              ))}
+            </div>
+          </div>
+          <div className={styles.metrics}>
             {data.stats.map((stat, index) => {
               const Icon = statIcons[index % statIcons.length];
               return (
@@ -681,18 +586,12 @@ export default function AboutUs({ previewData = null }) {
                   whileInView={{ opacity: 1, y: 0 }}
                   viewport={{ once: true }}
                   transition={{ duration: 0.55, delay: index * 0.1 }}
-                  className="group relative min-h-[142px] border-b border-emerald-100 p-5 transition hover:bg-[#F8FBF8] sm:border-r sm:p-6 lg:border-b-0"
+                  className={styles.metric}
                 >
-                  <div className="absolute inset-x-0 top-0 h-[2px] origin-left scale-x-0 bg-emerald-700 transition-transform duration-500 group-hover:scale-x-100" />
-                  <div className="flex items-start justify-between">
-                    <span className="grid h-10 w-10 place-items-center rounded-full bg-emerald-50 text-lg text-emerald-700">
-                      <Icon />
-                    </span>
-                    <span className="font-mono text-[9px] tracking-[0.16em] text-slate-300">0{index + 1}</span>
-                  </div>
-                  <div className="mt-6">
-                    <p className="font-about-display text-4xl font-semibold tracking-[-0.035em] text-slate-950">{stat.value}</p>
-                    <p className="mt-2 text-[9px] font-extrabold uppercase tracking-[0.18em] text-slate-500">{stat.label}</p>
+                  <span className={styles.metricIcon} aria-hidden="true"><Icon /></span>
+                  <div>
+                    <p className={`font-about-display ${styles.metricValue}`}>{stat.value}</p>
+                    <p className={styles.metricLabel}>{stat.label}</p>
                   </div>
                 </MotionDiv>
               );
@@ -701,193 +600,33 @@ export default function AboutUs({ previewData = null }) {
         </div>
       </section>
 
-      {/* ================================================================ DAILY ADIN FEATURE */}
-      <section id="about-media" className="relative overflow-hidden bg-white py-16 sm:py-20 lg:py-28">
-        <div className="pointer-events-none absolute -left-40 bottom-0 h-[380px] w-[380px] rounded-full bg-green-100/45 blur-3xl" />
-        <div className="pointer-events-none absolute right-[-180px] top-16 h-[460px] w-[460px] rounded-full bg-emerald-100/55 blur-3xl" />
-
-        <div className="relative mx-auto max-w-[1540px] px-4 sm:px-6 lg:px-10 xl:px-14">
-          <div className="mb-10 grid gap-6 lg:grid-cols-[1fr_0.78fr] lg:items-end">
-            <div>
-              <SectionEyebrow>{data.mediaEyebrow}</SectionEyebrow>
-
-              <PremiumHeading className="max-w-4xl">
-                {data.mediaTitle}
-              </PremiumHeading>
-            </div>
-
-            <div className="lg:justify-self-end">
-              <p className="max-w-xl text-sm leading-7 text-slate-500">
-                {data.mediaText}
-              </p>
-
-              <div className="mt-4 inline-flex items-center gap-2 rounded-full border border-emerald-100 bg-[#F6FAF7] px-3.5 py-2">
-                <FaRegNewspaper className="text-sm text-emerald-700" />
-                <span className="text-[8px] font-extrabold uppercase tracking-[0.17em] text-emerald-800">
-                  {data.mediaBadge}
-                </span>
-              </div>
-            </div>
-          </div>
-
-          {/* Main editorial composition */}
-          <div className="grid gap-4 lg:grid-cols-[1.18fr_0.82fr]">
-            {/* News Desk — strongest office image */}
-            <button
-              type="button"
-              onClick={() => openGallery(mediaGallery[0], mediaGallery)}
-              className="group relative min-h-[440px] overflow-hidden rounded-[28px] bg-emerald-950 text-left shadow-[0_30px_85px_rgba(15,76,58,0.14)] sm:min-h-[520px] lg:min-h-[650px]"
-            >
-              <img
-                src={mediaGallery[0]?.img}
-                alt={mediaGallery[0]?.title || "Daily Adin News Desk"}
-                className="absolute inset-0 h-full w-full object-cover transition duration-[1100ms] group-hover:scale-[1.03]"
-              />
-
-              <div className="absolute inset-0 bg-gradient-to-t from-emerald-950/88 via-emerald-950/8 to-transparent" />
-
-              <div className="absolute left-5 top-5 flex items-center gap-2 rounded-full border border-white/35 bg-white/12 px-3 py-1.5 text-[8px] font-bold uppercase tracking-[0.17em] text-white backdrop-blur-md sm:left-6 sm:top-6">
-                <span className="h-1.5 w-1.5 rounded-full bg-emerald-300" />
-                News Desk
-              </div>
-
-              <div className="absolute inset-x-0 bottom-0 p-5 sm:p-7 lg:p-9">
-                <p className="text-[8px] font-extrabold uppercase tracking-[0.21em] text-emerald-200 sm:text-[9px]">
-                  Inside Daily Adin
-                </p>
-
-                <h3 className="mt-3 max-w-2xl font-about-display text-3xl font-semibold leading-[1.02] text-white sm:text-4xl lg:text-5xl">
-                  {mediaGallery[0]?.title || "Daily Adin News Desk"}
-                </h3>
-
-                <p className="mt-4 max-w-xl text-sm leading-7 text-white/72">
-                  {mediaGallery[0]?.subtitle}
-                </p>
-
-                <div className="mt-6 inline-flex items-center gap-2 text-[8px] font-bold uppercase tracking-[0.18em] text-white/82 sm:text-[9px]">
-                  View Full Image
-                  <FaArrowRight className="text-[9px] transition-transform group-hover:translate-x-1" />
-                </div>
-              </div>
-            </button>
-
-            {/* Right editorial stack */}
-            <div className="grid gap-4">
-              {/* Front Desk */}
+      <section id="about-media" aria-labelledby="daily-adin-title" className={styles.newsroom}>
+        <div className={styles.shell}>
+          <h2 id="daily-adin-title" className="font-about-display">Daily Adin - newsroom</h2>
+          <div className={styles.newsroomGrid}>
+            {newsroomGallery.map((item, index) => (
               <button
+                key={item.id || `${item.img}-${index}`}
                 type="button"
-                onClick={() => openGallery(mediaGallery[1], mediaGallery)}
-                className="group relative min-h-[300px] overflow-hidden rounded-[26px] bg-emerald-950 text-left shadow-[0_20px_55px_rgba(15,76,58,0.10)] sm:min-h-[320px]"
+                onClick={() => openGallery(item, newsroomGallery)}
+                className={styles.newsroomPhoto}
               >
-                <img
-                  src={mediaGallery[1]?.img}
-                  alt={mediaGallery[1]?.title || "Daily Adin Front Desk"}
-                  className="absolute inset-0 h-full w-full object-cover transition duration-[900ms] group-hover:scale-[1.035]"
-                />
-
-                <div className="absolute inset-0 bg-gradient-to-t from-emerald-950/84 via-transparent to-transparent" />
-
-                <div className="absolute inset-x-0 bottom-0 p-5 sm:p-6">
-                  <p className="text-[8px] font-extrabold uppercase tracking-[0.18em] text-emerald-200">
-                    Front Desk
-                  </p>
-                  <h4 className="mt-2 font-about-display text-2xl font-semibold text-white sm:text-3xl">
-                    {mediaGallery[1]?.title}
-                  </h4>
-                  <p className="mt-2 text-xs leading-5 text-white/70">
-                    {mediaGallery[1]?.subtitle}
-                  </p>
-                </div>
+                <img src={item.img} alt="" loading="lazy" />
+                <span>{item.title || "Daily Adin"}</span>
               </button>
-
-              {/* Print Edition */}
-              <button
-                type="button"
-                onClick={() => openGallery(mediaGallery[2], mediaGallery)}
-                className="group relative min-h-[300px] overflow-hidden rounded-[26px] border border-emerald-100 bg-[#F4F9F5] text-left shadow-[0_18px_50px_rgba(15,76,58,0.08)] sm:min-h-[314px]"
-              >
-                <img
-                  src={mediaGallery[2]?.img}
-                  alt={mediaGallery[2]?.title || "Daily Adin Print Edition"}
-                  className="absolute inset-0 h-full w-full object-cover transition duration-[900ms] group-hover:scale-[1.04]"
-                />
-
-                <div className="absolute inset-0 bg-gradient-to-t from-emerald-950/82 via-emerald-950/3 to-transparent" />
-
-                <div className="absolute inset-x-0 bottom-0 p-5 sm:p-6">
-                  <p className="text-[8px] font-extrabold uppercase tracking-[0.18em] text-emerald-200">
-                    Print Edition
-                  </p>
-                  <h4 className="mt-2 font-about-display text-2xl font-semibold text-white sm:text-3xl">
-                    {mediaGallery[2]?.title}
-                  </h4>
-                  <p className="mt-2 text-xs leading-5 text-white/70">
-                    {mediaGallery[2]?.subtitle}
-                  </p>
-                </div>
-              </button>
-            </div>
-          </div>
-
-          {/* Distribution / readership strip */}
-          <div className="mt-5 rounded-[28px] border border-emerald-100 bg-[#F7FAF7] p-3 sm:p-4 lg:p-5">
-            <div className="mb-4 flex flex-col gap-2 px-1 sm:flex-row sm:items-end sm:justify-between">
-              <div>
-                <p className="text-[8px] font-extrabold uppercase tracking-[0.20em] text-emerald-700">
-                  {data.mediaStripEyebrow}
-                </p>
-                <h3 className="mt-1 font-about-display text-2xl font-semibold text-slate-950">
-                  {data.mediaStripTitle}
-                </h3>
-              </div>
-
-              <p className="max-w-md text-xs leading-5 text-slate-500">
-                {data.mediaStripText}
-              </p>
-            </div>
-
-            <div className="grid grid-cols-1 gap-3 min-[420px]:grid-cols-2 sm:grid-cols-3 lg:grid-cols-5">
-              {mediaGallery.slice(3, 8).map((item, index) => (
-                <button
-                  key={item?.id || index}
-                  type="button"
-                  onClick={() => openGallery(item, mediaGallery)}
-                  className="group relative h-[190px] overflow-hidden rounded-[18px] bg-emerald-50 text-left shadow-[0_10px_28px_rgba(15,76,58,0.06)] sm:h-[220px] lg:h-[235px]"
-                >
-                  <img
-                    src={item?.img}
-                    alt={item?.title}
-                    className="h-full w-full object-cover transition duration-700 group-hover:scale-105"
-                  />
-
-                  <div className="absolute inset-0 bg-gradient-to-t from-emerald-950/78 via-transparent to-transparent" />
-
-                  <div className="absolute inset-x-0 bottom-0 p-3 sm:p-4">
-                    <p className="text-[6px] font-extrabold uppercase tracking-[0.15em] text-emerald-200 sm:text-[7px]">
-                      {item?.type === "paper" ? "Print Media" : "Circulation"}
-                    </p>
-                    <h4 className="mt-1 font-about-display text-sm font-semibold leading-tight text-white sm:text-base">
-                      {item?.title}
-                    </h4>
-                  </div>
-
-                  <div className="pointer-events-none absolute inset-2 rounded-[13px] border border-white/15 opacity-0 transition duration-500 group-hover:opacity-100" />
-                </button>
-              ))}
-            </div>
+            ))}
           </div>
         </div>
       </section>
 
+
       {/* ================================================================ STORY / COMPANY OVERVIEW */}
-      <section id="story" className="relative w-full overflow-hidden bg-gradient-to-b from-[#F7FAF8] via-white to-[#F2F8F4] py-16 sm:py-24 lg:py-32">
+      <section id="story" className={`relative w-full overflow-hidden py-14 sm:py-18 lg:py-24 ${styles.contentBand}`}>
         {/* Soft background ambient blurs */}
-        <div className="pointer-events-none absolute -left-36 top-1/4 h-[480px] w-[480px] rounded-full bg-emerald-100/50 blur-[130px]" />
-        <div className="pointer-events-none absolute -right-36 bottom-10 h-[500px] w-[500px] rounded-full bg-green-100/40 blur-[140px]" />
 
         {/* Full-width responsive container */}
-        <div className="relative w-full px-4 sm:px-8 md:px-12 lg:px-16 xl:px-20 2xl:px-24">
-          <div className="grid items-center gap-12 lg:grid-cols-[1fr_1.12fr] xl:gap-20">
+        <div className={styles.shell}>
+          <div className={styles.overviewGrid}>
             <div>
               {/* Luxury Eyebrow Badge */}
               <div className="mb-5 inline-flex items-center gap-2.5 rounded-full border border-emerald-200/90 bg-emerald-50/70 px-4 py-1.5 shadow-2xs">
@@ -901,47 +640,47 @@ export default function AboutUs({ previewData = null }) {
               </div>
 
               {/* Grand Editorial Headline */}
-              <h2 className="font-about-display text-3xl sm:text-5xl lg:text-6xl font-medium tracking-[-0.035em] text-slate-950 leading-[1.08] max-w-2xl">
+              <h2 className={`font-about-display ${styles.overviewTitle}`}>
                 {data.overviewTitle || "A trusted name in real estate and urban development"}
               </h2>
 
               {/* Lead Paragraph */}
-              <p className="mt-6 text-base sm:text-lg leading-relaxed text-slate-700 font-medium">
+              <p className={styles.overviewLead}>
                 {data.overviewText}
               </p>
 
               {/* Detailed Paragraphs */}
-              <div className="mt-6 space-y-4 border-t border-emerald-100/90 pt-6">
+              <div className={styles.overviewParagraphs}>
                 {data.overviewParagraphs?.slice(0, 2).map((paragraph, index) => (
-                  <p key={index} className="text-sm sm:text-base leading-relaxed text-slate-600">
+                  <p key={index}>
                     {paragraph}
                   </p>
                 ))}
               </div>
 
               {/* Strengths Cards */}
-              <div className="mt-8 grid gap-4 sm:grid-cols-2">
-                <div className="group rounded-[22px] border border-emerald-100 bg-white p-5 sm:p-6 shadow-[0_8px_24px_rgba(15,76,58,0.05)] transition-all duration-300 hover:border-emerald-300 hover:shadow-xl hover:-translate-y-1">
-                  <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-emerald-50 text-emerald-700 transition duration-300 group-hover:bg-emerald-700 group-hover:text-white shadow-2xs">
-                    <HiOutlineClock className="text-2xl" />
+              <div className="mt-6 grid gap-3 sm:grid-cols-2">
+                <div className="group rounded-[22px] border border-emerald-100 bg-white p-4 shadow-[0_8px_24px_rgba(15,76,58,0.05)] transition-all duration-300 hover:border-emerald-300 hover:shadow-xl hover:-translate-y-1">
+                  <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-emerald-50 text-emerald-700 transition duration-300 group-hover:bg-emerald-700 group-hover:text-white shadow-2xs">
+                    <HiOutlineClock className="text-xl" />
                   </div>
-                  <p className="mt-4 text-base font-bold text-slate-900">
+                  <p className="mt-3 text-[0.9375rem] font-bold text-slate-900">
                     {data.strengths?.[0]?.title || "Planned Development"}
                   </p>
-                  <p className="mt-1.5 text-xs sm:text-sm leading-relaxed text-slate-500">
+                  <p className="mt-1.5 text-sm leading-relaxed text-slate-600">
                     {data.strengths?.[0]?.text ||
                       "Residential and industrial communities shaped around long-term value, access, and daily convenience."}
                   </p>
                 </div>
 
-                <div className="group rounded-[22px] border border-emerald-100 bg-white p-5 sm:p-6 shadow-[0_8px_24px_rgba(15,76,58,0.05)] transition-all duration-300 hover:border-emerald-300 hover:shadow-xl hover:-translate-y-1">
-                  <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-emerald-50 text-emerald-700 transition duration-300 group-hover:bg-emerald-700 group-hover:text-white shadow-2xs">
-                    <HiOutlineChartBar className="text-2xl" />
+                <div className="group rounded-[22px] border border-emerald-100 bg-white p-4 shadow-[0_8px_24px_rgba(15,76,58,0.05)] transition-all duration-300 hover:border-emerald-300 hover:shadow-xl hover:-translate-y-1">
+                  <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-emerald-50 text-emerald-700 transition duration-300 group-hover:bg-emerald-700 group-hover:text-white shadow-2xs">
+                    <HiOutlineChartBar className="text-xl" />
                   </div>
-                  <p className="mt-4 text-base font-bold text-slate-900">
+                  <p className="mt-3 text-[0.9375rem] font-bold text-slate-900">
                     {data.strengths?.[1]?.title || "Sustainable Living"}
                   </p>
-                  <p className="mt-1.5 text-xs sm:text-sm leading-relaxed text-slate-500">
+                  <p className="mt-1.5 text-sm leading-relaxed text-slate-600">
                     {data.strengths?.[1]?.text ||
                       "Green spaces, civic facilities, and organized layouts guide our approach to healthier township growth."}
                   </p>
@@ -950,7 +689,7 @@ export default function AboutUs({ previewData = null }) {
             </div>
 
             {/* Visual Composition - Refined layered architectural and workspace photos */}
-            <div className="relative min-h-[430px] sm:min-h-[640px] lg:min-h-[680px]">
+            <div className={styles.overviewPhotos}>
               {/* Ambient Glow */}
               <div className="absolute inset-0 rounded-[44px] bg-gradient-to-tr from-emerald-500/10 via-transparent to-amber-500/10 blur-xl" />
 
@@ -974,7 +713,7 @@ export default function AboutUs({ previewData = null }) {
               </div>
 
               {/* Floating Luxury Group Vision Badge */}
-              <div className="absolute bottom-[6%] left-[4%] sm:left-[6%] z-20 max-w-[310px] rounded-[24px] bg-[#0A1628] p-5 sm:p-6 text-white shadow-[0_24px_60px_rgba(10,22,40,0.40)] border border-slate-700/80 backdrop-blur-xl">
+              <div className="absolute bottom-[6%] left-[4%] sm:left-[6%] z-20 max-w-[min(82%,250px)] rounded-[18px] bg-[#0A1628] p-4 text-white shadow-[0_24px_60px_rgba(10,22,40,0.40)] border border-slate-700/80 backdrop-blur-xl">
                 <div className="flex items-center gap-2">
                   <span className="relative flex h-2 w-2">
                     <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-emerald-400 opacity-75" />
@@ -984,7 +723,7 @@ export default function AboutUs({ previewData = null }) {
                     Group Vision
                   </p>
                 </div>
-                <p className="mt-2.5 font-about-display text-lg sm:text-xl font-semibold leading-snug text-white">
+                <p className="mt-2 text-sm sm:text-base font-semibold leading-snug text-white">
                   {data.overviewHighlightTitle || "Planned projects shaped around trust and long-term value"}
                 </p>
               </div>
@@ -1001,14 +740,14 @@ export default function AboutUs({ previewData = null }) {
       </section>
 
       {/* ================================================================ OFFICE / WORKSPACES */}
-      <section id="about-office" className="bg-white py-16 sm:py-20 lg:py-28">
+      <section id="about-office" className={`py-16 sm:py-20 lg:py-28 ${styles.contentBand}`}>
         <div className="mx-auto max-w-[1540px] px-4 sm:px-6 lg:px-10 xl:px-14">
           <div className="mb-10 grid gap-6 lg:grid-cols-[1fr_0.8fr] lg:items-end">
             <div>
               <SectionEyebrow>{data.officeEyebrow}</SectionEyebrow>
-              <PremiumHeading className="max-w-3xl">
+              <h2 className={styles.workspaceTitle}>
                 {data.officeTitle}
-              </PremiumHeading>
+              </h2>
             </div>
 
             <p className="max-w-xl text-sm leading-7 text-slate-500 lg:justify-self-end">
@@ -1080,13 +819,13 @@ export default function AboutUs({ previewData = null }) {
         className="relative bg-[#F6FAF7] overflow-hidden"
       >
         <div
-          className="relative w-full flex flex-col py-10 sm:py-16 lg:py-20 px-4 sm:px-6 lg:px-8 xl:px-10 2xl:px-14"
+          className="relative w-full flex flex-col py-12 sm:py-16 lg:py-24 px-4 sm:px-6 lg:px-8"
         >
           <div className="pointer-events-none absolute -left-28 top-24 h-72 w-72 rounded-full bg-emerald-100/55 blur-3xl" />
           <div className="pointer-events-none absolute -right-28 bottom-12 h-80 w-80 rounded-full bg-green-100/45 blur-3xl" />
 
         {/* Header — aligned with cards */}
-        <div className="relative w-full max-w-[1360px] mx-auto mb-8 lg:mb-10">
+        <div className="relative w-full mb-8 lg:mb-10">
           <div className="grid gap-6 lg:grid-cols-[1fr_0.82fr] lg:items-end">
             <div>
               <MotionDiv
@@ -1134,11 +873,11 @@ export default function AboutUs({ previewData = null }) {
           onPointerMove={handleLeadershipPointerMove}
           onPointerUp={handleLeadershipPointerUp}
           onPointerCancel={handleLeadershipPointerUp}
-          className="relative w-full cursor-grab touch-pan-x select-none overflow-x-auto lg:overflow-visible overscroll-x-contain scrollbar-hide pb-4 pt-2"
+          className="relative w-full cursor-grab touch-pan-x select-none overflow-x-auto min-[1440px]:overflow-visible overscroll-x-contain scrollbar-hide pb-4 pt-2"
         >
           <div
             ref={leadershipTrackRef}
-            className="flex min-w-max lg:min-w-0 lg:w-full max-w-[1360px] mx-auto lg:grid lg:grid-cols-7 gap-3 sm:gap-4 lg:gap-3.5 xl:gap-4 will-change-transform py-2"
+            className={styles.leadershipTrack}
           >
             {managementTeam.map((leader, index) => (
               <MotionDiv
@@ -1147,7 +886,7 @@ export default function AboutUs({ previewData = null }) {
                 whileInView={{ opacity: 1, y: 0, scale: 1 }}
                 viewport={{ once: true, margin: "-40px" }}
                 transition={{ duration: 0.5, delay: index * 0.05 }}
-                className="w-[165px] sm:w-[180px] lg:w-full shrink-0 lg:shrink aspect-[175/270]"
+                className={styles.leadershipCard}
               >
                 <button
                   type="button"
@@ -1163,11 +902,11 @@ export default function AboutUs({ previewData = null }) {
                   <div className="absolute inset-0 bg-gradient-to-t from-emerald-950/95 via-emerald-950/40 via-30% to-transparent to-60%" />
                   <div className="pointer-events-none absolute inset-2 rounded-[14px] border border-white/20 opacity-70 transition-all duration-500 group-hover:border-emerald-200/90 group-hover:opacity-100" />
                   <div className="absolute inset-x-0 bottom-0 z-20 p-2.5 sm:p-3">
-                    <p className="text-[7px] font-extrabold uppercase tracking-[0.16em] text-emerald-300 sm:text-[7.5px] truncate drop-shadow-sm">{leader.role}</p>
-                    <h3 className="mt-0.5 font-about-display text-[12px] sm:text-[13px] font-semibold leading-tight text-white drop-shadow-sm line-clamp-2">{leader.name}</h3>
+                    <p className="text-[10px] font-extrabold uppercase tracking-[0.16em] text-emerald-300 break-words drop-shadow-sm">{leader.role}</p>
+                    <h3 className="mt-0.5 font-about-display text-sm sm:text-base font-semibold leading-tight text-white drop-shadow-sm break-words">{leader.name}</h3>
                     <div className="mt-1.5 flex items-center gap-1.5">
                       <span className="h-px w-4 bg-emerald-300/90 transition-all duration-500 group-hover:w-6" />
-                      <span className="text-[6px] font-bold uppercase tracking-[0.14em] text-white/80 group-hover:text-emerald-200 sm:text-[6.5px]">View Profile</span>
+                      <span className="text-[9px] font-bold uppercase tracking-[0.14em] text-white/80 group-hover:text-emerald-200">View Profile</span>
                     </div>
                   </div>
                   <div className="pointer-events-none absolute inset-x-0 bottom-0 h-[2px] origin-left scale-x-0 bg-gradient-to-r from-emerald-400 to-teal-300 transition-transform duration-500 group-hover:scale-x-100" />
@@ -1181,7 +920,7 @@ export default function AboutUs({ previewData = null }) {
 
       {/* ================================================================ VIDEO */}
       {embedUrl && (
-        <section id="about-video" className="bg-white py-16 sm:py-20 lg:py-28">
+        <section id="about-video" className={`py-16 sm:py-20 lg:py-28 ${styles.contentBand}`}>
           <div className="mx-auto grid max-w-[1540px] items-center gap-8 px-4 sm:px-6 lg:grid-cols-[0.72fr_1.28fr] lg:gap-12 lg:px-10 xl:px-14">
             <div>
               <SectionEyebrow>
@@ -1216,9 +955,7 @@ export default function AboutUs({ previewData = null }) {
 
       {/* ================================================================ COMMUNITY */}
       {Array.isArray(data.csrImages) && data.csrImages.length > 0 && (
-        <section id="about-csr" className="relative overflow-hidden bg-[#0a1628] py-20 sm:py-28 lg:py-32">
-          <div className="pointer-events-none absolute -left-40 top-1/3 h-[500px] w-[500px] rounded-full bg-emerald-900/20 blur-[100px]" />
-          <div className="pointer-events-none absolute -right-40 bottom-1/4 h-[400px] w-[400px] rounded-full bg-[#f3b128]/8 blur-[100px]" />
+        <section id="about-csr" className={`relative overflow-hidden py-20 sm:py-28 lg:py-32 ${styles.contentBand}`}>
           <div className="absolute inset-x-0 top-0 h-[1px] bg-gradient-to-r from-transparent via-[#f3b128]/50 to-transparent" />
 
           <div className="relative mx-auto max-w-[1540px] px-4 sm:px-6 lg:px-10 xl:px-14">
@@ -1336,7 +1073,7 @@ export default function AboutUs({ previewData = null }) {
       )}
 
       {/* ================================================================ MISSION */}
-      <section id="about-mission" className="bg-white py-16 sm:py-20 lg:py-28">
+      <section id="about-mission" className={`py-16 sm:py-20 lg:py-28 ${styles.contentBand}`}>
         <div className="mx-auto grid max-w-[1540px] gap-10 px-4 sm:px-6 lg:grid-cols-[0.7fr_1.3fr] lg:gap-16 lg:px-10 xl:px-14">
           <MotionDiv
             initial={{ opacity: 0, x: -24 }}
@@ -1592,4 +1329,6 @@ export default function AboutUs({ previewData = null }) {
       </AnimatePresence>
     </main>
   );
+
+  return <MotionConfig reducedMotion="user">{page}</MotionConfig>;
 }

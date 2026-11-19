@@ -85,6 +85,7 @@
 import { useEffect } from "react";
 import { usePartnerStore } from "../../store/partners/partnersStore";
 import PartnerCard from './PartnerCard';
+import { includeOfficialConcerns } from "../../components/ConcernLogo";
 import { FaSpinner } from "react-icons/fa";
 
 // const partners = [
@@ -112,6 +113,11 @@ const Partners = ({ title = "Our Concern" }) => {
       );
     }
 
+  const concerns = includeOfficialConcerns(partners.filter((partner) => partner.partnersImage).map((partner) => ({
+    name: partner.title || partner.name,
+    logo: partner.partnersImage,
+  })));
+
   return (
     <div className="mx-auto px-5 py-6 lg:py-12">
       <h2
@@ -126,13 +132,13 @@ const Partners = ({ title = "Our Concern" }) => {
         <div className="flex animate-marquee gap-8 w-max">
 
           {/* FIRST SET */}
-          {partners.map((partner, i) => (
-            <PartnerCard key={`p1-${i}`} img={partner.partnersImage} />
+          {concerns.map((concern, i) => (
+            <PartnerCard key={`p1-${i}`} concern={concern} />
           ))}
 
           {/* DUPLICATE SET */}
-          {partners.map((partner, i) => (
-            <PartnerCard key={`p2-${i}`} img={partner.partnersImage} />
+          {concerns.map((concern, i) => (
+            <PartnerCard key={`p2-${i}`} concern={concern} />
           ))}
 
         </div>
